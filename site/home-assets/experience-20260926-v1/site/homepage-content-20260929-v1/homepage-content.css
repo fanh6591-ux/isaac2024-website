@@ -1,0 +1,18 @@
+.home-page #hello .hero-footnote>span:first-child{max-width:32em;line-height:1.8;text-wrap:pretty}
+/* Consolidated consultation copy retains the original hand and skull scene. */
+.home-page #real-demand .story-copy>p{font-size:clamp(14px,1.18vw,20px);line-height:1.8;text-wrap:pretty}
+.home-page[data-layout=centerpiece] .hero-drag-hint{display:none}
+@media(max-width:700px){.home-page #real-demand .story-copy>p{font-size:13px;line-height:1.75}}
+/* The relocated paragraph must remain readable on small screens. */
+@media(max-width:700px){
+ .home-page #hello .hero-footnote{display:block;left:24px;right:24px;bottom:88px;width:auto;min-width:0;padding:12px 15px;font-size:12px;line-height:1.8;letter-spacing:.02em;background:#21352e80;backdrop-filter:blur(8px)}
+ .home-page #hello .hero-footnote>span:last-child{display:none}
+ .home-page #hello .story-copy>.scene-note{display:none}
+ .home-page #hello .story-copy>p{bottom:calc(190px - 13svh);font-size:22px;line-height:1.4}
+ .home-page[data-layout=desk] .hero-drag-hint{bottom:278px}
+}
+@media(orientation:landscape) and (max-height:520px){
+ .home-page #hello .hero-footnote{display:block;left:4.5%;right:auto;bottom:72px;width:35%;min-width:0;padding:12px 15px;font-size:11px;line-height:1.65}
+ .home-page #hello .story-copy>.scene-note{display:none}
+}
+.home-page.scene-unavailable #hello .hero-footnote{display:block;position:relative;left:auto;right:auto;bottom:auto;width:84%;max-width:760px;min-width:0;margin:0 auto 72px;opacity:1}

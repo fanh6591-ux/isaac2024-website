@@ -1,0 +1,31 @@
+.ai-support-page .ai-support-index summary {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  cursor:pointer;
+}
+.ai-support-page .ai-support-index summary span {
+  display:inline;
+  font-size:19px;
+  font-weight:300;
+  line-height:1;
+  transition:transform .2s ease;
+}
+.ai-support-page .ai-support-index[open] summary span { transform:rotate(45deg); }
+.ai-support-page .ai-support-index summary:hover { color:#fff; }
+.ai-support-page .ai-support-index summary:focus-visible {
+  outline:1px solid #fff;
+  outline-offset:4px;
+}
+.ai-knowledge-page .ai-support-intro { border-bottom-color:#303039; }
+.ai-knowledge-page .ai-support-intro h1 { font-size:clamp(42px,5.6vw,78px); }
+.ai-knowledge-page .ai-support-index { border-top-color:#303039; }
+.ai-knowledge-page .ai-support-content > .product-panel { border-top-color:#303039; }
+.ai-knowledge-page .ai-support-content .breadcrumb { display:none !important; }
+@media (max-width:1100px) {
+  .ai-support-page .ai-support-index summary { min-height:52px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .ai-support-page .ai-support-index summary span { transition:none; }
+}

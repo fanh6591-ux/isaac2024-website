@@ -1,0 +1,127 @@
+/* The catalog is a directory. The product pages carry the explanations. */
+.services-directory-page .faq-document-heading { margin-bottom: 26px; }
+.services-directory-page .catalog-inventory { padding: 0 0 48px; }
+.services-directory-page .catalog-unit,
+.services-directory-page .catalog-standalone,
+.services-directory-page .catalog-member,
+.services-directory-page .faq-index { border: 0; }
+
+.services-directory-page .catalog-unit {
+  margin: 0 0 8px;
+  padding: 0;
+  scroll-margin-top: 110px;
+}
+.services-directory-page .catalog-standalone,
+.services-directory-page #industrial-plc-simulation {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 84px;
+  padding: 18px 62px 18px 22px;
+  border-radius: 12px;
+  background: transparent;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.services-directory-page .catalog-standalone h2,
+.services-directory-page #industrial-plc-simulation h2,
+.services-directory-page .catalog-collection h2 {
+  margin: 0;
+  color: #f7f7f7;
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 500;
+  line-height: 1.35;
+}
+.services-directory-page .catalog-standalone::after,
+.services-directory-page #industrial-plc-simulation::after,
+.services-directory-page .catalog-member::after {
+  content: "↗";
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  color: #999;
+  font-size: 20px;
+  font-weight: 300;
+  transform: translateY(-50%);
+}
+.services-directory-page .catalog-standalone:hover,
+.services-directory-page #industrial-plc-simulation:hover,
+.services-directory-page .catalog-member:hover {
+  background: #151515;
+  box-shadow: none;
+  transform: translateX(3px);
+}
+
+.services-directory-page .catalog-collection {
+  border-radius: 12px;
+}
+.services-directory-page .customer-service-disclosure {
+  margin: 0;
+  border: 0;
+}
+.services-directory-page .customer-service-disclosure > summary {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 84px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  transition: background-color .2s ease;
+}
+.services-directory-page .customer-service-disclosure > summary:hover,
+.services-directory-page .customer-service-disclosure[open] > summary { background: #151515; }
+.services-directory-page .customer-service-disclosure .disclosure-mark { color: #aaa; }
+.services-directory-page .catalog-members { padding: 8px 0 12px 22px; }
+.services-directory-page .catalog-member {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 58px;
+  margin: 2px 0;
+  padding: 10px 52px 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  scroll-margin-top: 110px;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.services-directory-page .catalog-entry-content h3 {
+  margin: 0;
+  color: #dfdfdf;
+  font-size: clamp(17px, 1.5vw, 20px);
+  font-weight: 400;
+  line-height: 1.4;
+}
+.services-directory-page .catalog-member::after { right: 18px; font-size: 17px; }
+
+.services-directory-page #lab-products #industrial-plc-simulation {
+  margin: 0;
+  border: 0;
+  text-decoration: none;
+}
+.services-directory-page .faq-index [data-catalog-target],
+.services-directory-page .faq-index .product-category-index > a {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.services-directory-page .faq-index .catalog-index-group { margin-bottom: 7px; }
+.services-directory-page .faq-index .catalog-index-member { padding-top: 8px; padding-bottom: 8px; }
+.services-directory-page .faq-index .catalog-directory-search + nav { margin-top: 14px; }
+
+@media (max-width: 760px) {
+  .services-directory-page .faq-document-heading { margin-bottom: 16px; }
+  .services-directory-page .catalog-standalone,
+  .services-directory-page #industrial-plc-simulation,
+  .services-directory-page .customer-service-disclosure > summary { min-height: 70px; padding: 14px 18px; }
+  .services-directory-page .catalog-standalone,
+  .services-directory-page #industrial-plc-simulation { padding-right: 50px; }
+  .services-directory-page .catalog-members { padding-left: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .services-directory-page .catalog-standalone,
+  .services-directory-page #industrial-plc-simulation,
+  .services-directory-page .catalog-member,
+  .services-directory-page .customer-service-disclosure > summary { transition: none; }
+}

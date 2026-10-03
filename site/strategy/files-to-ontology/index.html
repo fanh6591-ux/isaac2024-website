@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palantir Foundry：从一堆文件到 Ontology，到底发生了什么？</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --text:#1a1a1a;--text2:#2d2d2d;--text3:#6b6b6b;--text4:#9e9e9e;
+  --bg:#ffffff;--bg2:#fafaf8;--border:#d4d4d4;
+  --blue:#0066ff;--cyan:#00d4ff;--coral:#ff6b6b;--green:#00d084;--amber:#ffb84d;
+  --code-bg:#2d2d2d;
+  --font:'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono','Fira Code','SF Mono',Consolas,monospace;
+}
+html{font-size:18px;scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--text2);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased}
+article{max-width:760px;margin:0 auto;padding:64px 24px 80px}
+h1{font-size:2.4rem;font-weight:700;color:var(--text);line-height:1.25;margin-bottom:16px;letter-spacing:-0.03em}
+h2{font-size:1.5rem;font-weight:700;color:var(--text);line-height:1.3;margin:56px 0 20px;padding-top:32px;border-top:1px solid var(--border)}
+h3{font-size:1.15rem;font-weight:600;color:var(--text);line-height:1.4;margin:36px 0 12px}
+h4{font-size:1rem;font-weight:600;color:var(--text3);margin:24px 0 8px;text-transform:uppercase;letter-spacing:.04em;font-size:.82rem}
+p{margin-bottom:18px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.subtitle{font-size:1.1rem;color:var(--text3);line-height:1.6;margin-bottom:40px}
+.meta{font-size:.8rem;color:var(--text4);margin-bottom:40px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+mark{background:linear-gradient(180deg,transparent 60%,rgba(0,102,255,.12) 60%);padding:0 2px}
+.hl{color:var(--blue);font-weight:600}
+blockquote{border-left:3px solid var(--blue);margin:24px 0;padding:16px 20px;background:var(--bg2);border-radius:0 6px 6px 0;font-size:.9rem;color:var(--text3);line-height:1.6}
+blockquote em{font-style:normal;color:var(--text2)}
+blockquote .src{display:block;margin-top:8px;font-size:.8rem;color:var(--text4)}
+code{font-family:var(--mono);font-size:.85em;background:var(--bg2);padding:2px 6px;border-radius:3px;color:var(--blue)}
+pre{background:var(--code-bg);color:#e0e0e0;padding:20px 24px;border-radius:8px;overflow-x:auto;font-family:var(--mono);font-size:.8rem;line-height:1.65;margin:20px 0}
+pre code{background:none;padding:0;color:inherit}
+.kw{color:#7dd3fc}.str{color:#86efac}.cm{color:#9e9e9e}.fn{color:#c4b5fd}
+.table-wrap{overflow-x:auto;margin:20px 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--bg2);font-weight:600;text-align:left;padding:10px 14px;border-bottom:2px solid var(--border);color:var(--text);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:var(--bg2)}
+.diagram{margin:32px 0;text-align:center}
+.diagram svg{max-width:100%;height:auto}
+.callout{margin:24px 0;padding:20px 24px;border-radius:8px;font-size:.92rem;line-height:1.65}
+.callout-blue{background:#f0f5ff;border-left:3px solid var(--blue)}
+.callout-coral{background:#fff5f5;border-left:3px solid var(--coral)}
+.callout-green{background:#f0faf5;border-left:3px solid var(--green)}
+.callout b{color:var(--text)}
+.stage{margin:32px 0;padding:28px;background:var(--bg2);border-radius:10px}
+.stage-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.stage-num{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.stage-title{font-size:1.15rem;font-weight:700;color:var(--text)}
+.layer-row{display:grid;grid-template-columns:100px 1fr 100px;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);align-items:start}
+.layer-row:last-child{border-bottom:none}
+.layer-label{font-weight:700;color:var(--blue);font-size:.85rem}
+.layer-reuse{font-size:.82rem;color:var(--green);font-weight:600;text-align:right}
+.footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);text-align:center;font-size:.82rem;color:var(--text4)}
+@media(max-width:640px){
+  html{font-size:16px}
+  h1{font-size:1.8rem}
+  article{padding:40px 16px 60px}
+  .stage{padding:20px 16px}
+  .layer-row{grid-template-columns:80px 1fr 80px;gap:10px}
+}
+</style>
+<meta name="description" content="沿着资料处理、结构化与业务建模，拆解文件如何成为可使用的 Ontology。"><link rel="canonical" href="https://isaac2024.online/strategy/files-to-ontology/"><link rel="stylesheet" href="/ontology-readings-20260930-v1/reading.css"></head>
+<body>
+<article>
+
+<p class="meta">
+  <span>ZeroFutureTech</span>
+  <span>·</span>
+  <span>AI Learning</span>
+  <span>·</span>
+  <span>约 25 分钟阅读</span>
+</p>
+
+<h1>Palantir Foundry：<br>从一堆文件到 Ontology，<br>到底发生了什么？</h1>
+
+<p class="subtitle">拆解 Foundry 数据集成的完整链路——从原始文件落地，到结构化清洗，到 Ontology 建模。用航空运营场景贯穿始终，所有技术细节标注官方出处。</p>
+
+<p>多数 Palantir 的分析文章从 Ontology 讲起，告诉你"它是组织的数字孪生"，然后就直接跳到 AIP Agent。但中间那段——<mark>一堆散乱的文件是怎么变成可操作的 Ontology 对象的</mark>——很少有人完整拆解。</p>
+
+<p>这条链路才是 Palantir 真正的基本功。如果你不理解 pipeline，就无法判断 Ontology 的能力边界和部署成本。</p>
+
+<!-- ============================================ -->
+<!-- FULL PIPELINE OVERVIEW -->
+<!-- ============================================ -->
+<h2>全链路：五个阶段</h2>
+
+<p>我们用一个<b>航空公司运营系统</b>的场景来走这条链路。假设你是某航空公司的数字化负责人，手上有三类数据：结构化的航班运营 CSV、半结构化的乘客预订 JSON、非结构化的维修报告 PDF。</p>
+
+<div class="diagram">
+<svg viewBox="0 0 720 520" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/></marker>
+  </defs>
+  <rect x="40" y="20" width="190" height="48" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="135" y="49" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">CSV / Parquet（结构化）</text>
+  <rect x="265" y="20" width="190" height="48" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="360" y="49" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">JSON / XML（半结构化）</text>
+  <rect x="490" y="20" width="190" height="48" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="585" y="49" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">PDF / 图片（非结构化）</text>
+  <line x1="135" y1="68" x2="135" y2="108" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <line x1="360" y1="68" x2="360" y2="108" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <line x1="585" y1="68" x2="585" y2="108" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <rect x="40" y="108" width="640" height="50" rx="8" fill="#fafaf8" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="60" y="128" font-size="11" fill="#0066ff" font-weight="700">STAGE 1</text>
+  <text x="60" y="146" font-size="14" font-weight="600" fill="#1a1a1a">Data Connection</text>
+  <text x="280" y="138" font-size="12" fill="#6b6b6b">200+ connectors · Batch / Streaming / CDC · 数据原封不动拉入</text>
+  <line x1="360" y1="158" x2="360" y2="198" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <rect x="40" y="198" width="640" height="50" rx="8" fill="#fafaf8" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="60" y="218" font-size="11" fill="#0066ff" font-weight="700">STAGE 2</text>
+  <text x="60" y="236" font-size="14" font-weight="600" fill="#1a1a1a">Raw Datasets</text>
+  <text x="280" y="228" font-size="12" fill="#6b6b6b">版本化文件容器 · "Git for Data" · Dataset / Media Set 两种存储</text>
+  <line x1="135" y1="248" x2="135" y2="288" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <line x1="360" y1="248" x2="360" y2="288" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <line x1="585" y1="248" x2="585" y2="288" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <rect x="40" y="288" width="190" height="56" rx="6" fill="#fff" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="135" y="312" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a1a">Schema 推断</text>
+  <text x="135" y="330" text-anchor="middle" font-size="11" fill="#6b6b6b">自动识别列 &amp; 类型</text>
+  <rect x="265" y="288" width="190" height="56" rx="6" fill="#fff" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="360" y="312" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a1a">JSON/XML 解析</text>
+  <text x="360" y="330" text-anchor="middle" font-size="11" fill="#6b6b6b">嵌套结构 → 表格</text>
+  <rect x="490" y="288" width="190" height="56" rx="6" fill="#fff" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="585" y="312" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a1a">AIP Doc Intelligence</text>
+  <text x="585" y="330" text-anchor="middle" font-size="11" fill="#6b6b6b">OCR + VLM → Markdown</text>
+  <text x="20" y="316" font-size="11" fill="#0066ff" font-weight="700" transform="rotate(-90 20 316)">STAGE 3</text>
+  <line x1="135" y1="344" x2="135" y2="374" stroke="#6b6b6b" stroke-width="1"/>
+  <line x1="360" y1="344" x2="360" y2="374" stroke="#6b6b6b" stroke-width="1"/>
+  <line x1="585" y1="344" x2="585" y2="374" stroke="#6b6b6b" stroke-width="1"/>
+  <line x1="135" y1="374" x2="585" y2="374" stroke="#6b6b6b" stroke-width="1"/>
+  <line x1="360" y1="374" x2="360" y2="398" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <rect x="100" y="398" width="520" height="50" rx="8" fill="#fafaf8" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="120" y="418" font-size="11" fill="#0066ff" font-weight="700">STAGE 4</text>
+  <text x="120" y="436" font-size="14" font-weight="600" fill="#1a1a1a">Curated Datasets</text>
+  <text x="310" y="428" font-size="12" fill="#6b6b6b">清洗、拼接、schema 验证后的标准表格数据</text>
+  <line x1="360" y1="448" x2="360" y2="478" stroke="#6b6b6b" stroke-width="1" marker-end="url(#a)"/>
+  <rect x="60" y="478" width="600" height="36" rx="8" fill="#0066ff"/>
+  <text x="360" y="501" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">STAGE 5 · Ontology：Object Types → Properties → Links → Actions</text>
+</svg>
+</div>
+
+<!-- ============================================ -->
+<!-- STAGE 1 -->
+<!-- ============================================ -->
+<div class="stage">
+  <div class="stage-header"><div class="stage-num">1</div><div class="stage-title">Data Connection — 数据原封不动拉进来</div></div>
+  <p>Foundry 的第一原则是 <b>as-is ingestion</b>——数据从源系统拉进来时不做任何预处理。</p>
+  <blockquote><em>"Foundry is also distinguished by a philosophy that data should be ingested 'as-is' from its most raw source, with no external preprocessing."</em><span class="src">— Data Connection Overview, Palantir Docs</span></blockquote>
+  <p>为什么？因为一旦所有变换都在 Foundry 内部完成，从 Ontology 的任何一个 property value，都能顺着 pipeline 一路追溯到原始文件的某一行。这就是 <span class="hl">end-to-end data lineage</span>。</p>
+  <p>连接方式：通过 <b>200+ 种连接器</b>对接外部系统（数据库、ERP、API、文件系统、IoT 流），通过 <b>Batch Sync</b>（全量 SNAPSHOT 或增量 APPEND）将数据拉入 Foundry。</p>
+</div>
+
+<!-- ============================================ -->
+<!-- STAGE 2: Dataset & Media Set -->
+<!-- ============================================ -->
+<div class="stage">
+  <div class="stage-header"><div class="stage-num">2</div><div class="stage-title">Raw Dataset — Foundry 的数据存储单元</div></div>
+
+  <p>在深入 pipeline 之前，有必要先理解 Foundry 里<mark>"数据"到底是怎么存的</mark>——这直接决定了后续 pipeline 能对它做什么操作。</p>
+
+  <h3>Dataset：Foundry 的核心存储抽象</h3>
+
+  <p>在 Foundry 里，<b>Dataset 不是一张表，而是一个版本化的文件容器</b>。它可以承载三类数据：</p>
+
+  <blockquote><em>"Datasets are used to store and represent all types of data—structured, unstructured, and semi-structured: Structured (tabular) data consists of files in an open-source format such as Parquet, along with metadata about the columns. Unstructured datasets consist of files such as images, video, or PDFs, but do not have an associated schema. Semi-structured datasets contain file formats such as XML or JSON."</em><span class="src">— Core Concepts: Datasets, Palantir Docs</span></blockquote>
+
+  <div class="table-wrap">
+  <table>
+    <tr><th>形态</th><th>存储格式</th><th>Schema</th><th>航空场景</th></tr>
+    <tr><td><b>结构化</b></td><td>Parquet 文件 + schema 元数据</td><td>有（列名 + 类型）</td><td><code>raw_flight_operations</code></td></tr>
+    <tr><td><b>半结构化</b></td><td>JSON / XML 原始文件</td><td>可推断，建议下游处理</td><td><code>raw_passenger_bookings</code></td></tr>
+    <tr><td><b>非结构化</b></td><td>原始二进制文件</td><td>无（unstructured dataset）</td><td>可存，但缺乏媒体处理工作流支持</td></tr>
+  </table>
+  </div>
+
+  <p>Dataset 的每次变更都是一个原子性 <b>Transaction</b>，类比 Git 的 commit。四种事务类型：SNAPSHOT（全量替换当前视图）、APPEND（增量追加）、UPDATE（更新）、DELETE（删除）。这就是 Palantir 所说的 <span class="hl">"Git for Data"</span>——任何中间步骤出问题，都可以回溯到历史版本。</p>
+
+  <h3>Media Set：面向媒体处理工作流的专用抽象</h3>
+
+  <p>Dataset 技术上可以存非结构化文件，但在面向大规模文档、图片、音视频处理的场景下，工程实践中通常使用 <b>Media Set</b>——因为它在 Dataset 的存储基础之上，专门提供了 media item 管理、media reference 关联、媒体格式转换、以及后续 AI 提取工作流（Document Intelligence）的集成支持。</p>
+
+  <blockquote><em>"A media set is a collection of media files with a common schema, for example, files of the same format. Media sets are designed to work with high-scale, unstructured data and enable the processing of media items such as audio, imagery, video, and documents."</em><span class="src">— Core Concepts: Media Sets, Palantir Docs</span></blockquote>
+
+  <p>Media Set 有两个关键属性：</p>
+
+  <p><b>Schema Type（文件类别）</b>——定义这个 Media Set 存什么类型的文件：document、image、audio、video、spreadsheet、dicom、email。创建时必须选定，之后只接受匹配类型的文件上传。</p>
+
+  <p><b>Primary Format（主格式）</b>——指定文件的标准格式（如 PDF、PNG、MP4）。你也可以设定 additional input formats，上传时会自动转换为主格式。</p>
+
+  <p>Media Set 里的每个文件叫 <b>Media Item</b>，有唯一的 <code>media_item_rid</code>。关键设计是 <b>Media Reference</b>——你可以在 tabular dataset 里用一个特殊列引用 media item，把非结构化内容和结构化元数据关联起来：</p>
+
+  <blockquote><em>"You can use media references to reference media set items in datasets. This is useful for associating media items with metadata or other information in a tabular format. For example, you can associate the original PDF with its file name, page count, and extracted text as additional columns."</em><span class="src">— Media Sets Overview, Palantir Docs</span></blockquote>
+
+  <p>航空场景：维修报告 PDF 存储在一个 schema type 为 <code>document</code>、primary format 为 <code>PDF</code> 的 Media Set 里。后续 pipeline 提取出的结构化信息（报告编号、维修日期、零件列表等）存为普通 Dataset，通过 media_reference 列指向原始 PDF。</p>
+
+  <div class="callout callout-blue">
+    <b>准确理解两者关系：</b>Dataset 是 Foundry 的通用存储单元，可以承载结构化、半结构化、非结构化三类数据。Media Set 不是 Dataset 的替代，而是针对媒体处理工作流的专用上层抽象——当你需要处理大规模图片、视频、PDF 并接入 AI 提取管道时，Media Set 提供了 Dataset 本身没有的工作流支持。两者可以通过 Media Reference 关联。
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- STAGE 3: PIPELINE TRANSFORMS (EXPANDED) -->
+<!-- ============================================ -->
+<div class="stage">
+  <div class="stage-header"><div class="stage-num">3</div><div class="stage-title">Pipeline Transforms — 真正的"脏活"</div></div>
+
+  <p>目标：将所有数据统一变换为有 schema 的 <b>tabular dataset</b>。Foundry 提供两个主要的 pipeline 构建工具：</p>
+
+  <p><b>Pipeline Builder</b>——低代码/无代码的可视化界面，拖拽式构建数据变换。<span class="hl">两种操作类型</span>：expressions（输入列→输出单列，如字符串拆分、类型转换）和 transforms（输入表→输出表，如 Filter、Pivot、Aggregate、Join）。</p>
+
+  <blockquote><em>"Pipeline Builder uses a general model for describing data transformations. This backend is an intermediate layer between the tools used to write transformations and the execution of said transformations."</em><span class="src">— Pipeline Builder Overview, Palantir Docs</span></blockquote>
+
+  <p><b>Code Repositories</b>——用 Python（PySpark）或 Java 写 transform 代码。用 <code>@transform_df</code> 装饰器声明输入输出，返回 DataFrame 自动写入 output dataset。</p>
+
+  <p>根据数据类型，pipeline 走不同的路径：</p>
+</div>
+
+<!-- Path A -->
+<h3>路径 A：结构化数据 → Schema 自动推断 + 清洗</h3>
+
+<p>这是最简单的路径。CSV 或 JSON 文件已经是表格格式，Foundry 可以直接推断 schema：</p>
+
+<blockquote><em>"Foundry allows you to manually add a schema to datasets containing CSV or JSON files by selecting the Apply a schema button in the dataset. The Apply a schema button will automatically infer the schema based on a subset of the data."</em><span class="src">— Infer a schema, Palantir Docs</span></blockquote>
+
+<p>Schema 应用后，你可以进一步修改列类型、丢弃格式异常的行、添加额外列（如文件路径、导入时间戳、行号等）。</p>
+
+<h4>航空场景实例：航班运营数据清洗</h4>
+
+<p>假设 <code>raw_flight_operations</code> 是从 Oracle DB 同步过来的 CSV，包含 flight_id, tail_number, origin, destination, departure_time, status 等列。Pipeline 需要做的：</p>
+
+<p><b>在 Pipeline Builder 中</b>（无代码）：选择 raw dataset 作为 Input → Apply schema（自动推断 departure_time 为 Timestamp 类型）→ Filter transform 过滤 status 不为 null 的行 → Cast expression 将 flight_id 统一为 String 类型 → 输出为 <code>clean_flights</code>。</p>
+
+<p><b>在 Code Repositories 中</b>（Python），同样的逻辑：</p>
+
+<pre><code><span class="kw">from</span> transforms.api <span class="kw">import</span> transform_df, Input, Output
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="fn">@transform_df</span>(
+    Output(<span class="str">'/airlines/clean/flights'</span>),
+    raw=Input(<span class="str">'/airlines/raw/flight_operations'</span>)
+)
+<span class="kw">def</span> <span class="fn">clean_flights</span>(raw):
+    <span class="kw">return</span> (
+        raw
+        .filter(F.col(<span class="str">'status'</span>).isNotNull())           <span class="cm"># 过滤空状态</span>
+        .withColumn(<span class="str">'flight_id'</span>,                       <span class="cm"># 统一类型</span>
+            F.col(<span class="str">'flight_id'</span>).cast(<span class="str">'string'</span>))
+        .withColumn(<span class="str">'departure_time'</span>,                  <span class="cm"># 时间解析</span>
+            F.to_timestamp(<span class="str">'departure_time'</span>,
+                           <span class="str">'yyyy-MM-dd HH:mm:ss'</span>))
+        .dropDuplicates([<span class="str">'flight_id'</span>])                <span class="cm"># 去重</span>
+    )</code></pre>
+
+<p><code>@transform_df</code> 装饰器做了三件事：声明输入 dataset 路径、声明输出 dataset 路径、把返回的 DataFrame 自动写入 output。这是 Foundry pipeline 的基本编程模型。</p>
+
+<!-- Path B -->
+<h3>路径 B：半结构化数据 → JSON/XML 解析 + 摊平</h3>
+
+<p>半结构化数据的核心挑战是<b>嵌套结构</b>。一个 JSON 预订报文可能长这样：</p>
+
+<pre><code>{
+  <span class="str">"booking_id"</span>: <span class="str">"BK-20250601-001"</span>,
+  <span class="str">"passenger"</span>: {
+    <span class="str">"name"</span>: <span class="str">"Zhang Wei"</span>,
+    <span class="str">"passport"</span>: <span class="str">"E12345678"</span>
+  },
+  <span class="str">"flights"</span>: [
+    {<span class="str">"flight_id"</span>: <span class="str">"CA1234"</span>, <span class="str">"seat"</span>: <span class="str">"32A"</span>},
+    {<span class="str">"flight_id"</span>: <span class="str">"CA5678"</span>, <span class="str">"seat"</span>: <span class="str">"14C"</span>}
+  ]
+}</code></pre>
+
+<p>Pipeline Builder 提供 <b>parsing transform functions</b> 把文件转为表格：</p>
+
+<blockquote><em>"Semi-structured data refers to a dataset that consists of files without a schema, making the data non-tabular. Pipeline Builder supports semi-structured data in the form of XML, JSON, and CSV files. You can use parsing transform functions to convert semi-structured files into tabular form and benefit from schema safety."</em><span class="src">— Pipeline Builder: Input datasets, Palantir Docs</span></blockquote>
+
+<h4>航空场景实例：预订 JSON 摊平为两张表</h4>
+
+<p>一个 JSON 文件需要变成两个 output：</p>
+
+<p><b>Output 1 — <code>clean_passengers</code></b>：提取 <code>passenger</code> 对象，取 booking_id 作为关联键。在 Pipeline Builder 中用 file transform 解析 JSON → 用 expression 提取嵌套字段 <code>passenger.name</code>、<code>passenger.passport</code> → 输出 tabular dataset。</p>
+
+<p><b>Output 2 — <code>clean_bookings</code></b>：对 <code>flights</code> 数组使用 <b>explode_array</b> generator（Pipeline Builder 的内置功能），将数组展开为每行一条 flight 记录，附带 booking_id 和 passenger_id 作为外键。</p>
+
+<p>在 Code Repositories 中，PySpark 的 <code>explode</code> 函数天然支持这种操作：</p>
+
+<pre><code><span class="fn">@transform_df</span>(
+    Output(<span class="str">'/airlines/clean/bookings'</span>),
+    raw=Input(<span class="str">'/airlines/raw/passenger_bookings'</span>)
+)
+<span class="kw">def</span> <span class="fn">flatten_bookings</span>(raw):
+    <span class="cm"># 读取 JSON → 展开 flights 数组 → 提取嵌套字段</span>
+    <span class="kw">return</span> (
+        raw
+        .select(
+            F.col(<span class="str">'booking_id'</span>),
+            F.col(<span class="str">'passenger.name'</span>).alias(<span class="str">'passenger_name'</span>),
+            F.col(<span class="str">'passenger.passport'</span>).alias(<span class="str">'passport'</span>),
+            F.explode(<span class="str">'flights'</span>).alias(<span class="str">'flight'</span>)      <span class="cm"># 数组展开</span>
+        )
+        .select(
+            <span class="str">'booking_id'</span>, <span class="str">'passenger_name'</span>, <span class="str">'passport'</span>,
+            F.col(<span class="str">'flight.flight_id'</span>).alias(<span class="str">'flight_id'</span>),
+            F.col(<span class="str">'flight.seat'</span>).alias(<span class="str">'seat'</span>)
+        )
+    )</code></pre>
+
+<p>一个 <code>explode</code> 调用就把嵌套的 JSON 数组"摊平"成了标准的 tabular 格式。这是处理半结构化数据最常用的模式。</p>
+
+<!-- Path C -->
+<h3>路径 C：非结构化数据 → AIP Document Intelligence</h3>
+
+<p>这是最复杂的路径，也是 Palantir 近年投入最重的方向。非结构化数据（PDF、图片、音频）不能直接变成"行和列"，需要<b>内容提取</b>。</p>
+
+<p><b>AIP Document Intelligence</b> 是 Palantir 在 AIP 层面专门为文档提取构建的产品级工具，提供两大类策略：</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>类别</th><th>方法</th><th>机制</th><th>适用场景</th></tr>
+  <tr><td rowspan="3"><b>Traditional</b></td><td>Raw text</td><td>读取 PDF 元数据中的文本</td><td>电子生成的 PDF</td></tr>
+  <tr><td>OCR</td><td>传统 OCR 提取文本</td><td>扫描件，版面不重要</td></tr>
+  <tr><td>Layout-aware OCR</td><td>OCR + bounding box，保留版面结构</td><td>表格、多栏文档</td></tr>
+  <tr><td rowspan="2"><b>Generative AI</b></td><td>VLM 提取</td><td>Vision Language Model 直接"看"页面，输出 Markdown</td><td>复杂版面、混合内容</td></tr>
+  <tr><td>混合模式</td><td>先 OCR 预处理，再将结果 + 页面图像传给 VLM</td><td>最高精度场景</td></tr>
+</table>
+</div>
+
+<blockquote><em>"Document preprocessing essentially runs traditional OCR on the document, then passes that output in addition to the document page itself to a VLM, giving the model more context to successfully analyze the document."</em><span class="src">— AIP Document Intelligence: Core Concepts, Palantir Docs</span></blockquote>
+
+<h4>航空场景实例：维修报告 PDF 提取全流程</h4>
+
+<p><b>第一步</b>——在 AIP Document Intelligence UI 中导入维修报告 Media Set，选择 Layout-aware OCR + VLM 混合策略，执行提取，查看 Markdown 输出（带 bounding box 对照原文）。</p>
+
+<p><b>第二步</b>——用 VLM-as-judge 自动评分，评估表格、标题、代码块等不同元素的提取质量。</p>
+
+<p><b>第三步</b>——满意后一键部署为 Python transform。系统自动生成代码仓库：</p>
+
+<pre><code><span class="fn">@transform.using</span>(
+    output=Output(<span class="str">"ri.foundry.main.dataset.abc"</span>),
+    media_input=MediaSetInput(<span class="str">"ri.mio.main.media-set.abc"</span>),
+    extractor=VisionLLMDocumentsExtractorInput(
+        <span class="str">"ri.language-model-service..language-model.anthropic-claude-sonnet"</span>
+    ),
+)
+<span class="kw">def</span> <span class="fn">extract</span>(media_input, output, extractor):
+    extracted_data = extractor.create_extraction(
+        media_input,
+        with_ocr=<span class="kw">True</span>,            <span class="cm"># 混合模式：先 OCR 再 VLM</span>
+        prompt=USER_PROMPT,        <span class="cm"># 可自定义提取 prompt</span>
+        thread_number=20           <span class="cm"># 并行线程数</span>
+    )
+    output.write_dataframe(extracted_data)
+<span class="cm"># 输出：media_item_rid | page_num | extraction_result (Markdown)</span></code></pre>
+
+<p><b>第四步</b>——Document Intelligence 的输出是每页一行的 Markdown 文本。要从 Markdown 进一步提取结构化字段（aircraft_tail_number、maintenance_date、parts_replaced），还需要一个<b>下游 pipeline</b>——可以用 Pipeline Builder 的 LLM transform（分类、实体抽取），也可以写正则/NLP 代码。</p>
+
+<p><b>第五步（容易被忽略）</b>——LLM/VLM 提取的字段进入 curated dataset 之前，生产环境通常需要一套<b>校验与人工复核闭环</b>：</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>环节</th><th>目的</th><th>做法</th></tr>
+  <tr><td><b>Schema Validation</b></td><td>确保提取字段类型和格式合规</td><td>对 tail_number、date 格式做规则校验，不合规的行进异常队列</td></tr>
+  <tr><td><b>置信度过滤</b></td><td>过滤低可信度的提取结果</td><td>VLM 输出置信度低于阈值的记录标记为待复核</td></tr>
+  <tr><td><b>抽样人工复核</b></td><td>评估整体提取质量</td><td>随机抽取 N% 由人工对照原始 PDF 核验</td></tr>
+  <tr><td><b>异常队列</b></td><td>处理边界情况和失败记录</td><td>提取失败、格式异常的记录进人工处理队列</td></tr>
+</table>
+</div>
+
+<p>Palantir 的 Document Intelligence 官方也强调：用户在 UI 里先测试提取策略、查看 Markdown 与 bounding box 的对照、评估质量/速度/token cost，再部署。这个测试→评估→部署的闭环，本质上就是在做 offline 的 ground truth 校验，只是工具帮你做了一部分。</p>
+
+<div class="callout callout-coral">
+  <b>非结构化数据的完整路径（不是两跳，是五跳）：</b><br>
+  Media Set → Document Intelligence（OCR/VLM）→ Markdown/chunks → 字段提取（LLM/NLP）→ 校验 &amp; 人工复核 → Curated Dataset → Ontology<br><br>
+  Document Intelligence 解决了最难的第一跳（PDF → Markdown），但后续的提取精度、字段格式化、异常处理，每一步都有工程成本。这才是非结构化数据进入 Ontology 的真实代价。
+</div>
+
+<p>对于<b>音频</b>数据，Foundry 的 Media Set transforms 内置了 Whisper 语音转录功能，可以直接用 <code>transcribe</code> 方法将音频转为文本。对于<b>图片</b>，支持 OCR、图像嵌入（image embeddings）、元数据提取（尺寸、分辨率等）。</p>
+
+<!-- ============================================ -->
+<!-- STAGE 4+5: ONTOLOGY -->
+<!-- ============================================ -->
+<h2>从表格到 Ontology：四个核心概念</h2>
+
+<p>经过 pipeline 清洗，你有了干净的 tabular datasets。现在要把它们映射到 Ontology——Palantir 所谓的"组织的数字孪生"。</p>
+
+<blockquote><em>"The Foundry Ontology creates a complete picture of an organization's world by mapping datasets and models to object types, properties, link types, and action types."</em><span class="src">— Ontology Core Concepts, Palantir Docs</span></blockquote>
+
+<p>映射关系用 mental model 来理解很直接——<span class="hl">dataset ≈ object type，row ≈ object，column ≈ property</span>。这个类比适合入门，但实际建模时需要显式配置 backing datasource、property mapping、primary key / title key、link cardinality、property visibility，以及更复杂的情况如 Multi-datasource Object Types（MDO，一个 Object Type 从多个 datasource 取属性）。</p>
+
+<h3>1. Object Types — 每张表变成一类实体</h3>
+
+<p>创建 Object Type 时，你选择一个 backing dataset，系统自动把每一列映射为一个 property，你指定 primary key 和 title。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Backing Dataset</th><th>Object Type</th><th>Primary Key</th><th>Title 示例</th></tr>
+  <tr><td><code>clean_flights</code></td><td>Flight</td><td>flight_id</td><td>"CA1234"</td></tr>
+  <tr><td><code>clean_passengers</code></td><td>Passenger</td><td>passenger_id</td><td>"Zhang Wei"</td></tr>
+  <tr><td><code>clean_bookings</code></td><td>Booking</td><td>booking_id</td><td>booking_id</td></tr>
+  <tr><td><code>clean_aircraft</code></td><td>Aircraft</td><td>tail_number</td><td>"B-6075"</td></tr>
+  <tr><td><code>clean_maintenance</code></td><td>Maintenance Record</td><td>report_id</td><td>report_id</td></tr>
+</table>
+</div>
+
+<h3>2. Properties — 列变成属性</h3>
+
+<p>以 Flight 为例：<code>flight_id</code> → Flight ID (String, PK)，<code>tail_number</code> → Tail Number (String, FK)，<code>departure_time</code> → Departure Time (Timestamp)，<code>status</code> → Status (String)。</p>
+
+<p>支持的属性类型包括基础类型和高级类型：<b>Vector</b>（语义搜索）、<b>Geopoint/Geoshape</b>（地理）、<b>Media Reference</b>（关联原始 PDF/图片）、<b>Time Series</b>（传感器数据）、<b>Struct</b>（复杂嵌套结构）。</p>
+
+<h3>3. Link Types — 外键变成关系</h3>
+
+<p>Link 基于 foreign key ↔ primary key 匹配：</p>
+
+<div class="diagram">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <defs><marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#0066ff" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+  <rect x="40" y="20" width="130" height="44" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="105" y="47" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">Aircraft</text>
+  <rect x="40" y="80" width="130" height="44" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="105" y="107" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">Flight</text>
+  <rect x="295" y="80" width="130" height="44" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="360" y="107" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">Booking</text>
+  <rect x="550" y="20" width="130" height="44" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="615" y="47" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">Passenger</text>
+  <rect x="550" y="140" width="130" height="44" rx="6" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="615" y="167" text-anchor="middle" font-size="13" font-weight="600" fill="#0066ff">Maintenance</text>
+  <line x1="105" y1="80" x2="105" y2="68" stroke="#0066ff" stroke-width="1" marker-end="url(#b)"/>
+  <text x="125" y="78" font-size="10" fill="#6b6b6b">tail_number</text>
+  <line x1="170" y1="102" x2="293" y2="102" stroke="#0066ff" stroke-width="1" marker-end="url(#b)"/>
+  <text x="230" y="96" font-size="10" fill="#6b6b6b">flight_id</text>
+  <line x1="425" y1="92" x2="548" y2="52" stroke="#0066ff" stroke-width="1" marker-end="url(#b)"/>
+  <text x="500" y="65" font-size="10" fill="#6b6b6b">passenger_id</text>
+  <path d="M548 162 L105 162 L105 124" fill="none" stroke="#0066ff" stroke-width="1" marker-end="url(#b)" stroke-dasharray="4 3"/>
+  <text x="300" y="156" font-size="10" fill="#6b6b6b">tail_number（via Aircraft）</text>
+</svg>
+</div>
+
+<h3>4. Action Types — 让 Ontology 可写</h3>
+
+<p>Actions 允许用户通过定义好的操作<b>修改数据</b>——创建对象、修改属性、建立/删除链接。</p>
+
+<div class="callout callout-green">
+  <b>精妙设计：</b>用户的编辑不直接写回 backing dataset，而是写入独立的 <b>writeback dataset</b>。原始数据永远不会被用户操作污染——你始终可以区分"系统同步的数据"和"人工修改的数据"。
+</div>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Action Type</th><th>操作</th><th>涉及 Object</th><th>业务逻辑</th></tr>
+  <tr><td>De-escalate Alert</td><td>Modify</td><td>Flight</td><td>将 status 从 Alert 改为 Monitoring</td></tr>
+  <tr><td>Assign Aircraft</td><td>Modify + Link</td><td>Flight, Aircraft</td><td>修改 tail_number，自动建立链接</td></tr>
+  <tr><td>Create Maintenance</td><td>Create + Link</td><td>Maintenance, Aircraft</td><td>创建记录，关联 Aircraft</td></tr>
+  <tr><td>Rebook Passenger</td><td>Modify + Relink</td><td>Booking</td><td>修改 flight_id，重建链接</td></tr>
+</table>
+</div>
+
+<!-- ============================================ -->
+<!-- LOGIC & ACTIONS -->
+<!-- ============================================ -->
+<h2>Ontology 的逻辑层：Logic 和 Actions 是怎么来的</h2>
+
+<p>Ontology 映射完成后，你有了 Object Types、Properties、Link Types。但还缺两层关键能力：<span class="hl">逻辑计算</span>（基于数据自动推导新信息）和<span class="hl">写操作</span>（让业务用户可以修改数据）。这两层在 Palantir 里分别叫 <b>Functions</b> 和 <b>Action Types</b>。</p>
+
+<div class="diagram">
+<svg viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <defs><marker id="la" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+
+  <!-- Layer 1: Functions -->
+  <rect x="20" y="20" width="640" height="170" rx="16" fill="#f3f0ff" stroke="#7f77dd" stroke-width="1"/>
+  <text x="340" y="48" text-anchor="middle" font-size="14" font-weight="700" fill="#534ab7">Functions（逻辑计算层）</text>
+  <text x="340" y="66" text-anchor="middle" font-size="11" fill="#6b6b6b">TypeScript / Python 代码，运行在 Ontology 数据之上</text>
+
+  <rect x="40" y="84" width="140" height="44" rx="6" fill="#eeedfe" stroke="#afa9ec" stroke-width="0.5"/>
+  <text x="110" y="102" text-anchor="middle" font-size="11" font-weight="600" fill="#534ab7">Derived properties</text>
+  <text x="110" y="118" text-anchor="middle" font-size="10" fill="#6b6b6b">派生属性</text>
+
+  <rect x="196" y="84" width="140" height="44" rx="6" fill="#eeedfe" stroke="#afa9ec" stroke-width="0.5"/>
+  <text x="266" y="102" text-anchor="middle" font-size="11" font-weight="600" fill="#534ab7">Aggregations</text>
+  <text x="266" y="118" text-anchor="middle" font-size="10" fill="#6b6b6b">自定义聚合</text>
+
+  <rect x="352" y="84" width="140" height="44" rx="6" fill="#eeedfe" stroke="#afa9ec" stroke-width="0.5"/>
+  <text x="422" y="102" text-anchor="middle" font-size="11" font-weight="600" fill="#534ab7">Complex edits</text>
+  <text x="422" y="118" text-anchor="middle" font-size="10" fill="#6b6b6b">批量修改逻辑</text>
+
+  <rect x="508" y="84" width="140" height="44" rx="6" fill="#eeedfe" stroke="#afa9ec" stroke-width="0.5"/>
+  <text x="578" y="102" text-anchor="middle" font-size="11" font-weight="600" fill="#534ab7">External queries</text>
+  <text x="578" y="118" text-anchor="middle" font-size="10" fill="#6b6b6b">外部系统查询</text>
+
+  <text x="340" y="160" text-anchor="middle" font-size="10" fill="#6b6b6b">Functions 可以被 Action Types 调用（function-backed actions）</text>
+
+  <!-- Arrow -->
+  <line x1="340" y1="190" x2="340" y2="226" stroke="#6b6b6b" stroke-width="1" marker-end="url(#la)"/>
+
+  <!-- Layer 2: Action Types -->
+  <rect x="20" y="228" width="640" height="330" rx="16" fill="#f0faf5" stroke="#5dcaa5" stroke-width="1"/>
+  <text x="340" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#0f6e56">Action Types（写操作层）</text>
+  <text x="340" y="274" text-anchor="middle" font-size="11" fill="#6b6b6b">定义用户可以对 Ontology 做的操作</text>
+
+  <!-- Parameters -->
+  <rect x="44" y="294" width="270" height="50" rx="6" fill="#e6f1fb" stroke="#85b7eb" stroke-width="0.5"/>
+  <text x="179" y="315" text-anchor="middle" font-size="12" font-weight="600" fill="#185fa5">Parameters（参数）</text>
+  <text x="179" y="332" text-anchor="middle" font-size="10" fill="#6b6b6b">Action 的输入：新角色、目标对象、日期…</text>
+
+  <line x1="179" y1="344" x2="179" y2="364" stroke="#6b6b6b" stroke-width="1" marker-end="url(#la)"/>
+
+  <!-- Rules -->
+  <rect x="44" y="366" width="270" height="64" rx="6" fill="#e1f5ee" stroke="#5dcaa5" stroke-width="0.5"/>
+  <text x="179" y="386" text-anchor="middle" font-size="12" font-weight="600" fill="#0f6e56">Rules（规则）</text>
+  <text x="179" y="404" text-anchor="middle" font-size="10" fill="#6b6b6b">Create / Modify / Delete 对象</text>
+  <text x="179" y="418" text-anchor="middle" font-size="10" fill="#6b6b6b">Create / Delete Link</text>
+
+  <line x1="179" y1="430" x2="179" y2="450" stroke="#6b6b6b" stroke-width="1" marker-end="url(#la)"/>
+
+  <!-- Submission Criteria -->
+  <rect x="44" y="452" width="270" height="50" rx="6" fill="#faece7" stroke="#f0997b" stroke-width="0.5"/>
+  <text x="179" y="473" text-anchor="middle" font-size="12" font-weight="600" fill="#993c1d">Submission criteria（提交条件）</text>
+  <text x="179" y="490" text-anchor="middle" font-size="10" fill="#6b6b6b">谁能执行？满足什么条件？</text>
+
+  <!-- Right column: Side Effects -->
+  <rect x="366" y="294" width="270" height="96" rx="6" fill="#faeeda" stroke="#ef9f27" stroke-width="0.5"/>
+  <text x="501" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#854f0b">Side effects（副作用）</text>
+  <text x="501" y="336" text-anchor="middle" font-size="10" fill="#6b6b6b">Notification 通知</text>
+  <text x="501" y="352" text-anchor="middle" font-size="10" fill="#6b6b6b">Webhook 外部系统回调</text>
+  <text x="501" y="368" text-anchor="middle" font-size="10" fill="#6b6b6b">触发其他 Pipeline</text>
+
+  <!-- Function-backed -->
+  <rect x="366" y="410" width="270" height="44" rx="6" fill="#eeedfe" stroke="#afa9ec" stroke-width="0.5"/>
+  <text x="501" y="428" text-anchor="middle" font-size="12" font-weight="600" fill="#534ab7">Function-backed actions</text>
+  <text x="501" y="444" text-anchor="middle" font-size="10" fill="#6b6b6b">复杂逻辑用代码实现</text>
+
+  <line x1="501" y1="454" x2="501" y2="474" stroke="#6b6b6b" stroke-width="1" marker-end="url(#la)"/>
+
+  <!-- Writeback -->
+  <rect x="366" y="476" width="270" height="36" rx="6" fill="#fafaf8" stroke="#d4d4d4" stroke-width="0.5"/>
+  <text x="501" y="498" text-anchor="middle" font-size="11" font-weight="600" fill="#5f5e5a">→ Writeback Dataset（独立存储）</text>
+</svg>
+</div>
+
+<h3>Functions：逻辑计算层</h3>
+
+<p>Functions 是运行在 Ontology 数据之上的 TypeScript / Python 代码，能做四件事：</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>能力</th><th>说明</th><th>航空场景例子</th></tr>
+  <tr><td><b>Derived Properties</b></td><td>从现有属性实时计算出新属性</td><td>delay_minutes = actual_departure - scheduled_departure</td></tr>
+  <tr><td><b>Aggregations</b></td><td>跨对象的聚合计算</td><td>avg_delay_per_airline = AVG(Flight.delay_minutes) GROUP BY airline</td></tr>
+  <tr><td><b>Complex Edits</b></td><td>批量修改逻辑（配合 Action 使用）</td><td>取消航班时自动释放所有座位、通知所有乘客</td></tr>
+  <tr><td><b>External Queries</b></td><td>查询外部系统丰富 Ontology</td><td>调用天气 API 给 Flight 对象附加当前天气数据</td></tr>
+</table>
+</div>
+
+<blockquote><em>"Functions on objects (FOO) enables code authors to write business logic on object data and leverage this logic downstream in operational applications."</em><span class="src">— Functions on Objects: Overview, Palantir Docs</span></blockquote>
+
+<h3>Action Types：写操作层（四个组件）</h3>
+
+<p>Action Type 不是简单的"让用户点编辑"——它是一套完整的写操作定义框架，由四个组件构成：</p>
+
+<blockquote><em>"An action type is the definition of a set of changes or edits to objects, property values, and links that a user can take at once. It also includes the side effect behaviors that occur with action submission."</em><span class="src">— Action Types: Overview, Palantir Docs</span></blockquote>
+
+<div class="table-wrap">
+<table>
+  <tr><th>组件</th><th>作用</th><th>"改签乘客"实例</th></tr>
+  <tr><td><b>Parameters</b><br><small>参数</small></td><td>Action 的输入，类型化的表单字段</td><td>passenger（Object Reference）、new_flight（Object Reference）、reason（enum）</td></tr>
+  <tr><td><b>Rules</b><br><small>规则</small></td><td>定义对 Ontology 的编辑操作</td><td>Modify Booking.flight_id → new_flight；Delete Link → old_flight；Create Link → new_flight</td></tr>
+  <tr><td><b>Submission Criteria</b><br><small>提交条件</small></td><td>前置校验，不满足则无法提交</td><td>new_flight.status ≠ Cancelled；new_flight.available_seats > 0；current_user.role ∈ [agent, supervisor]</td></tr>
+  <tr><td><b>Side Effects</b><br><small>副作用</small></td><td>执行后触发的外部效果</td><td>Notification → passenger.email："您的航班已改为 {new_flight}"；Webhook → crew_management_api</td></tr>
+</table>
+</div>
+
+<p>Action 有两种实现方式：<b>简单规则配置</b>（UI 点选，不用写代码）和 <b>function-backed action</b>（用 Functions 层的代码实现复杂逻辑）。</p>
+
+<blockquote><em>"Rules define the logic of the action type that transform the parameters into Ontology edits. Create object: create an object of a predefined type. Modify object(s): modify an existing object. Delete link: delete a many-to-many link."</em><span class="src">— Action Types: Rules, Palantir Docs</span></blockquote>
+
+<div class="callout callout-green">
+  <b>Action 的执行时序：</b>用户填入参数 → Submission Criteria 校验 → PASS：执行 Rules → 写入 Writeback Dataset → 触发 Side Effects → Ontology 立即更新 ｜ FAIL：展示失败原因（"目标航班已取消" / "无权限"）。
+</div>
+
+<!-- ============================================ -->
+<!-- INCREMENTAL UPDATES -->
+<!-- ============================================ -->
+<h2>数据怎么保持最新：增量更新机制</h2>
+
+<p>Ontology 建好之后，源系统的数据每天都在变化——新航班不断加入，维修记录持续更新，乘客随时改签。这些变化怎么反映到 Ontology 里？全量重算一遍代价太高，这就是<b>增量更新</b>要解决的问题。</p>
+
+<p>增量更新贯穿整条链路三个层次：<span class="hl">同步层 → Pipeline 层 → Ontology 索引层</span>，每层都有独立的增量机制，必须端到端配合才能真正省时省力。</p>
+
+<h3>基础概念：APPEND vs SNAPSHOT</h3>
+
+<p>两种事务类型决定了整个增量机制能否成立：</p>
+
+<div class="diagram">
+<svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <!-- APPEND side -->
+  <rect x="20" y="10" width="320" height="220" rx="10" fill="#f0f5ff" stroke="#0066ff" stroke-width="1"/>
+  <text x="180" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#0066ff">APPEND 事务</text>
+  <text x="180" y="58" text-anchor="middle" font-size="11" fill="#6b6b6b">只追加新文件，不修改已有文件</text>
+  <!-- dataset blocks week 1 -->
+  <rect x="44" y="72" width="272" height="32" rx="4" fill="#0066ff" opacity="0.15"/>
+  <text x="180" y="93" text-anchor="middle" font-size="11" fill="#2d2d2d">Week 1：100 万行（Transaction 1）</text>
+  <!-- week 2 -->
+  <rect x="44" y="112" width="272" height="32" rx="4" fill="#0066ff" opacity="0.25"/>
+  <text x="180" y="133" text-anchor="middle" font-size="11" fill="#2d2d2d">Week 2：新增 10 万行（Transaction 2）</text>
+  <!-- week 3 -->
+  <rect x="44" y="152" width="272" height="32" rx="4" fill="#0066ff" opacity="0.38"/>
+  <text x="180" y="173" text-anchor="middle" font-size="11" fill="#2d2d2d">Week 3：新增 8 万行（Transaction 3）</text>
+  <text x="180" y="210" text-anchor="middle" font-size="11" fill="#00d084" font-weight="600">✓ 增量 pipeline 的基础</text>
+
+  <!-- SNAPSHOT side -->
+  <rect x="380" y="10" width="320" height="220" rx="10" fill="#fff5f5" stroke="#ff6b6b" stroke-width="1"/>
+  <text x="540" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#ff6b6b">SNAPSHOT 事务</text>
+  <text x="540" y="58" text-anchor="middle" font-size="11" fill="#6b6b6b">全量替换，覆盖当前视图所有数据</text>
+  <!-- blocks -->
+  <rect x="404" y="72" width="272" height="32" rx="4" fill="#ff6b6b" opacity="0.12"/>
+  <text x="540" y="93" text-anchor="middle" font-size="11" fill="#9e9e9e" text-decoration="line-through">Week 1：100 万行（已覆盖）</text>
+  <rect x="404" y="112" width="272" height="32" rx="4" fill="#ff6b6b" opacity="0.12"/>
+  <text x="540" y="133" text-anchor="middle" font-size="11" fill="#9e9e9e" text-decoration="line-through">Week 2：110 万行（已覆盖）</text>
+  <rect x="404" y="152" width="272" height="32" rx="4" fill="#ff6b6b" opacity="0.55"/>
+  <text x="540" y="173" text-anchor="middle" font-size="11" fill="#1a1a1a">Week 3：118 万行（当前视图）</text>
+  <text x="540" y="210" text-anchor="middle" font-size="11" fill="#ff6b6b" font-weight="600">↻ 迫使下游全量重算</text>
+</svg>
+</div>
+
+<div class="callout callout-coral">
+  <b>关键约束：</b>UPDATE 事务（可能覆盖已有文件）会破坏 APPEND-only 要求，迫使下游所有 pipeline 回退到全量 SNAPSHOT 重算。只有在无法避免修改已有文件时才用 UPDATE。历史记录仍然保留（Git for Data 特性），但当前视图被替换。
+</div>
+
+<h3>三层增量更新：端到端配合</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <defs>
+    <marker id="inc-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <!-- Layer 1: Sync -->
+  <rect x="20" y="10" width="680" height="80" rx="10" fill="#fafaf8" stroke="#d4d4d4"/>
+  <text x="40" y="34" font-size="11" fill="#0066ff" font-weight="700">第 1 层：同步层</text>
+  <text x="40" y="54" font-size="14" font-weight="600" fill="#1a1a1a">Data Connection — APPEND Sync</text>
+  <text x="40" y="74" font-size="12" fill="#6b6b6b">源系统有新数据 → 只拉增量行进 Foundry，不重传历史</text>
+  <text x="600" y="54" text-anchor="middle" font-size="11" fill="#00d084" font-weight="600">✓ 减轻源系统负担</text>
+
+  <line x1="360" y1="90" x2="360" y2="120" stroke="#6b6b6b" stroke-width="1" marker-end="url(#inc-arr)"/>
+
+  <!-- Layer 2: Pipeline -->
+  <rect x="20" y="120" width="680" height="110" rx="10" fill="#fafaf8" stroke="#d4d4d4"/>
+  <text x="40" y="144" font-size="11" fill="#0066ff" font-weight="700">第 2 层：Pipeline 层</text>
+  <text x="40" y="164" font-size="14" font-weight="600" fill="#1a1a1a">@incremental() Transform</text>
+  <!-- boxes inside -->
+  <rect x="40" y="178" width="190" height="40" rx="6" fill="#fff" stroke="#d4d4d4"/>
+  <text x="135" y="201" text-anchor="middle" font-size="11" fill="#2d2d2d">read mode: <tspan font-weight="600">added</tspan></text>
+  <text x="135" y="214" text-anchor="middle" font-size="10" fill="#6b6b6b">只读新增行</text>
+  <rect x="265" y="178" width="190" height="40" rx="6" fill="#fff" stroke="#d4d4d4"/>
+  <text x="360" y="201" text-anchor="middle" font-size="11" fill="#2d2d2d">write mode: <tspan font-weight="600">modify</tspan></text>
+  <text x="360" y="214" text-anchor="middle" font-size="10" fill="#6b6b6b">追加到已有输出</text>
+  <rect x="490" y="178" width="190" height="40" rx="6" fill="#fff" stroke="#d4d4d4"/>
+  <text x="585" y="198" text-anchor="middle" font-size="11" fill="#2d2d2d">semantic_version bump</text>
+  <text x="585" y="213" text-anchor="middle" font-size="10" fill="#6b6b6b">强制全量重算</text>
+
+  <line x1="360" y1="230" x2="360" y2="260" stroke="#6b6b6b" stroke-width="1" marker-end="url(#inc-arr)"/>
+
+  <!-- Layer 3: Funnel/Ontology -->
+  <rect x="20" y="260" width="680" height="110" rx="10" fill="#fafaf8" stroke="#d4d4d4"/>
+  <text x="40" y="284" font-size="11" fill="#0066ff" font-weight="700">第 3 层：Ontology 索引层</text>
+  <text x="40" y="304" font-size="14" font-weight="600" fill="#1a1a1a">Funnel Service</text>
+  <!-- boxes inside -->
+  <rect x="40" y="318" width="155" height="40" rx="6" fill="#fff" stroke="#d4d4d4"/>
+  <text x="117" y="338" text-anchor="middle" font-size="10" fill="#2d2d2d" font-weight="600">Changelog Job</text>
+  <text x="117" y="352" text-anchor="middle" font-size="10" fill="#6b6b6b">自动计算 data diff</text>
+  <line x1="196" y1="338" x2="218" y2="338" stroke="#6b6b6b" stroke-width="1" marker-end="url(#inc-arr)"/>
+  <rect x="220" y="318" width="155" height="40" rx="6" fill="#fff" stroke="#d4d4d4"/>
+  <text x="297" y="338" text-anchor="middle" font-size="10" fill="#2d2d2d" font-weight="600">Merge Job</text>
+  <text x="297" y="352" text-anchor="middle" font-size="10" fill="#6b6b6b">合并 datasource + Actions</text>
+  <line x1="376" y1="338" x2="398" y2="338" stroke="#6b6b6b" stroke-width="1" marker-end="url(#inc-arr)"/>
+  <rect x="400" y="318" width="155" height="40" rx="6" fill="#fff" stroke="#d4d4d4"/>
+  <text x="477" y="338" text-anchor="middle" font-size="10" fill="#2d2d2d" font-weight="600">Hydration</text>
+  <text x="477" y="352" text-anchor="middle" font-size="10" fill="#6b6b6b">写入 OSv2 搜索节点</text>
+  <line x1="556" y1="338" x2="578" y2="338" stroke="#6b6b6b" stroke-width="1" marker-end="url(#inc-arr)"/>
+  <rect x="580" y="318" width="100" height="40" rx="6" fill="#0066ff"/>
+  <text x="630" y="341" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">Ontology</text>
+  <text x="630" y="353" text-anchor="middle" font-size="10" fill="#fff">可查询</text>
+</svg>
+</div>
+
+<h3>增量不是一个开关：端到端契约</h3>
+
+<p>很容易产生一个误解：上游配了 APPEND sync，下游就自然是增量的。实际上，<mark>增量是一个端到端契约，链路上任何一个环节断裂，后面的增量就失效</mark>。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>层次</th><th>增量机制</th><th>容易断裂的情况</th></tr>
+  <tr>
+    <td><b>Ingestion 层</b><br><small>Data Connection</small></td>
+    <td>JDBC incremental sync：基于严格递增的 cursor 字段（如 updated_at、auto-increment ID）只拉新行</td>
+    <td>源数据会更新已有行（非 insert-only）；cursor 字段不严格单调递增；源系统无法提供可靠 change marker</td>
+  </tr>
+  <tr>
+    <td><b>Transform 层</b><br><small>@incremental() decorator</small></td>
+    <td>只读自上次 build 以来的新增事务（read mode: added）</td>
+    <td>上游 dataset 收到 UPDATE 事务（修改已有文件），下游 pipeline 被迫回退到 SNAPSHOT 全量重跑</td>
+  </tr>
+  <tr>
+    <td><b>Ontology 索引层</b><br><small>Funnel Service</small></td>
+    <td>Changelog job 计算 diff，只把变化量推入 OSv2</td>
+    <td>backing dataset 触发 SNAPSHOT，Funnel 需要全量重索引</td>
+  </tr>
+</table>
+</div>
+
+<div class="callout callout-coral">
+  <b>两个常见陷阱：</b><br><br>
+  <b>1. 源数据可变（mutable）+ APPEND 事务 = 重复数据问题。</b>如果源系统的记录会被修改（比如航班状态从 Scheduled 改为 Delayed），而你用 APPEND 事务同步，dataset 里就会同时存在同一条记录的旧版本和新版本。下游 transform 必须显式做 <code>dropDuplicates</code> 或取最新版本，否则 Ontology 里会出现脏数据。<br><br>
+  <b>2. File-based incremental UPDATE = 增量链断裂。</b>File-based 的 UPDATE 事务（修改已有文件）虽然每次只摄入变更的文件，但会导致下游所有 pipeline 无法增量运行——因为输入 dataset 不再是 append-only，下游必须全量重跑来保证正确性。
+</div>
+
+<p>设计增量链路的起点是：<b>源系统能否提供可靠的 cursor 或 change marker</b>（insert-only 或带 updated_at 的 upsert）？如果不能，从 ingestion 层就只能 SNAPSHOT，后续所有增量都是补救措施而非真正的端到端增量。</p>
+
+<h3>具体例子：航班数据增量更新</h3>
+
+<p>假设 <code>clean_flights</code> 有 <b>2000 万行</b>历史数据，每周新增 <b>100 万行</b>。如果每次全量重跑，每次要处理 2000 万行；用增量，每次只处理 100 万行——<span class="hl">节省 95% 的计算量</span>。</p>
+
+<p>Pipeline Builder 中勾选 incremental 模式即可；Code Repositories 中用 <code>@incremental()</code> 装饰器：</p>
+
+<pre><code><span class="kw">from</span> transforms.api <span class="kw">import</span> transform_df, Input, Output, incremental
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="fn">@incremental</span>(semantic_version=<span class="str">1</span>, v2_semantics=<span class="kw">True</span>)
+<span class="fn">@transform_df</span>(
+    Output(<span class="str">'/airlines/clean/flights'</span>),
+    raw=Input(<span class="str">'/airlines/raw/flight_operations'</span>)
+)
+<span class="kw">def</span> <span class="fn">clean_flights</span>(ctx, raw):
+    <span class="cm"># 增量模式：raw 只包含自上次 build 以来的新增行</span>
+    <span class="cm"># 无需改写任何逻辑，加装饰器即可生效</span>
+    <span class="kw">return</span> (
+        raw
+        .filter(F.col(<span class="str">'status'</span>).isNotNull())
+        .withColumn(<span class="str">'departure_time'</span>,
+            F.to_timestamp(<span class="str">'departure_time'</span>, <span class="str">'yyyy-MM-dd HH:mm:ss'</span>))
+        .dropDuplicates([<span class="str">'flight_id'</span>])
+    )
+<span class="cm"># semantic_version：改为 2 会强制全量重跑（逻辑变更时用）</span></code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>@incremental() 参数</th><th>作用</th><th>何时用</th></tr>
+  <tr><td><code>semantic_version</code></td><td>整数，bump 强制全量重算</td><td>业务逻辑变了，历史数据需要重跑</td></tr>
+  <tr><td><code>snapshot_inputs</code></td><td>指定某个 input 允许 UPDATE/DELETE</td><td>部分输入不是 append-only</td></tr>
+  <tr><td><code>allow_retention</code></td><td>允许 Foundry Retention 删除旧文件</td><td>不需要永久保留历史数据</td></tr>
+  <tr><td><code>strict_append</code></td><td>强制底层写入为 APPEND 事务</td><td>需要严格保证 append-only 语义</td></tr>
+  <tr><td><code>v2_semantics=True</code></td><td>启用新版增量语义</td><td>所有新项目推荐默认开启</td></tr>
+</table>
+</div>
+
+<h3>长期运行的隐患：小文件积累与 Projection Compaction</h3>
+
+<p>增量 pipeline 运行几周后，dataset 里会积累大量小 Parquet 文件——每次 APPEND 就是一批新文件。文件数达到数万、数十万时，读性能会明显下降。</p>
+
+<div class="diagram">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <!-- Before: many small files -->
+  <rect x="20" y="10" width="310" height="180" rx="8" fill="#fafaf8" stroke="#d4d4d4"/>
+  <text x="175" y="34" text-anchor="middle" font-size="13" font-weight="600" fill="#ff6b6b">积累 6 个月后（无 Projection）</text>
+  <!-- small file blocks -->
+  <rect x="36" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="70" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="104" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="138" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="172" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="206" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="240" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="274" y="50" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.4"/>
+  <rect x="36" y="84" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.3"/>
+  <rect x="70" y="84" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.3"/>
+  <rect x="104" y="84" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.3"/>
+  <rect x="138" y="84" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.3"/>
+  <rect x="172" y="84" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.3"/>
+  <rect x="206" y="84" width="28" height="28" rx="3" fill="#ff6b6b" opacity="0.3"/>
+  <text x="36" y="138" font-size="11" fill="#6b6b6b">数万个 2-5MB 小文件</text>
+  <text x="36" y="155" font-size="11" fill="#ff6b6b">→ 读取慢，查询耗时长</text>
+  <text x="36" y="172" font-size="11" fill="#ff6b6b">→ Spark 需要打开大量文件</text>
+
+  <!-- Arrow -->
+  <text x="360" y="105" text-anchor="middle" font-size="20" fill="#0066ff">→</text>
+  <text x="360" y="122" text-anchor="middle" font-size="10" fill="#0066ff">Projection</text>
+  <text x="360" y="135" text-anchor="middle" font-size="10" fill="#0066ff">Compaction</text>
+
+  <!-- After: compacted -->
+  <rect x="390" y="10" width="310" height="180" rx="8" fill="#f0faf5" stroke="#00d084"/>
+  <text x="545" y="34" text-anchor="middle" font-size="13" font-weight="600" fill="#00d084">启用 Projection（自动 Compaction）</text>
+  <rect x="410" y="50" width="260" height="50" rx="4" fill="#00d084" opacity="0.25"/>
+  <text x="540" y="80" text-anchor="middle" font-size="12" fill="#1a1a1a">大文件 1（已排序 + hash-bucketed）</text>
+  <rect x="410" y="108" width="260" height="50" rx="4" fill="#00d084" opacity="0.18"/>
+  <text x="540" y="138" text-anchor="middle" font-size="12" fill="#1a1a1a">大文件 2</text>
+  <text x="410" y="172" font-size="11" fill="#00d084">→ 读性能与文件数无关 · 自动维护</text>
+</svg>
+</div>
+
+<div class="callout callout-green">
+  <b>Projection 工作方式：</b>独立于 canonical dataset 的查询机制，自动把大量小文件合并成排序好的大文件（compaction）。Foundry 所有产品都知道怎么把 projection 和最新的 canonical 数据合并，读取结果和没有 projection 时完全一致——只是快很多。可以按 filter（优化过滤查询）或 join（优化关联查询，hash-bucketed）两种模式配置。
+</div>
+
+<h3>Ontology 层的增量：Link Type 和 Action Type</h3>
+
+<p>很多人只理解到 Object Type 的数据更新，忽略了 Link 和 Action 的同步机制——它们的更新方式完全不同：</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Ontology 元素</th><th>更新触发方式</th><th>更新时机</th><th>处理层</th></tr>
+  <tr>
+    <td><b>Object Type 属性</b></td>
+    <td>backing dataset 收到新事务</td>
+    <td>下次 Funnel batch pipeline 运行后</td>
+    <td>Funnel changelog + merge + hydration</td>
+  </tr>
+  <tr>
+    <td><b>One-to-many Link</b><br><small>（FK 型，如 Flight → Aircraft）</small></td>
+    <td>FK 属性值变化（随 Object 更新自动解析）</td>
+    <td>随 Object 更新，无需单独 sync</td>
+    <td>查询时动态解析，不需要 Funnel 单独处理</td>
+  </tr>
+  <tr>
+    <td><b>Many-to-many Link</b><br><small>（join table 型）</small></td>
+    <td>join table dataset 收到新事务</td>
+    <td>下次 Funnel batch pipeline 运行后</td>
+    <td>Funnel 独立为 link type 维护 changelog</td>
+  </tr>
+  <tr>
+    <td><b>Action Type 执行结果</b></td>
+    <td>用户触发 Action</td>
+    <td><b>立即</b>写入 OSv2 live index</td>
+    <td>Actions service → Funnel queue → 异步持久化</td>
+  </tr>
+</table>
+</div>
+
+<p><b>Action 的两段式更新</b>是最关键的设计：</p>
+
+<div class="diagram">
+<svg viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,'Noto Sans SC',sans-serif">
+  <defs>
+    <marker id="act-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+    </marker>
+  </defs>
+  <!-- User action -->
+  <rect x="20" y="50" width="130" height="60" rx="8" fill="#f0f5ff" stroke="#0066ff"/>
+  <text x="85" y="76" text-anchor="middle" font-size="12" font-weight="600" fill="#0066ff">用户点击</text>
+  <text x="85" y="93" text-anchor="middle" font-size="11" fill="#2d2d2d">"Rebook 改签"</text>
+  <!-- Arrow to Actions service -->
+  <line x1="152" y1="80" x2="192" y2="80" stroke="#6b6b6b" stroke-width="1" marker-end="url(#act-arr)"/>
+  <rect x="194" y="50" width="130" height="60" rx="8" fill="#fafaf8" stroke="#d4d4d4"/>
+  <text x="259" y="76" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Actions Service</text>
+  <text x="259" y="93" text-anchor="middle" font-size="11" fill="#6b6b6b">发送修改指令</text>
+  <!-- Two arrows from Actions service -->
+  <line x1="326" y1="68" x2="366" y2="40" stroke="#0066ff" stroke-width="1.5" marker-end="url(#act-arr)"/>
+  <line x1="326" y1="92" x2="366" y2="120" stroke="#6b6b6b" stroke-width="1" marker-end="url(#act-arr)" stroke-dasharray="4 3"/>
+  <!-- Immediate path -->
+  <rect x="368" y="18" width="160" height="44" rx="8" fill="#f0faf5" stroke="#00d084"/>
+  <text x="448" y="36" text-anchor="middle" font-size="11" font-weight="700" fill="#00d084">立即</text>
+  <text x="448" y="52" text-anchor="middle" font-size="11" fill="#2d2d2d">写入 OSv2 live index</text>
+  <!-- Async path -->
+  <rect x="368" y="98" width="160" height="44" rx="8" fill="#fafaf8" stroke="#d4d4d4"/>
+  <text x="448" y="116" text-anchor="middle" font-size="11" fill="#6b6b6b">异步 · 周期性</text>
+  <text x="448" y="130" text-anchor="middle" font-size="11" fill="#2d2d2d">持久化到 Writeback Dataset</text>
+  <!-- Arrows to result -->
+  <line x1="530" y1="40" x2="570" y2="68" stroke="#00d084" stroke-width="1.5" marker-end="url(#act-arr)"/>
+  <line x1="530" y1="120" x2="570" y2="92" stroke="#6b6b6b" stroke-width="1" marker-end="url(#act-arr)" stroke-dasharray="4 3"/>
+  <rect x="572" y="50" width="128" height="60" rx="8" fill="#0066ff"/>
+  <text x="636" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Ontology</text>
+  <text x="636" y="93" text-anchor="middle" font-size="11" fill="#fff">查询立即可见</text>
+</svg>
+</div>
+
+<p>这意味着：用户执行"Rebook 改签"后，Booking 对象的 flight_id 属性和 Link 链接<b>立刻</b>更新，不需要等 Funnel batch pipeline 的下次运行。但这次 Action 的持久化记录（写入 Writeback Dataset）是异步完成的——Funnel 有 offset 追踪保证故障恢复后能补齐未刷入的编辑。</p>
+
+<!-- ============================================ -->
+<!-- WIDE TABLE PROBLEM -->
+<!-- ============================================ -->
+<h2>现实问题：一张超大宽表怎么办？</h2>
+
+<p>前面的场景假设数据已范式化。但企业现实是：你拿到的往往是一张<b>几百列的大宽表</b>——ERP 导出的报表视图，order、customer、product、shipping 全打平在一张表里。</p>
+
+<p>Palantir 的答案很明确：<mark>必须在 pipeline 层先拆分，没有捷径。</mark></p>
+
+<div class="callout callout-coral">
+  <b>硬性约束：</b>一个 Object Type 只能对应一个 backing dataset，一个 dataset 只能 back 一个 Object Type。<br><br>
+  <b>"Kitchen Sink" 反模式：</b>Palantir 在 Best Practices 文档中专门警告——把所有列都映射为 properties 会让数据模型"被技术产物搞得一团糟"。只包含有明确业务含义且对 workflow 有用的列。
+</div>
+
+<p>实际工程路径是三步：Pipeline 层拆分宽表为多个 focused datasets → 每个映射到独立 Object Type → 用 Link Types 关联。</p>
+
+<h3>关键瓶颈：谁来决定"怎么拆"？</h3>
+
+<p>Pipeline Builder 的 AIP 功能可以帮你<b>写</b>拆分代码。但<b>决定怎么拆</b>——200 列宽表拆成哪几个实体、order_status 属于 Order 还是应该独立——<mark>完全依赖人工判断</mark>，也就是 Palantir 的 Forward Deployed Engineer（FDE）。AIP Assist 是加速执行的 copilot，不是替代建模决策的 architect。</p>
+
+<!-- ============================================ -->
+<!-- DOMAIN TEMPLATE (REFRAMED) -->
+<!-- ============================================ -->
+<h2>延伸思考：垂直行业的 Domain Ontology Template</h2>
+
+<p>上一节指出了 Palantir 模式的一个结构性成本：<b>每个客户的 Ontology 设计都是从零开始的 FDE 定制项目</b>。但这个问题在某些行业里，可能存在产品化的解法。</p>
+
+<h3>Palantir 有模板分发机制，但没做垂直行业模板</h3>
+
+<p>Palantir 的 <b>Marketplace</b> 支持把 object types 和 link types 打包成可复用产品，技术上完全可以做成一键安装的行业骨架。但作为平台厂商，Palantir 自己并没有针对特定行业做这件事。</p>
+
+<h3>机会在哪？</h3>
+
+<p>在业务实体高度标准化的行业——比如供应链（Shipment、Container、SKU、Warehouse、Carrier）、医疗（Patient、Encounter、Diagnosis、Medication、Provider）、金融（Account、Transaction、Instrument、Counterparty）——核心 Object Types 的跨企业共识度很高。<b>这不是护城河。</b></p>
+
+<p>真正值钱的不是"模板里有哪些 entity"，而是：<mark>当客户给你一张源系统导出的 200 列宽表时，哪些列映射到哪个 entity</mark>。这套 mapping 规则才是 FDE 在每个客户那里反复花时间做的事。</p>
+
+<p>产品化的方向不是一个静态模板，而是一套 <b>source-system-aware 的 mapping 规则库</b>。以供应链为例：</p>
+
+<div style="background:var(--bg2);border-radius:10px;padding:24px;margin:24px 0">
+  <div class="layer-row" style="border-bottom:2px solid var(--border);padding-bottom:12px;margin-bottom:4px">
+    <div style="font-weight:700;font-size:.82rem;color:var(--text3)">层级</div>
+    <div style="font-weight:700;font-size:.82rem;color:var(--text3)">内容</div>
+    <div style="font-weight:700;font-size:.82rem;color:var(--text3);text-align:right">复用率</div>
+  </div>
+  <div class="layer-row">
+    <div class="layer-label">Layer 1</div>
+    <div><b>Domain Object Types</b><br><span style="color:var(--text3);font-size:.88rem">Shipment、Container、SKU、Warehouse 等标准 entity + Link Types</span></div>
+    <div class="layer-reuse">90%+</div>
+  </div>
+  <div class="layer-row">
+    <div class="layer-label">Layer 2</div>
+    <div><b>Source System Mappings</b><br><span style="color:var(--text3);font-size:.88rem">SAP MM/SD/WM、Oracle EBS、用友、金蝶等主流 ERP 标准表 → Object Type 映射</span></div>
+    <div class="layer-reuse">70%+</div>
+  </div>
+  <div class="layer-row">
+    <div class="layer-label">Layer 3</div>
+    <div><b>Customer Extensions</b><br><span style="color:var(--text3);font-size:.88rem">非标字段、定制业务逻辑、客户特有 entity</span></div>
+    <div class="layer-reuse" style="color:var(--coral)">需定制</div>
+  </div>
+</div>
+
+<p>同样的三层架构可以套用到医疗（HL7 FHIR 标准 → 各 HIS 系统映射）、金融（SWIFT 消息标准 → 各核心系统映射）等领域。客户选了源系统类型，Layer 1 和 Layer 2 就大致有了，FDE 只需处理 Layer 3。</p>
+
+<p>Palantir 没做这一步，因为它是平台厂商——没有动力把某个行业的 FDE 知识固化成产品。但对<b>垂直行业玩家</b>来说，这正好是杠杆点：谁能把这个领域知识标准化，谁就能在 Palantir 生态（或任何类似的 Ontology-driven 平台）里占据一个有结构性优势的位置。</p>
+
+<!-- ============================================ -->
+<!-- BOTTOM LINE -->
+<!-- ============================================ -->
+<h2>底层真相：Ontology 到底"新"在哪？</h2>
+
+<p>如果你有数据库背景，看完可能会问：这不就是关系型 schema 加了一层业务语义吗？坦率说，从纯数据建模角度，确实如此。但 Ontology 真正的价值在三点：</p>
+
+<p><b>第一，全链路可追溯。</b>从 Ontology 任意 property value 到原始文件的某一行，整条 pipeline 有完整版本历史。合规行业的硬性需求。</p>
+
+<p><b>第二，可写回。</b>传统语义层是只读的。Ontology 通过 Action Types + Writeback Dataset 设计，让业务用户直接修改数据——且修改和原始数据分离存储。</p>
+
+<p><b>第三，应用层直接消费。</b>Workshop、Slate、OSDK、AIP 直接操作 Ontology 对象。业务用户点"Resolve Alert"按钮，背后自动完成 property 修改、link 更新、writeback 写入。</p>
+
+<div class="footer">
+  <p style="margin-bottom:8px"><b>ZeroFutureTech</b> · AI Learning</p>
+  <p>所有技术细节均标注 Palantir 官方文档出处。完整参考来源列表见配套 Markdown 版本。</p>
+</div>
+
+</article>
+<footer class="isaac-reading-end">本文收录自本地 HTML 阅读资料，原有署名与参考资料保留在文中。<br><a href="/strategy/">返回 AI 战略认知 · 全部文章</a></footer><a class="isaac-reading-return" href="/strategy/">← AI 战略认知 · 全部文章</a></body>
+</html>

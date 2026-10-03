@@ -1,0 +1,1133 @@
+{
+  "captured_on": "2026-10-03",
+  "origin": "https://isaac2024.online",
+  "scope": "Public frontend pages and unbundled JS/CSS; no server code, accounts, uploads, databases or logs. Large media and third-party bundles remain hosted at the origin.",
+  "routes": {
+    "/": {
+      "file": "site/index.html",
+      "source": "https://isaac2024.online/",
+      "sha256": "a5e8135a4ebec3683f409be7ad968e133a192213e9f7b38bbde9e0bf5675a162",
+      "bytes": 29748,
+      "kind": "page"
+    },
+    "/enterprise-faq/": {
+      "file": "site/enterprise-faq/index.html",
+      "source": "https://isaac2024.online/enterprise-faq/",
+      "sha256": "8c46dfe6593f56d897cd5bcdab23aa890a296eef494b3159f4a16b7e73045b06",
+      "bytes": 27595,
+      "kind": "page"
+    },
+    "/services/": {
+      "file": "site/services/index.html",
+      "source": "https://isaac2024.online/services/",
+      "sha256": "e6f5519dd161a1d024bb995b413b78be125ea88a207fd4913f9818983537c484",
+      "bytes": 27865,
+      "kind": "page"
+    },
+    "/strategy/": {
+      "file": "site/strategy/index.html",
+      "source": "https://isaac2024.online/strategy/",
+      "sha256": "601c7d2b2b44c987daae2756c63ee4fa26fc578c48f4599a48c92c2b8077162e",
+      "bytes": 17253,
+      "kind": "page"
+    },
+    "/work/": {
+      "file": "site/work/index.html",
+      "source": "https://isaac2024.online/work/",
+      "sha256": "35c9022fad9c8d5e3e14ffd027e5f6e19304be22e770e2c43ef8b2aa9ccbe631",
+      "bytes": 6766,
+      "kind": "page"
+    },
+    "/work/details/banu/": {
+      "file": "site/work/details/banu/index.html",
+      "source": "https://isaac2024.online/work/details/banu/",
+      "sha256": "0ebcdc14e168c0d0d9ec9f155350538f23972f5b7cee6d637bed9c29f1a91d76",
+      "bytes": 14723,
+      "kind": "page"
+    },
+    "/work/details/bookstore/": {
+      "file": "site/work/details/bookstore/index.html",
+      "source": "https://isaac2024.online/work/details/bookstore/",
+      "sha256": "778f4d7d6e0e06011a651ebdb98736bf9c7a72aff2617714e361b1faa3d69734",
+      "bytes": 13495,
+      "kind": "page"
+    },
+    "/work/details/hospital/": {
+      "file": "site/work/details/hospital/index.html",
+      "source": "https://isaac2024.online/work/details/hospital/",
+      "sha256": "1ce065e0b00d1ce6e4c84f9c557a5d26ad0ea81fd16028c8435040e63beb8b7f",
+      "bytes": 14248,
+      "kind": "page"
+    },
+    "/work/details/ins/": {
+      "file": "site/work/details/ins/index.html",
+      "source": "https://isaac2024.online/work/details/ins/",
+      "sha256": "b2de3da7cb4cf72e22ad4717dfcb592f9c303913e071e7a4dba5162f34361f1d",
+      "bytes": 13729,
+      "kind": "page"
+    },
+    "/about/journal/banu-cooperation/": {
+      "file": "site/about/journal/banu-cooperation/index.html",
+      "source": "https://isaac2024.online/about/journal/banu-cooperation/",
+      "sha256": "09168f8856a509245fee12101b4945c462fc185adf3d4a5fbb79979b38c4115d",
+      "bytes": 4370,
+      "kind": "page"
+    },
+    "/about/journal/hospital-cooperation/": {
+      "file": "site/about/journal/hospital-cooperation/index.html",
+      "source": "https://isaac2024.online/about/journal/hospital-cooperation/",
+      "sha256": "69aa267a2877868bca92927b7b64ce9183bbfa5b6ab98694e024e4e116012b63",
+      "bytes": 4430,
+      "kind": "page"
+    },
+    "/services/solutions/customer-service/": {
+      "file": "site/services/solutions/customer-service/index.html",
+      "source": "https://isaac2024.online/services/solutions/customer-service/",
+      "sha256": "331ec5275efc978f1b5b7bbd0a349bc755a2490cb7741d4e20d13cc4847e1516",
+      "bytes": 109671,
+      "kind": "page"
+    },
+    "/services/solutions/knowledge-base/": {
+      "file": "site/services/solutions/knowledge-base/index.html",
+      "source": "https://isaac2024.online/services/solutions/knowledge-base/",
+      "sha256": "c28475165d7984417f808b9679c0ad989b3e3e90f24a5443b5f29ca588cafb00",
+      "bytes": 94992,
+      "kind": "page"
+    },
+    "/services/solutions/ai-delivery/": {
+      "file": "site/services/solutions/ai-delivery/index.html",
+      "source": "https://isaac2024.online/services/solutions/ai-delivery/",
+      "sha256": "44f46a83cd2012969ea6dce66d5df02ceb0cc4c118062facbaa5455a3b240e0f",
+      "bytes": 47576,
+      "kind": "page"
+    },
+    "/services/geo-website/": {
+      "file": "site/services/geo-website/index.html",
+      "source": "https://isaac2024.online/services/geo-website/",
+      "sha256": "f8b445d3f9abf4d7840941f3c2272d9ce9faf8c9008a8fcf4c8819ed9ed42bd8",
+      "bytes": 14485,
+      "kind": "page"
+    },
+    "/services/industrial-plc-simulation/": {
+      "file": "site/services/industrial-plc-simulation/index.html",
+      "source": "https://isaac2024.online/services/industrial-plc-simulation/",
+      "sha256": "651ed1149cf0ac4d2cb2e8166a5319d17e9479b18d74d547c37eb3bbdfaaa0b6",
+      "bytes": 12437,
+      "kind": "page"
+    },
+    "/services/overseas-compliance/": {
+      "file": "site/services/overseas-compliance/index.html",
+      "source": "https://isaac2024.online/services/overseas-compliance/",
+      "sha256": "e10a8e0c5a74513d5546c6ce0173e6b80324b38da0890c3978e2d7a5c7d53c79",
+      "bytes": 25146,
+      "kind": "page"
+    },
+    "/strategy/agent-design-patterns/": {
+      "file": "site/strategy/agent-design-patterns/index.html",
+      "source": "https://isaac2024.online/strategy/agent-design-patterns/",
+      "sha256": "3e667a44fe50be3d2a5f2de0e088ba56a37c45dbc4717fc1f738d1b29b91b9a6",
+      "bytes": 74934,
+      "kind": "page"
+    },
+    "/strategy/agent-ontology-interaction/": {
+      "file": "site/strategy/agent-ontology-interaction/index.html",
+      "source": "https://isaac2024.online/strategy/agent-ontology-interaction/",
+      "sha256": "441aa8a6a27c1c40bf67c147e6f8820db60fbbfe31dee4237c194206aaaa93d4",
+      "bytes": 79292,
+      "kind": "page"
+    },
+    "/strategy/ai-delivery-ten-questions/": {
+      "file": "site/strategy/ai-delivery-ten-questions/index.html",
+      "source": "https://isaac2024.online/strategy/ai-delivery-ten-questions/",
+      "sha256": "ed1b1956605bba553b13392159165b90ef98345dd72ddb6e905f71ba0c4712d2",
+      "bytes": 10467,
+      "kind": "page"
+    },
+    "/strategy/beasts-dilemma/": {
+      "file": "site/strategy/beasts-dilemma/index.html",
+      "source": "https://isaac2024.online/strategy/beasts-dilemma/",
+      "sha256": "86977fa369471bb89904a261b17a00d9ce5398a484129fe41178a5b9501d08bf",
+      "bytes": 20413,
+      "kind": "page"
+    },
+    "/strategy/data/": {
+      "file": "site/strategy/data/index.html",
+      "source": "https://isaac2024.online/strategy/data/",
+      "sha256": "fa2f515688a05f48862a99de4c8e396afc255ca727443d54448d5855713e1cad",
+      "bytes": 9378,
+      "kind": "page"
+    },
+    "/strategy/delivery/": {
+      "file": "site/strategy/delivery/index.html",
+      "source": "https://isaac2024.online/strategy/delivery/",
+      "sha256": "0a687b1d298b84a929c5fe4263857c5bb985494c83bbf8c4bc62cfd2efa73999",
+      "bytes": 9226,
+      "kind": "page"
+    },
+    "/strategy/facing-cycles/": {
+      "file": "site/strategy/facing-cycles/index.html",
+      "source": "https://isaac2024.online/strategy/facing-cycles/",
+      "sha256": "6fa02a4a47c981739c142d77b4861d06eeaa60a12db07541b8a18850952a1ff4",
+      "bytes": 14460,
+      "kind": "page"
+    },
+    "/strategy/files-to-ontology/": {
+      "file": "site/strategy/files-to-ontology/index.html",
+      "source": "https://isaac2024.online/strategy/files-to-ontology/",
+      "sha256": "14e6917ef277ec9b407beba6555cece8956630c2f56af37c6ddaa43723c0a5db",
+      "bytes": 73028,
+      "kind": "page"
+    },
+    "/strategy/focus/": {
+      "file": "site/strategy/focus/index.html",
+      "source": "https://isaac2024.online/strategy/focus/",
+      "sha256": "bd2e72c4a8f021c5e85538124860d7700f428b1b10ea4a13dad6d916a8849298",
+      "bytes": 9373,
+      "kind": "page"
+    },
+    "/strategy/llm-ontology-methods/": {
+      "file": "site/strategy/llm-ontology-methods/index.html",
+      "source": "https://isaac2024.online/strategy/llm-ontology-methods/",
+      "sha256": "b41fc8076aec76da3e49f954486efb29f8024f9006bceb53a30587f062600cd2",
+      "bytes": 56619,
+      "kind": "page"
+    },
+    "/strategy/ontology-design-principles/": {
+      "file": "site/strategy/ontology-design-principles/index.html",
+      "source": "https://isaac2024.online/strategy/ontology-design-principles/",
+      "sha256": "7d921ea2998729cbdc06a58b1876bc580baad2b75af404d2fc2a948ebd333c2e",
+      "bytes": 68417,
+      "kind": "page"
+    },
+    "/strategy/ontology-five-graphs/": {
+      "file": "site/strategy/ontology-five-graphs/index.html",
+      "source": "https://isaac2024.online/strategy/ontology-five-graphs/",
+      "sha256": "3368dd0bab3a7448cc8eab827d163103f9edaf9a32c555d0fd2d42dec2f7fd49",
+      "bytes": 96928,
+      "kind": "page"
+    },
+    "/strategy/palantir-ontology/": {
+      "file": "site/strategy/palantir-ontology/index.html",
+      "source": "https://isaac2024.online/strategy/palantir-ontology/",
+      "sha256": "2d61aec842afc312017aa3f531bfa82c25cfcb5b5369bf776b0e7596b6bbee1a",
+      "bytes": 88859,
+      "kind": "page"
+    },
+    "/about/explore/": {
+      "file": "site/about/explore/index.html",
+      "source": "https://isaac2024.online/about/explore/",
+      "sha256": "d5d064ec715c2dafdf3dbab7da4d23edd1bf4153e847af2bf58233be0e4876f4",
+      "bytes": 13450,
+      "kind": "page"
+    },
+    "/about/journal/company-founded/": {
+      "file": "site/about/journal/company-founded/index.html",
+      "source": "https://isaac2024.online/about/journal/company-founded/",
+      "sha256": "fd4680dacb561820c2f74b91199a68e8de89d6af8705dc36febb8cca1ad2d2bc",
+      "bytes": 4029,
+      "kind": "page"
+    },
+    "/about/journal/sequoia-incubation/": {
+      "file": "site/about/journal/sequoia-incubation/index.html",
+      "source": "https://isaac2024.online/about/journal/sequoia-incubation/",
+      "sha256": "f93d4143a2ed79a8df314fcc72509d8af1ab1625e2866b67144af45d35fc7829",
+      "bytes": 4100,
+      "kind": "page"
+    },
+    "/about/journal/": {
+      "file": "site/about/journal/index.html",
+      "source": "https://isaac2024.online/about/journal/",
+      "sha256": "8871657d8f1547f80cb971b9df064924a6485d016429191dfb369ee5af7628bb",
+      "bytes": 4743,
+      "kind": "page"
+    },
+    "/entry-gate.css": {
+      "file": "site/entry-gate.css",
+      "source": "https://isaac2024.online/entry-gate.css",
+      "sha256": "ecf5597799b5cb99cad4e494cfd5d33182d19688bf1f8c32dbe27b96c4c5ba59",
+      "bytes": 2237,
+      "kind": "asset"
+    },
+    "/entry-gate.js": {
+      "file": "site/entry-gate.js",
+      "source": "https://isaac2024.online/entry-gate.js",
+      "sha256": "8c2d904442a9fdb876cb25d854df4fb8687c21d369e3f673fa3cd8532abc3f8f",
+      "bytes": 4974,
+      "kind": "asset"
+    },
+    "/home-assets/about-timeline-20260926-232531/site/about/css/main.css": {
+      "file": "site/home-assets/about-timeline-20260926-232531/site/about/css/main.css",
+      "source": "https://isaac2024.online/home-assets/about-timeline-20260926-232531/site/about/css/main.css",
+      "sha256": "be4b20295d182e01af8ad275efa472392152ff759ebe140b56b5ba1cc008145b",
+      "bytes": 27925,
+      "kind": "asset"
+    },
+    "/home-assets/about-timeline-20260926-232531/site/about/journal/journal.css": {
+      "file": "site/home-assets/about-timeline-20260926-232531/site/about/journal/journal.css",
+      "source": "https://isaac2024.online/home-assets/about-timeline-20260926-232531/site/about/journal/journal.css",
+      "sha256": "26f81ab180c6fbca945cef79ffbf38e67bbf9ac5430beddb899eb7e18e2374b6",
+      "bytes": 1004,
+      "kind": "asset"
+    },
+    "/home-assets/about-timeline-20260926-232531/site/about/replacement.css": {
+      "file": "site/home-assets/about-timeline-20260926-232531/site/about/replacement.css",
+      "source": "https://isaac2024.online/home-assets/about-timeline-20260926-232531/site/about/replacement.css",
+      "sha256": "314cb33c4dd61eefa66159fd87070fd96dc2ebea82ac7b95b1ba4d28f4fdfa56",
+      "bytes": 800,
+      "kind": "asset"
+    },
+    "/home-assets/about-timeline-20260926-232531/site/about/shared-navigation/fonts.css": {
+      "file": "site/home-assets/about-timeline-20260926-232531/site/about/shared-navigation/fonts.css",
+      "source": "https://isaac2024.online/home-assets/about-timeline-20260926-232531/site/about/shared-navigation/fonts.css",
+      "sha256": "36b5781dcb591237202cd78f021fff4ec96710e404f91f728dac7bfff9571904",
+      "bytes": 240,
+      "kind": "asset"
+    },
+    "/home-assets/about-timeline-20260926-232531/site/about/shared-navigation/scene-layout.css": {
+      "file": "site/home-assets/about-timeline-20260926-232531/site/about/shared-navigation/scene-layout.css",
+      "source": "https://isaac2024.online/home-assets/about-timeline-20260926-232531/site/about/shared-navigation/scene-layout.css",
+      "sha256": "8adbb999dcba2844c49d88dcff6cb47fdda015e7bef04553489ee6ca1cceb252",
+      "bytes": 294,
+      "kind": "asset"
+    },
+    "/home-assets/case-studies-20260927T182838Z/site/work/case-study.css": {
+      "file": "site/home-assets/case-studies-20260927T182838Z/site/work/case-study.css",
+      "source": "https://isaac2024.online/home-assets/case-studies-20260927T182838Z/site/work/case-study.css",
+      "sha256": "55a20b2d8b17d67a1bbb9049d86d5673ee8685657fffe085a9924a562573f0d6",
+      "bytes": 8047,
+      "kind": "asset"
+    },
+    "/home-assets/case-toc-complete-20260928T061044Z/site/work/case-sidebar.css": {
+      "file": "site/home-assets/case-toc-complete-20260928T061044Z/site/work/case-sidebar.css",
+      "source": "https://isaac2024.online/home-assets/case-toc-complete-20260928T061044Z/site/work/case-sidebar.css",
+      "sha256": "e8e0a77939a5ac1bdcc2cbf73a3993e7f75c6c7a05e5545f10d8bd9bf9b6199c",
+      "bytes": 2136,
+      "kind": "asset"
+    },
+    "/home-assets/case-toc-complete-20260928T061044Z/site/work/case-toc.js": {
+      "file": "site/home-assets/case-toc-complete-20260928T061044Z/site/work/case-toc.js",
+      "source": "https://isaac2024.online/home-assets/case-toc-complete-20260928T061044Z/site/work/case-toc.js",
+      "sha256": "7da5201ceae12cd0bb3c9f844e60607e3a5574e9707021229a48f75ec4c2e068",
+      "bytes": 1989,
+      "kind": "asset"
+    },
+    "/home-assets/enterprise-faq-mobile-20260929-v1/touch.css": {
+      "file": "site/home-assets/enterprise-faq-mobile-20260929-v1/touch.css",
+      "source": "https://isaac2024.online/home-assets/enterprise-faq-mobile-20260929-v1/touch.css",
+      "sha256": "d0352f5d12dfdaac1a34ea05bb1340e74fbc6325c308b6328b3716d6ba2b4c08",
+      "bytes": 1535,
+      "kind": "asset"
+    },
+    "/home-assets/enterprise-faq-node-text-trim-20261002-v1/explorer.css": {
+      "file": "site/home-assets/enterprise-faq-node-text-trim-20261002-v1/explorer.css",
+      "source": "https://isaac2024.online/home-assets/enterprise-faq-node-text-trim-20261002-v1/explorer.css",
+      "sha256": "3b9962c7a14eb726fbb98deddaccc289f1e4a08e0d0372ce2efa592e749ffb2c",
+      "bytes": 19167,
+      "kind": "asset"
+    },
+    "/home-assets/enterprise-faq-node-text-trim-20261002-v1/explorer.js": {
+      "file": "site/home-assets/enterprise-faq-node-text-trim-20261002-v1/explorer.js",
+      "source": "https://isaac2024.online/home-assets/enterprise-faq-node-text-trim-20261002-v1/explorer.js",
+      "sha256": "813cb00c54fc892529c73f68152ba71100031308e3274175ccdac842ad38ace3",
+      "bytes": 40438,
+      "kind": "asset"
+    },
+    "/home-assets/enterprise-faq-node-text-trim-20261002-v1/model.js": {
+      "file": "site/home-assets/enterprise-faq-node-text-trim-20261002-v1/model.js",
+      "source": "https://isaac2024.online/home-assets/enterprise-faq-node-text-trim-20261002-v1/model.js",
+      "sha256": "e9debe945511d4f9403cb1feafb3f9253327fa64a514ed16d146f0f6c50216f6",
+      "bytes": 29204,
+      "kind": "asset"
+    },
+    "/home-assets/enterprise-faq-waiting-placement-20261002-v1/stories.js": {
+      "file": "site/home-assets/enterprise-faq-waiting-placement-20261002-v1/stories.js",
+      "source": "https://isaac2024.online/home-assets/enterprise-faq-waiting-placement-20261002-v1/stories.js",
+      "sha256": "35f0b654f651c91288d6e4f28770383dbcd3e712dc3d2127245175a7474379e9",
+      "bytes": 27958,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/assets/main-jwLaSJG2.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/assets/main-jwLaSJG2.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/assets/main-jwLaSJG2.css",
+      "sha256": "f26c5cad048215c259008fd78bf8d1d8b1c692da9add27464db46592f97b62fc",
+      "bytes": 56112,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/assets/mobile-performance-20260927-v1.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/assets/mobile-performance-20260927-v1.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/assets/mobile-performance-20260927-v1.css",
+      "sha256": "d467d52b8b898de1691a3bd06f7f446ca1f336d44f9afe21dc8e646395e19372",
+      "bytes": 194,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/assets/scene-shade-scroll-20260927-v1.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/assets/scene-shade-scroll-20260927-v1.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/assets/scene-shade-scroll-20260927-v1.css",
+      "sha256": "8945242b6cf665dfdc9e8b121ea0e64141b5e45a0adbf8ab307ed3aa00012b1a",
+      "bytes": 879,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/click-response-20260927-132315/pending.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/click-response-20260927-132315/pending.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/click-response-20260927-132315/pending.css",
+      "sha256": "bc2f8e80848cd9b9babd92fbdea8360008edc01045c1a6859e4c9dbf789d704b",
+      "bytes": 460,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/eager-reading-20260927-134121/navigation.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/eager-reading-20260927-134121/navigation.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/eager-reading-20260927-134121/navigation.js",
+      "sha256": "5f928d4f12de61f3505b9960022ad7724e37675ce066165f948609592d199245",
+      "bytes": 11634,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/game-return-overlay-20260929-v1/return-overlay.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/game-return-overlay-20260929-v1/return-overlay.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/game-return-overlay-20260929-v1/return-overlay.css",
+      "sha256": "78926891bb278c41d875f2a003333263b2cc73ebdc8c14735c3f5f5cd38ed62b",
+      "bytes": 353,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/depth-quality.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/depth-quality.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/depth-quality.css",
+      "sha256": "e24df4ff2eadd01b59c6c1ce19cd486d66467b4ad42c1aaa96b6dffde96c16a1",
+      "bytes": 2256,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/product-journey.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/product-journey.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/product-journey.css",
+      "sha256": "e80132affa8885405c031f543f1c6662a853dce1bffeb3469dfb0099bc339d18",
+      "bytes": 5774,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-direct-entry-20260930-v1/entry-gate.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-direct-entry-20260930-v1/entry-gate.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-direct-entry-20260930-v1/entry-gate.css",
+      "sha256": "bb4bfd9f963af8a515bedd3a5f107956c86e669da01ef25987b0e0f240280a94",
+      "bytes": 1915,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-direct-entry-20260930-v1/entry-gate.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-direct-entry-20260930-v1/entry-gate.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-direct-entry-20260930-v1/entry-gate.js",
+      "sha256": "019f577a0bc209903e551d502fc251a0bc8450236b1eb5b22b709f18e386f502",
+      "bytes": 3945,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/main.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/main.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/main.js",
+      "sha256": "58862d48f99a39be88c2bbd03446b321a5a067bc0e6cdca98f29268fd26d627f",
+      "bytes": 8918,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/portal.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/portal.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/portal.js",
+      "sha256": "568e85a9e76ad014d85d99099fa93a3a2f3e47244964554b2645bcab8b7d3d02",
+      "bytes": 17006,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/scene.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/scene.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-load-speed-20261002-v1/scene.js",
+      "sha256": "9f3cf421bf58127451d5acc1de4cd80ab76082ac2df1b44bf919cc8472fd8339",
+      "bytes": 332605,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/homepage-content.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/homepage-content.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/homepage-content.css",
+      "sha256": "7cf91dd94b7851336ab925ac96a81c9b6a7bf44e0af8547324434eb365795412",
+      "bytes": 1489,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/homepage-flow.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/homepage-flow.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/homepage-flow.css",
+      "sha256": "8c93414b155ba9463798f2c347af273178b75f9b62395a04797cf64f0599751e",
+      "bytes": 8026,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/mobile-parity-20260929-v1.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/mobile-parity-20260929-v1.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/mobile-parity-20260929-v1.css",
+      "sha256": "8ea2b6e7ef5c5584a62277c22f62c0c14d80137837a235b129b6620380559801",
+      "bytes": 958,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/mobile-readability-20260929-v2.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/mobile-readability-20260929-v2.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/homepage-flow-20260929-v2/mobile-readability-20260929-v2.css",
+      "sha256": "143a9da9c482de7f3e06543f6d24a96b04226596c18117a1e1a3f0ce1fed8bbd",
+      "bytes": 2932,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/menu-stars-fix-20260926-231955/navigation.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/menu-stars-fix-20260926-231955/navigation.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/menu-stars-fix-20260926-231955/navigation.css",
+      "sha256": "3346939d073bb84a6e9c57225cadd028e73eb8363dcafe48946a09545ea4e707",
+      "bytes": 1059,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/fallback-navigation.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/fallback-navigation.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/fallback-navigation.js",
+      "sha256": "29edf55715cb98c6e0ed99048a982e700b5687dbce28edbee8d07c592ae47dba",
+      "bytes": 2911,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/mobile-responsive.css": {
+      "file": "site/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/mobile-responsive.css",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/mobile-responsive.css",
+      "sha256": "723b88d7e66225aba24a3da0e2a8413dcd9bd81a6d9594a1a6beba464de01cda",
+      "bytes": 4962,
+      "kind": "asset"
+    },
+    "/home-assets/feedback-20260926-v1/site-feedback.js": {
+      "file": "site/home-assets/feedback-20260926-v1/site-feedback.js",
+      "source": "https://isaac2024.online/home-assets/feedback-20260926-v1/site-feedback.js",
+      "sha256": "a2c82e8efab1c82526da5e6180902af0dbb1ddc30a92c49349d91601eabbf9eb",
+      "bytes": 3335,
+      "kind": "asset"
+    },
+    "/home-assets/homepage-page8-20260927-v1/page8-v6.css": {
+      "file": "site/home-assets/homepage-page8-20260927-v1/page8-v6.css",
+      "source": "https://isaac2024.online/home-assets/homepage-page8-20260927-v1/page8-v6.css",
+      "sha256": "ca894da8f5eb723fc08a0b0a75769e4cefb79ad5c6bb3a01d34b45fde00d368e",
+      "bytes": 463,
+      "kind": "asset"
+    },
+    "/home-assets/liquid-cases-20260926T162458Z/site/shared-navigation/fonts.css": {
+      "file": "site/home-assets/liquid-cases-20260926T162458Z/site/shared-navigation/fonts.css",
+      "source": "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/shared-navigation/fonts.css",
+      "sha256": "36b5781dcb591237202cd78f021fff4ec96710e404f91f728dac7bfff9571904",
+      "bytes": 240,
+      "kind": "asset"
+    },
+    "/home-assets/liquid-cases-20260926T162458Z/site/work/liquid-page.css": {
+      "file": "site/home-assets/liquid-cases-20260926T162458Z/site/work/liquid-page.css",
+      "source": "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/liquid-page.css",
+      "sha256": "3b9cb0b26977d817b93c0fb0c08dccc571b933a59b094218e0276229c6941478",
+      "bytes": 3170,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/assets/main-BrjFJyGo.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/assets/main-BrjFJyGo.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/assets/main-BrjFJyGo.css",
+      "sha256": "99baafe7a743eec0634c1e6a5a55d175019f3042656033e45221d5d28856ea34",
+      "bytes": 55082,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/editorial-dark-20260927.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/editorial-dark-20260927.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/editorial-dark-20260927.css",
+      "sha256": "4387b2ebf73fc9c1c8f118e8bc8e3e623d174ada8d38ce9dd1ef19592ea1a7dd",
+      "bytes": 3360,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/editorial-design-20260927/design.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/editorial-design-20260927/design.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/editorial-design-20260927/design.css",
+      "sha256": "ab638760ed7cff1ab72434a4760df818074e998b4a5bf69b94a30f66cf454e6f",
+      "bytes": 12989,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/editorial.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/editorial.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/editorial.css",
+      "sha256": "cce03977bb3daf75d15e6da71c9b756a568aadfe9b481a44c2c9964e85260130",
+      "bytes": 9980,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/bootstrap.js": {
+      "file": "site/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/bootstrap.js",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/bootstrap.js",
+      "sha256": "2ec9e07ffa5a0755dcfcabd6bfca4f37206eb695dded71a5f400b933d7db7883",
+      "bytes": 578,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/navigation.js": {
+      "file": "site/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/navigation.js",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/navigation.js",
+      "sha256": "3cb9ca9c38ec7e7b9d30a720173f578b169b55994684d2a3877601bdd30394c6",
+      "bytes": 10942,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/return.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/return.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/eye-return-20260927-022420/return.css",
+      "sha256": "8d9b58d0046c5fd9a3db28ce02787fe38d1571781076da7723aee79aac7d6b71",
+      "bytes": 301,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/faq-original-20260927/reading.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/faq-original-20260927/reading.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/faq-original-20260927/reading.css",
+      "sha256": "4011b115a61b213386192d2d16f719e06622b2d30faa5e73f9048d76518eebaf",
+      "bytes": 1881,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/faq-toc-20260927/toc.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/faq-toc-20260927/toc.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/faq-toc-20260927/toc.css",
+      "sha256": "4c129befd260a1796bddfab9e8f2a6241aacce3cdee9e8add27451412bc8ae12",
+      "bytes": 1922,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/faq-toc-20260927/toc.js": {
+      "file": "site/home-assets/navigation-20260926-v1/site/faq-toc-20260927/toc.js",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/faq-toc-20260927/toc.js",
+      "sha256": "e6f90fe83176ae1e4746bdcd05385f63dada714788be08217d495ec1c963e75e",
+      "bytes": 494,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/feishu-blog-20260927/reading.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/feishu-blog-20260927/reading.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/feishu-blog-20260927/reading.css",
+      "sha256": "05b4d4e9838a691af5372c7eb106d57b2dbbd312f308732174c0365078f22d4b",
+      "bytes": 729,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/navigation.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/navigation.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/navigation.css",
+      "sha256": "fac14c71b6c27aaa226890e57e4a8f9e275717a12bfff4fb5c54d1f7bdd8bfed",
+      "bytes": 3353,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/services-editorial-20260927/services.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/services-editorial-20260927/services.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/services-editorial-20260927/services.css",
+      "sha256": "5edd734e4af1af3579719f05383de6f340a397b35462ed6712b80e3fb908629d",
+      "bytes": 1455,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/strategy-blog-20260927/blog.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/strategy-blog-20260927/blog.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/strategy-blog-20260927/blog.css",
+      "sha256": "7d0f31d25790f56dbc08d968cd967e7a0c64d6bb71c7847bfa3dd111171e1f6c",
+      "bytes": 5491,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/strategy-blog-20260927/blog.js": {
+      "file": "site/home-assets/navigation-20260926-v1/site/strategy-blog-20260927/blog.js",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/strategy-blog-20260927/blog.js",
+      "sha256": "851fc3e5fbf1761f8b51ed2067f83e11d3c5b259cc7ed0a2b43c7e870bd44f73",
+      "bytes": 624,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/unified-navigation-20260927/bridge.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/unified-navigation-20260927/bridge.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/unified-navigation-20260927/bridge.css",
+      "sha256": "f1fe087e2b17af12bec3156554c45ee494c4e95350d0abecdfa5651c29d1d02c",
+      "bytes": 3583,
+      "kind": "asset"
+    },
+    "/home-assets/navigation-20260926-v1/site/unified-navigation-20260927/navigation.css": {
+      "file": "site/home-assets/navigation-20260926-v1/site/unified-navigation-20260927/navigation.css",
+      "source": "https://isaac2024.online/home-assets/navigation-20260926-v1/site/unified-navigation-20260927/navigation.css",
+      "sha256": "2e6c9a11d700d8ac3a14cf78eb53ffd11de88853a0070cad50e94c446e0b7fa0",
+      "bytes": 6794,
+      "kind": "asset"
+    },
+    "/home-assets/seo-20260926-v1/site/assets/main-CzrS6v7M.css": {
+      "file": "site/home-assets/seo-20260926-v1/site/assets/main-CzrS6v7M.css",
+      "source": "https://isaac2024.online/home-assets/seo-20260926-v1/site/assets/main-CzrS6v7M.css",
+      "sha256": "c6216de95566bd2a9713d4249fed25fda553b41af4ee6ff5bba8086c7def13bc",
+      "bytes": 55148,
+      "kind": "asset"
+    },
+    "/home-assets/seo-20260926-v1/site/entry-gate.css": {
+      "file": "site/home-assets/seo-20260926-v1/site/entry-gate.css",
+      "source": "https://isaac2024.online/home-assets/seo-20260926-v1/site/entry-gate.css",
+      "sha256": "ecf5597799b5cb99cad4e494cfd5d33182d19688bf1f8c32dbe27b96c4c5ba59",
+      "bytes": 2237,
+      "kind": "asset"
+    },
+    "/home-assets/seo-20260926-v1/site/entry-gate.js": {
+      "file": "site/home-assets/seo-20260926-v1/site/entry-gate.js",
+      "source": "https://isaac2024.online/home-assets/seo-20260926-v1/site/entry-gate.js",
+      "sha256": "8c2d904442a9fdb876cb25d854df4fb8687c21d369e3f673fa3cd8532abc3f8f",
+      "bytes": 4974,
+      "kind": "asset"
+    },
+    "/home-assets/seo-20260926-v1/site/icons/rotating/rotating-favicon.js": {
+      "file": "site/home-assets/seo-20260926-v1/site/icons/rotating/rotating-favicon.js",
+      "source": "https://isaac2024.online/home-assets/seo-20260926-v1/site/icons/rotating/rotating-favicon.js",
+      "sha256": "4dd6688c8f992e927505727e321108cce4548d855613d8ea13c8e16068ddbf49",
+      "bytes": 2444,
+      "kind": "asset"
+    },
+    "/home-assets/seo-20260926-v1/site/overseas-compliance-reading-20260927-v2.css": {
+      "file": "site/home-assets/seo-20260926-v1/site/overseas-compliance-reading-20260927-v2.css",
+      "source": "https://isaac2024.online/home-assets/seo-20260926-v1/site/overseas-compliance-reading-20260927-v2.css",
+      "sha256": "ab74205b94f9ee7346e1e9ebe17624858b1b47912d51c89df90d59f7d7d8c967",
+      "bytes": 8400,
+      "kind": "asset"
+    },
+    "/home-assets/services-brand-cleanup-20260928-v1/brand-cleanup.css": {
+      "file": "site/home-assets/services-brand-cleanup-20260928-v1/brand-cleanup.css",
+      "source": "https://isaac2024.online/home-assets/services-brand-cleanup-20260928-v1/brand-cleanup.css",
+      "sha256": "2e51283ec7cb738a8c554ef3724b09f5c197811be277d3fb2e74392afd3670e6",
+      "bytes": 1368,
+      "kind": "asset"
+    },
+    "/home-assets/services-catalog-minimal-20260928-v1/catalog-minimal.css": {
+      "file": "site/home-assets/services-catalog-minimal-20260928-v1/catalog-minimal.css",
+      "source": "https://isaac2024.online/home-assets/services-catalog-minimal-20260928-v1/catalog-minimal.css",
+      "sha256": "e63a2e8c9f30279270d877393cff297487d64b2ab2da0233848edd73e582b308",
+      "bytes": 4392,
+      "kind": "asset"
+    },
+    "/home-assets/services-click-20260928-v1/click.css": {
+      "file": "site/home-assets/services-click-20260928-v1/click.css",
+      "source": "https://isaac2024.online/home-assets/services-click-20260928-v1/click.css",
+      "sha256": "78b526c57ad5827f29b9e380e745bbfb199b4b95bb3a043d9d21af7711f388bf",
+      "bytes": 784,
+      "kind": "asset"
+    },
+    "/home-assets/services-customer-continuous-20260928-v3/continuous.css": {
+      "file": "site/home-assets/services-customer-continuous-20260928-v3/continuous.css",
+      "source": "https://isaac2024.online/home-assets/services-customer-continuous-20260928-v3/continuous.css",
+      "sha256": "809888d8c52d5f93d980c519bb0346c91eefb488ccd7bf170e80caf8a3a5ab2c",
+      "bytes": 4682,
+      "kind": "asset"
+    },
+    "/home-assets/services-directory-20260927-v2/products.css": {
+      "file": "site/home-assets/services-directory-20260927-v2/products.css",
+      "source": "https://isaac2024.online/home-assets/services-directory-20260927-v2/products.css",
+      "sha256": "706f1d4a551ded8e05aaf7711c64fcafd5d6c55888fcc3b9889342911b19f67b",
+      "bytes": 4702,
+      "kind": "asset"
+    },
+    "/home-assets/services-knowledge-consolidate-20260928-v1/combined.css": {
+      "file": "site/home-assets/services-knowledge-consolidate-20260928-v1/combined.css",
+      "source": "https://isaac2024.online/home-assets/services-knowledge-consolidate-20260928-v1/combined.css",
+      "sha256": "f5e95273305a38a2a16519798e50ad94d4357bbc09a8ad62defabadcc6afc1f7",
+      "bytes": 1175,
+      "kind": "asset"
+    },
+    "/home-assets/services-knowledge-consolidate-20260928-v1/detail.js": {
+      "file": "site/home-assets/services-knowledge-consolidate-20260928-v1/detail.js",
+      "source": "https://isaac2024.online/home-assets/services-knowledge-consolidate-20260928-v1/detail.js",
+      "sha256": "928b0eaf9eafa63775682bee516bffe35e4011cf1cf0f3757be9d2cb0bf17bfa",
+      "bytes": 9778,
+      "kind": "asset"
+    },
+    "/home-assets/services-lab-20260927-v1/products.css": {
+      "file": "site/home-assets/services-lab-20260927-v1/products.css",
+      "source": "https://isaac2024.online/home-assets/services-lab-20260927-v1/products.css",
+      "sha256": "a2e1a1a13d1a691266a9cff0ca0d7f11dd7fa18a3526f8e9709c740e6068eabb",
+      "bytes": 2908,
+      "kind": "asset"
+    },
+    "/home-assets/services-menu-motion-20260928-v1/motion.css": {
+      "file": "site/home-assets/services-menu-motion-20260928-v1/motion.css",
+      "source": "https://isaac2024.online/home-assets/services-menu-motion-20260928-v1/motion.css",
+      "sha256": "18a4a4b355ef299a67b34b90bd9b0215c828736055632ff64b5e839447429f89",
+      "bytes": 2433,
+      "kind": "asset"
+    },
+    "/home-assets/services-merged-20260928-v1/catalog-order-20260928-v1/catalog.css": {
+      "file": "site/home-assets/services-merged-20260928-v1/catalog-order-20260928-v1/catalog.css",
+      "source": "https://isaac2024.online/home-assets/services-merged-20260928-v1/catalog-order-20260928-v1/catalog.css",
+      "sha256": "33d3a2f5e00b5b6cafad7ad4a856b258425f8675af0b42aaa4f47039da136891",
+      "bytes": 3222,
+      "kind": "asset"
+    },
+    "/home-assets/services-merged-20260928-v1/merged.css": {
+      "file": "site/home-assets/services-merged-20260928-v1/merged.css",
+      "source": "https://isaac2024.online/home-assets/services-merged-20260928-v1/merged.css",
+      "sha256": "a0e2d7cf7f171fd11d614e285b156c0a541276197a517b47c8344f6a338691cd",
+      "bytes": 2942,
+      "kind": "asset"
+    },
+    "/home-assets/services-merged-20260928-v1/product-content-20260927T192015Z/product-content.css": {
+      "file": "site/home-assets/services-merged-20260928-v1/product-content-20260927T192015Z/product-content.css",
+      "source": "https://isaac2024.online/home-assets/services-merged-20260928-v1/product-content-20260927T192015Z/product-content.css",
+      "sha256": "31333e591679c3a90bf0ed4b1d30fb622bfdbf72bdcc175a1f11681469dcc166",
+      "bytes": 623,
+      "kind": "asset"
+    },
+    "/home-assets/services-merged-20260928-v1/source-scoped.js": {
+      "file": "site/home-assets/services-merged-20260928-v1/source-scoped.js",
+      "source": "https://isaac2024.online/home-assets/services-merged-20260928-v1/source-scoped.js",
+      "sha256": "a7c31598c00767c09e0ec67d6488ee44b70ec95bc417b25263659eea48488a3a",
+      "bytes": 20534,
+      "kind": "asset"
+    },
+    "/home-assets/services-merged-20260928-v1/source.css": {
+      "file": "site/home-assets/services-merged-20260928-v1/source.css",
+      "source": "https://isaac2024.online/home-assets/services-merged-20260928-v1/source.css",
+      "sha256": "b8e4f3e6cc2f8b0bef3ddbadd9cc0dfd5ce1a8f64f2b34041e2bff265ddfaf43",
+      "bytes": 1548017,
+      "kind": "asset"
+    },
+    "/home-assets/services-original-adaptive-20260929-v4/adaptive.css": {
+      "file": "site/home-assets/services-original-adaptive-20260929-v4/adaptive.css",
+      "source": "https://isaac2024.online/home-assets/services-original-adaptive-20260929-v4/adaptive.css",
+      "sha256": "90b53d6fc9dca1fbe3e04fff07eb85e64c58f4aece1504b09f165f87755a372c",
+      "bytes": 4796,
+      "kind": "asset"
+    },
+    "/home-assets/services-original-adaptive-20260929-v4/detail.js": {
+      "file": "site/home-assets/services-original-adaptive-20260929-v4/detail.js",
+      "source": "https://isaac2024.online/home-assets/services-original-adaptive-20260929-v4/detail.js",
+      "sha256": "4d78d8929c57ff0c3ef53e72f8981586a8c8fa1eedcf46303d1a8c50f755a855",
+      "bytes": 13386,
+      "kind": "asset"
+    },
+    "/home-assets/services-original-adaptive-20260929-v4/directory.js": {
+      "file": "site/home-assets/services-original-adaptive-20260929-v4/directory.js",
+      "source": "https://isaac2024.online/home-assets/services-original-adaptive-20260929-v4/directory.js",
+      "sha256": "3dd57e581bd7d7632bd5680eab6bf717bd0014ccecf8a4a3b1db13b44a085ce7",
+      "bytes": 1144,
+      "kind": "asset"
+    },
+    "/home-assets/services-original-adaptive-20260929-v4/product-source.css": {
+      "file": "site/home-assets/services-original-adaptive-20260929-v4/product-source.css",
+      "source": "https://isaac2024.online/home-assets/services-original-adaptive-20260929-v4/product-source.css",
+      "sha256": "a3e51a37ec69270bf2aaf76a317189b27cb382166ea782885da3c1e86e928d6d",
+      "bytes": 1826008,
+      "kind": "asset"
+    },
+    "/home-assets/services-original-adaptive-20260929-v4/product-theme.css": {
+      "file": "site/home-assets/services-original-adaptive-20260929-v4/product-theme.css",
+      "source": "https://isaac2024.online/home-assets/services-original-adaptive-20260929-v4/product-theme.css",
+      "sha256": "d12b5df354b642e3ed379c8e910fe894c9729dd8cc9e1a42738f1ad6b1c45546",
+      "bytes": 4635,
+      "kind": "asset"
+    },
+    "/home-assets/services-original-adaptive-20260929-v4/source-scoped.js": {
+      "file": "site/home-assets/services-original-adaptive-20260929-v4/source-scoped.js",
+      "source": "https://isaac2024.online/home-assets/services-original-adaptive-20260929-v4/source-scoped.js",
+      "sha256": "53d454ec14ce080184d85b1860d6e1a84a2285f3c776b2069742180fe3b9ffd6",
+      "bytes": 20716,
+      "kind": "asset"
+    },
+    "/home-assets/services-regroup-20260928-v1/regroup.css": {
+      "file": "site/home-assets/services-regroup-20260928-v1/regroup.css",
+      "source": "https://isaac2024.online/home-assets/services-regroup-20260928-v1/regroup.css",
+      "sha256": "50c7920a61051d1e979ef79844607c48ff3fe70a9eb8791213f8557a35701de5",
+      "bytes": 308,
+      "kind": "asset"
+    },
+    "/home-assets/services-return-sidebar-20260928-v1/return-sidebar.css": {
+      "file": "site/home-assets/services-return-sidebar-20260928-v1/return-sidebar.css",
+      "source": "https://isaac2024.online/home-assets/services-return-sidebar-20260928-v1/return-sidebar.css",
+      "sha256": "466ea26a8aafddadcfca0ffa7c05daf2c32c38bba1bf529e997492b2545e95bf",
+      "bytes": 895,
+      "kind": "asset"
+    },
+    "/home-assets/services-search-20260928-v1/search.css": {
+      "file": "site/home-assets/services-search-20260928-v1/search.css",
+      "source": "https://isaac2024.online/home-assets/services-search-20260928-v1/search.css",
+      "sha256": "d24dab427e91d7c71e1568227d04cabef080d7250e62cf2b797af5e24a37f917",
+      "bytes": 734,
+      "kind": "asset"
+    },
+    "/home-assets/services-selective-cta-20260928-v1/catalog-toggle.css": {
+      "file": "site/home-assets/services-selective-cta-20260928-v1/catalog-toggle.css",
+      "source": "https://isaac2024.online/home-assets/services-selective-cta-20260928-v1/catalog-toggle.css",
+      "sha256": "4a8f5b4d5ede8fa702de4b581ec9c5d899086ccf1c42b97ab2f1368d01307755",
+      "bytes": 1980,
+      "kind": "asset"
+    },
+    "/home-assets/services-selective-cta-20260928-v1/detail-cleanup.css": {
+      "file": "site/home-assets/services-selective-cta-20260928-v1/detail-cleanup.css",
+      "source": "https://isaac2024.online/home-assets/services-selective-cta-20260928-v1/detail-cleanup.css",
+      "sha256": "6ac2c3acefedc65db71d8d9cd16d2b7e44218162d718756c3f9ceda3258e3cc4",
+      "bytes": 805,
+      "kind": "asset"
+    },
+    "/home-assets/services-solutions-20260927-v1/directory.css": {
+      "file": "site/home-assets/services-solutions-20260927-v1/directory.css",
+      "source": "https://isaac2024.online/home-assets/services-solutions-20260927-v1/directory.css",
+      "sha256": "8d9c5e412f89866a3a43f7ea899734e152f7edcae5728e7e6c07adecd31284f0",
+      "bytes": 1823,
+      "kind": "asset"
+    },
+    "/home-assets/services-solutions-20260927-v1/isaac.css": {
+      "file": "site/home-assets/services-solutions-20260927-v1/isaac.css",
+      "source": "https://isaac2024.online/home-assets/services-solutions-20260927-v1/isaac.css",
+      "sha256": "1d43d777716f8b9144e985a8ac49a04fc1c73bd916bfc5abe3230deb12e07e21",
+      "bytes": 4549,
+      "kind": "asset"
+    },
+    "/home-assets/services-solutions-20260927-v1/motion-path.js": {
+      "file": "site/home-assets/services-solutions-20260927-v1/motion-path.js",
+      "source": "https://isaac2024.online/home-assets/services-solutions-20260927-v1/motion-path.js",
+      "sha256": "ecf90640398db66cc215b2fb1318f5407d803841cfb82c9a7e962e401d8d0246",
+      "bytes": 21615,
+      "kind": "asset"
+    },
+    "/home-assets/services-support-fullwidth-20260928-v1/support-fullwidth.css": {
+      "file": "site/home-assets/services-support-fullwidth-20260928-v1/support-fullwidth.css",
+      "source": "https://isaac2024.online/home-assets/services-support-fullwidth-20260928-v1/support-fullwidth.css",
+      "sha256": "b60b697055dde5916ed47a746bf2160c5900356ec498b77c48b058cfc9e9e1c4",
+      "bytes": 406,
+      "kind": "asset"
+    },
+    "/home-assets/services-support-fullwidth-20260928-v2/support-rail.css": {
+      "file": "site/home-assets/services-support-fullwidth-20260928-v2/support-rail.css",
+      "source": "https://isaac2024.online/home-assets/services-support-fullwidth-20260928-v2/support-rail.css",
+      "sha256": "92770f7f09518c6d0cdd0cf4074d88ee39004d8e142a7a8784db10e742582b5e",
+      "bytes": 1130,
+      "kind": "asset"
+    },
+    "/home-assets/services-support-scene-20260928-v1/support-scene.css": {
+      "file": "site/home-assets/services-support-scene-20260928-v1/support-scene.css",
+      "source": "https://isaac2024.online/home-assets/services-support-scene-20260928-v1/support-scene.css",
+      "sha256": "00538a18a2f695f2ccfe5d3fb6b6e1fdb0d83147f486514955a534fba10ecfe4",
+      "bytes": 2058,
+      "kind": "asset"
+    },
+    "/home-assets/services-unified-directory-20260928-v2/catalog.js": {
+      "file": "site/home-assets/services-unified-directory-20260928-v2/catalog.js",
+      "source": "https://isaac2024.online/home-assets/services-unified-directory-20260928-v2/catalog.js",
+      "sha256": "933be945934f6ba044386b61534e5b7954d57358700f00a9f765836acdb21d4c",
+      "bytes": 7995,
+      "kind": "asset"
+    },
+    "/home-assets/services-unified-directory-20260928-v2/detail-directory.css": {
+      "file": "site/home-assets/services-unified-directory-20260928-v2/detail-directory.css",
+      "source": "https://isaac2024.online/home-assets/services-unified-directory-20260928-v2/detail-directory.css",
+      "sha256": "8379f86169fe75d53c75efade767b27ca949f84422f729563a5ba17e2f8d718a",
+      "bytes": 1153,
+      "kind": "asset"
+    },
+    "/home-assets/services-unified-directory-20260928-v2/disclosure.js": {
+      "file": "site/home-assets/services-unified-directory-20260928-v2/disclosure.js",
+      "source": "https://isaac2024.online/home-assets/services-unified-directory-20260928-v2/disclosure.js",
+      "sha256": "0d94257d273859e62f17921085bb15dce2c81724b77f75c5dbacd3db1ab5ecbd",
+      "bytes": 1264,
+      "kind": "asset"
+    },
+    "/home-assets/services-unified-directory-20260928-v2/product-intros.css": {
+      "file": "site/home-assets/services-unified-directory-20260928-v2/product-intros.css",
+      "source": "https://isaac2024.online/home-assets/services-unified-directory-20260928-v2/product-intros.css",
+      "sha256": "25e4c29038e183acf131ffea798010cd3502bae43c488a45563131e3a27e2c85",
+      "bytes": 8370,
+      "kind": "asset"
+    },
+    "/home-assets/work-stability-20260927-v1/bridge.css": {
+      "file": "site/home-assets/work-stability-20260927-v1/bridge.css",
+      "source": "https://isaac2024.online/home-assets/work-stability-20260927-v1/bridge.css",
+      "sha256": "817ec0afc88b6a83c453db8ac89fff9dfc134ed654592bb408b548ee8e6202b0",
+      "bytes": 4669,
+      "kind": "asset"
+    },
+    "/home-assets/work-stability-20260927-v1/gallery-runtime.js": {
+      "file": "site/home-assets/work-stability-20260927-v1/gallery-runtime.js",
+      "source": "https://isaac2024.online/home-assets/work-stability-20260927-v1/gallery-runtime.js",
+      "sha256": "756fdf10cc6612da99cad5ea867ffb0fceaeaf3a6508df798dfc1559a6a938b1",
+      "bytes": 4890,
+      "kind": "asset"
+    },
+    "/home-assets/work-stability-20260927-v1/liquid-entry.js": {
+      "file": "site/home-assets/work-stability-20260927-v1/liquid-entry.js",
+      "source": "https://isaac2024.online/home-assets/work-stability-20260927-v1/liquid-entry.js",
+      "sha256": "aa1a3a4854ab9a2174601019840cc35a01ca7c79d76fcb2502c99019580188fc",
+      "bytes": 4301,
+      "kind": "asset"
+    },
+    "/home-assets/work-stability-20260927-v1/navigation.js": {
+      "file": "site/home-assets/work-stability-20260927-v1/navigation.js",
+      "source": "https://isaac2024.online/home-assets/work-stability-20260927-v1/navigation.js",
+      "sha256": "6550d6e3cec4607da72d4d409e226f35fae55af31d49e878659bd6df3647446d",
+      "bytes": 11452,
+      "kind": "asset"
+    },
+    "/icons/rotating/rotating-favicon.js": {
+      "file": "site/icons/rotating/rotating-favicon.js",
+      "source": "https://isaac2024.online/icons/rotating/rotating-favicon.js",
+      "sha256": "4dd6688c8f992e927505727e321108cce4548d855613d8ea13c8e16068ddbf49",
+      "bytes": 2444,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/agent-design-patterns-1.js": {
+      "file": "site/ontology-readings-20260930-v1/agent-design-patterns-1.js",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/agent-design-patterns-1.js",
+      "sha256": "518babe5a679aeb564304e62eb8cf5f5a9e7def9441dfb23f2a6c120a0211257",
+      "bytes": 2076,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/agent-ontology-interaction-1.js": {
+      "file": "site/ontology-readings-20260930-v1/agent-ontology-interaction-1.js",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/agent-ontology-interaction-1.js",
+      "sha256": "9be572c1e56cb406a171d9e005bc3bda41c31ec27b33b234b93cf5b276cdd953",
+      "bytes": 4917,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/llm-ontology-methods-1.js": {
+      "file": "site/ontology-readings-20260930-v1/llm-ontology-methods-1.js",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/llm-ontology-methods-1.js",
+      "sha256": "cdef58ba5e71e86193b4660a7684cf9c0fbc6d53d816c5f3f5259f001655286f",
+      "bytes": 674,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/ontology-design-principles-1.js": {
+      "file": "site/ontology-readings-20260930-v1/ontology-design-principles-1.js",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/ontology-design-principles-1.js",
+      "sha256": "3621d7d319dc2b173abadee4180b25ac5d11bf8b0b62b1b90c75a7e629eb0c97",
+      "bytes": 1238,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/ontology-five-graphs-1.js": {
+      "file": "site/ontology-readings-20260930-v1/ontology-five-graphs-1.js",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/ontology-five-graphs-1.js",
+      "sha256": "5d1c3bb47686c18126e77aac0baa626508bcda4cdada7d81d15a052d5ee9a0dc",
+      "bytes": 2274,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/palantir-ontology-1.js": {
+      "file": "site/ontology-readings-20260930-v1/palantir-ontology-1.js",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/palantir-ontology-1.js",
+      "sha256": "181fe3924ba49f9d3596db87916d1ad505dd9c9961c5702369fb89e812781e76",
+      "bytes": 2739,
+      "kind": "asset"
+    },
+    "/ontology-readings-20260930-v1/reading.css": {
+      "file": "site/ontology-readings-20260930-v1/reading.css",
+      "source": "https://isaac2024.online/ontology-readings-20260930-v1/reading.css",
+      "sha256": "7b16cd31661c5bbcfb4f03a3f9fbe0f331ed6c291f455b2cb6327725ad5b1b80",
+      "bytes": 1015,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/calm-motion.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/calm-motion.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/calm-motion.js",
+      "sha256": "f0effb0afa069bcd9b218c44434e0e9d9c99c7543a67d1425e489516f9a481d7",
+      "bytes": 5678,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/consulting-content.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/consulting-content.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/consulting-content.js",
+      "sha256": "cc67681bc48f2ec9143b248405912c94a0095e1028aaa3bc196b40556b1c59dc",
+      "bytes": 4225,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/gallery-fit.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/gallery-fit.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/gallery-fit.js",
+      "sha256": "1524948afeffb0be85b9191a20da16edd2246b464428b104cac84a2fcaab5f61",
+      "bytes": 649,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/hand-fit.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/hand-fit.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/hand-fit.js",
+      "sha256": "5dc7e1496f4175635dbef90c1fa445474c90d843f6d06c205709e852b136a8be",
+      "bytes": 2022,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/homepage-flow.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/homepage-flow.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/homepage-flow.js",
+      "sha256": "bc3dc70044761028d6f4b0f21d6f7382668c335f011b0c611b32a758203536b0",
+      "bytes": 6451,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/reference-desk.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/reference-desk.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/reference-desk.js",
+      "sha256": "d46115d3b8e211747c57f45ba2ffe9dc2ce38710f5ac1a0ac95b9c0cb1ecb32a",
+      "bytes": 7282,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/product-journey.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/product-journey.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/mobile-responsive-20261001-v1/product-journey.js",
+      "sha256": "9b254ac2dab095d8301862c662f798e989f9c6a12d142589f120805bab756233",
+      "bytes": 8276,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/products-stutter-fix-20261001-v1/quality-budget.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/products-stutter-fix-20261001-v1/quality-budget.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/products-stutter-fix-20261001-v1/quality-budget.js",
+      "sha256": "96c8687a56e54143aa2a40c9a8a3ff561f2defca59dfe2262c9434c36d60d8d4",
+      "bytes": 2271,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/hand-envelope.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/hand-envelope.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/hand-envelope.js",
+      "sha256": "237be8efadaa19f0441eea07f6c06582a87698e97fb8af104a3a2123a36a63bc",
+      "bytes": 1757,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/journey-math.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/journey-math.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/journey-math.js",
+      "sha256": "babdf498d47a6b70fac763afd818295b063da59d2fbf7c35cbc54818489057d6",
+      "bytes": 1928,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/product-journey.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/product-journey.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/product-journey.js",
+      "sha256": "1f8232da23e5a28ff35cea6b5b4bbd86a4bf9799a979a9b87fb42693672aa4f5",
+      "bytes": 7852,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/scroll-return-state.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/scroll-return-state.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/home-depth-quality-20260929-v1/scroll-return-state.js",
+      "sha256": "3fb54fe9b370a6f433513a1abd7a82cff38e0cb73590611fa9571a9eda096103",
+      "bytes": 1632,
+      "kind": "asset"
+    },
+    "/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/oryzo-physics.js": {
+      "file": "site/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/oryzo-physics.js",
+      "source": "https://isaac2024.online/home-assets/experience-20260926-v1/site/homepage-content-20260929-v1/oryzo-physics.js",
+      "sha256": "1cd2557a7bee857834ac528334e145063f35b6c4015fb30a61c2ac0933019a52",
+      "bytes": 7527,
+      "kind": "asset"
+    },
+    "/about/": {
+      "file": "site/about/index.html",
+      "source": "https://isaac2024.online/about/",
+      "sha256": "7ecf5cc1c2c51896aef7342a2b44d885bb1e8b411bd3a0e6d91f2ef84559a509",
+      "bytes": 13416,
+      "kind": "page"
+    }
+  },
+  "external_bundles": [
+    "https://isaac2024.online/about/explore/js/main.bundle.js",
+    "https://isaac2024.online/about/explore/js/vendor.bundle.js",
+    "https://isaac2024.online/home-assets/enterprise-faq-explorer-20260927-v1/vendor/echarts.min.js",
+    "https://isaac2024.online/home-assets/experience-20260926-v1/site/assets/home-performance-20260927-v1.js",
+    "https://isaac2024.online/home-assets/experience-20260926-v1/site/assets/scene-shade-scroll-20260927-v1.js",
+    "https://isaac2024.online/home-assets/experience-20260926-v1/site/assets/world-runtime-performance-20260927-v1.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/0w2iwebs5-c-n.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/15g8z-f7fh-y5.css",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/1s19wbg2gjkv0.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/1xaeaw6ztv3gm.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/25kvgcvbp6c14.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/2c5x84gieuvai.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/2fxvkdsdfb39m.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/2l6r176tw29k7.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/38oklgdmv1ybw.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/3r5716256bwc-.js",
+    "https://isaac2024.online/home-assets/liquid-cases-20260926T162458Z/site/work/_next/static/immutable/chunks/turbopack-1pkwdr4knmj6d.js",
+    "https://isaac2024.online/home-assets/navigation-20260926-v1/site/assets/main-yxSyW8aJ.js",
+    "https://isaac2024.online/home-assets/seo-20260926-v1/site/assets/main-BzHYu8z3.js",
+    "https://isaac2024.online/home-assets/services-solutions-20260927-v1/assets/298cbc027725786dc38129d1.js",
+    "https://isaac2024.online/home-assets/services-solutions-20260927-v1/assets/583fce388398c31854b3d8e9.js"
+  ],
+  "fetch_errors": [
+    {
+      "path": "/about/explore/css/main.css",
+      "error": "HTTPError"
+    }
+  ],
+  "withheld_files": [
+    "/home-assets/services-merged-20260928-v1/pricing.css",
+    "/home-assets/services-solutions-20260927-v1/assets/5b3fa5ff4ba5dcfd79543f3e.css",
+    "/home-assets/work-stability-20260927-v1/gallery-bundle.js"
+  ]
+}

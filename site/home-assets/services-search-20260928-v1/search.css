@@ -1,0 +1,17 @@
+.faq-index .catalog-directory-search { margin-top: 18px; }
+.faq-index .catalog-search { font-size: 12px; line-height: 1.6; }
+.faq-index .catalog-search input {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.faq-index .catalog-directory-search + nav { margin-top: 16px; }
+.faq-index .catalog-directory-search #solution-search-status { line-height: 1.6; }
+.faq-index .catalog-directory-search #solution-search-status:empty { display: none; }
+@media (max-width: 1000px) {
+  .faq-index .catalog-directory-search { margin-top: 0; padding: 4px 16px 12px; }
+  .faq-index .catalog-directory-search + nav { margin-top: 0; }
+  .faq-index .catalog-search input { font-size: 16px; }
+}

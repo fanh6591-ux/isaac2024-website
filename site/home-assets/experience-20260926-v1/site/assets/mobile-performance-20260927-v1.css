@@ -1,0 +1,3 @@
+/* Keep the camera viewport stable when mobile browser chrome expands/collapses. */
+.home-page .story{overflow-anchor:none}
+@media(max-width:700px){.home-page #stage{bottom:auto;height:100lvh}}

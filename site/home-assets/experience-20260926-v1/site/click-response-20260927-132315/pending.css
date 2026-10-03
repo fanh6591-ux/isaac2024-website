@@ -1,0 +1,4 @@
+/* Immediate feedback while a destination document is becoming ready. */
+.menu-route-pending .menu-status::before{content:'';display:inline-block;width:10px;height:10px;margin-right:9px;border:2px solid #ffffff45;border-top-color:#fff;border-radius:50%;animation:isaac-route-loading .7s linear infinite}
+@keyframes isaac-route-loading{to{transform:rotate(1turn)}}
+@media(prefers-reduced-motion:reduce){.menu-route-pending .menu-status::before{animation:none}}

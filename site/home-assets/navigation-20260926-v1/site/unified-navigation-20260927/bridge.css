@@ -1,0 +1,28 @@
+@font-face{font-family:'Isaac Editorial Han';src:url('../editorial-design-20260927/fonts/noto-sans-sc.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Isaac Editorial Serif';src:url('../editorial-design-20260927/fonts/cormorant.woff2') format('woff2');font-weight:300 700;font-display:swap}
+@font-face{font-family:'Isaac Editorial Song';src:url('../editorial-design-20260927/fonts/noto-serif-sc.woff2') format('woff2');font-weight:200 900;font-display:swap}
+@font-face{font-family:'Isaac Editorial Sans';src:url('../editorial-design-20260927/fonts/plex-sans.woff2') format('woff2');font-weight:100 900;font-display:swap}
+isaac-site-navigation[data-design=metalab]{all:initial!important;display:contents!important}
+html[data-portal-embedded] isaac-site-navigation[data-design=metalab],html.game-playing isaac-site-navigation[data-design=metalab],body.in-game isaac-site-navigation[data-design=metalab]{display:none!important}
+html.isaac-nav-active,html.isaac-nav-active body{overflow:hidden!important;overscroll-behavior:none!important}
+html.isaac-nav-active body{min-height:var(--isaac-page-height)!important}
+#isaac-nav-surface{position:fixed;inset:0 auto auto 0;width:var(--isaac-reader-width);height:100dvh;z-index:1201;overflow:hidden;pointer-events:none;transform:translateY(0) scale(1);transform-origin:50% 0;transition:transform var(--isaac-nav-duration,240ms) cubic-bezier(.22,1,.36,1);background:var(--isaac-page-background,#000);will-change:transform}
+#isaac-nav-surface-inner{position:relative;top:var(--isaac-reader-offset);width:100%;min-height:100vh}
+html.isaac-nav-open #isaac-nav-surface{height:calc((100dvh - 160px) / .30);transform:translateY(80px) scale(.30);border-radius:18px}
+html.isaac-nav-active .assistant-launch,html.isaac-nav-active .hero-drag-surface,html.isaac-nav-active .hero-drag-hint{visibility:hidden!important}
+body[data-page=auth] main,body[data-page=account] main{padding-top:120px}
+@media(max-width:760px){html.isaac-nav-open #isaac-nav-surface{height:196px;transform:translateY(calc(80px - var(--isaac-menu-scroll,0px))) scale(.915);border-radius:6px}}
+@media(prefers-reduced-motion:reduce){#isaac-nav-surface{transition:none!important}}
+
+html.isaac-nav-active iframe.isaac-nav-portal-preview{z-index:1201!important;pointer-events:none!important;transform-origin:50% 0;transition:transform var(--isaac-nav-duration,240ms) cubic-bezier(.22,1,.36,1);transform:translateY(0) scale(1)}
+html.isaac-nav-open iframe.isaac-nav-portal-preview{inset:0 auto auto 0!important;width:var(--isaac-reader-width)!important;height:calc((100dvh - 160px) / .3)!important;transform:translateY(80px) scale(.3);border-radius:18px}
+@media(max-width:760px){html.isaac-nav-open iframe.isaac-nav-portal-preview{height:196px!important;transform:translateY(calc(80px - var(--isaac-menu-scroll,0px))) scale(.915);border-radius:6px}}
+@media(prefers-reduced-motion:reduce){html.isaac-nav-active iframe.isaac-nav-portal-preview{transition:none!important}}
+
+@media(max-width:760px){#isaac-nav-surface-inner{top:calc(var(--isaac-reader-offset) - 96px)}}
+/* Content routes own the screen while the homepage scene is retained for return. */
+body.menu-page-open .hero-drag-surface,body.menu-page-open .hero-drag-hint,body.menu-page-open .assistant-launch{visibility:hidden!important;pointer-events:none!important}
+body.menu-page-open>.skip-link,body.menu-page-open .story-toolbar{display:none!important}
+
+/* Set the preview viewport once; only its composited transform animates. */
+html:not(.isaac-nav-open) #isaac-nav-surface{border-radius:0}

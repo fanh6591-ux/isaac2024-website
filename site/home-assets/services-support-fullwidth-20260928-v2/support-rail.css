@@ -1,0 +1,37 @@
+/* The source rail was centered on the section's left edge and clipped by its parent. */
+.ai-support-page #website-support .section-2 {
+  box-sizing: border-box;
+  padding-inline: clamp(16px, 2vw, 36px);
+}
+.ai-support-page #website-support .section-2 .wp1320 > svg,
+.ai-support-page #website-support .section-2 .wp1320 > .m {
+  display: none !important;
+}
+.ai-support-page #website-support .section-2 .item::before {
+  content: "";
+  position: absolute;
+  left: 37px;
+  top: 0;
+  width: 6px;
+  height: 175px;
+  border-radius: 6px;
+  background: linear-gradient(#d5e6ff, #2969f2 35%, #2969f2);
+  z-index: 1;
+}
+.ai-support-page #website-support .section-2 .item .avatar {
+  left: 0 !important;
+  z-index: 2;
+}
+.ai-support-page #website-support .section-2 .item .lt[data-aos] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+.ai-support-page #website-support .section-2 .title .t { color: #182b45; }
+.ai-support-page #website-support .section-2 .title .p { color: #253b55; }
+@media (max-width: 760px) {
+  .ai-support-page #website-support .section-2 .item::before {
+    left: 19px;
+    width: 4px;
+    height: 112px;
+  }
+}

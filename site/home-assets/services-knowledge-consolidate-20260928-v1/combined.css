@@ -1,0 +1,10 @@
+/* The two source articles remain intact and read in document order. */
+.isaac-merged-page .combined-reading-hero{box-sizing:border-box;max-width:1180px;margin:0 auto;padding:72px 32px 54px;color:#f5f5f5;font:16px/1.7 'PingFang SC','Microsoft YaHei',sans-serif}
+.isaac-merged-page .combined-reading-hero h1{font-size:clamp(32px,4vw,56px);line-height:1.2;margin:10px 0 20px}
+.isaac-merged-page .combined-reading-hero>p:first-child{font-size:12px;letter-spacing:.16em;color:#aaa}
+.isaac-merged-page .combined-reading-hero>p:nth-of-type(2){max-width:740px;color:#bbb}
+.isaac-merged-page .combined-reading-hero nav{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.isaac-merged-page .combined-reading-hero nav a{display:inline-block;padding:11px 18px;border:1px solid #777;border-radius:2px;color:#fff;text-decoration:none;font-size:15px}
+.isaac-merged-page .combined-reading-hero nav a:hover,.isaac-merged-page .combined-reading-hero nav a:focus-visible{background:#222;border-color:#fff}
+.isaac-merged-page[data-continuous-reading="true"] .product-panel{border-top:1px solid #333}
+@media(max-width:760px){.isaac-merged-page .combined-reading-hero{padding:44px 20px 38px}}

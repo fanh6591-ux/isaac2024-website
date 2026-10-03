@@ -1,0 +1,2 @@
+/* Hide only the default pose while the incoming camera is prepared. */
+html.isaac-return-preparing #stage,html.isaac-return-preparing #main,html.isaac-return-preparing .scene-word,html.isaac-return-preparing .hero-drag-surface,html.isaac-return-preparing .hero-drag-hint{visibility:hidden!important}

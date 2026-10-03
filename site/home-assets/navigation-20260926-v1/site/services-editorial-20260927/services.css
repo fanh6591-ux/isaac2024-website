@@ -1,0 +1,19 @@
+.services-document{font-family:'Isaac Editorial Sans','Isaac Editorial Han','Isaac FAQ Han','PingFang SC',sans-serif}
+.services-document h1,.services-document h2{font-family:'Isaac Editorial Serif','Isaac Editorial Song','Isaac FAQ Song',serif}
+.services-document .faq-document-heading p{font-size:16px;color:#bbb;line-height:1.9;margin:0}
+.services-document .faq-document-heading .services-intro{color:#eee;font-size:20px;margin:24px 0 14px}
+.service-number{display:block;color:#aaa;font-size:11px;line-height:1.6;letter-spacing:.06em;margin-bottom:18px}
+.services-document .service-summary h2{margin-bottom:22px}
+.services-document .service-promise{font-size:21px;line-height:1.7;color:#fff;margin-bottom:14px}
+.service-detail-link{display:inline-flex;align-items:center;gap:24px;min-height:44px;padding:8px 0;font-size:14px;line-height:1.5;color:#fff;text-decoration:none;border-bottom:1px solid #606060}
+.service-detail-link:hover{border-color:#fff}
+.service-detail-link:focus-visible{outline:1px solid #fff;outline-offset:5px}
+.services-ending{border-top:1px solid #343434;padding-top:40px}
+.services-ending h2{font-size:28px}
+@media(max-width:760px){
+ .services-document .faq-document-heading p{font-size:14px}
+ .services-document .faq-document-heading .services-intro{font-size:17px;margin-top:20px}
+ .services-document .service-promise{font-size:18px}
+ .services-document .service-summary h2{font-size:24px}
+ .services-ending h2{font-size:24px}
+}

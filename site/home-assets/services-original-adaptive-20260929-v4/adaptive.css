@@ -1,0 +1,62 @@
+/* The original product design keeps its own scale inside the reading column. */
+.ai-support-page .ai-support-layout {
+  display: grid; grid-template-columns: 168px minmax(0,1fr); gap: 28px;
+  width: 100%; max-width: none; padding: 0 20px;
+}
+.ai-support-page .ai-support-sidebar { position: sticky; top: 88px; min-width: 0; background: #000; }
+.ai-support-page .ai-support-back { margin: 0 0 20px; padding: 14px 0; border: 0; }
+.ai-support-page .ai-support-index { padding: 0; border: 0; max-height: calc(100dvh - 170px); overflow: auto; }
+.ai-support-page .ai-support-index nav { display: grid; grid-template-columns: 1fr; margin: 0; gap: 2px; }
+.ai-support-page .ai-support-index nav a { grid-template-columns: 22px minmax(0,1fr); gap: 8px; padding: 10px 6px 10px 10px; font-size: 13px; }
+.ai-support-page .ai-support-content > .product-panel { container: product / inline-size; scroll-margin-top: 82px; }
+.ai-support-page .merged-product { --product-rem: min(200px, calc((100cqw - 56px) / 6.6)); }
+.ai-support-page .merged-product :is(.wp1250,.wp1280,.wp1320,.wp1360) { box-sizing: border-box; }
+.ai-support-page .merged-product img { max-width: 100%; }
+.ai-support-page .programmer .section-1 .img-box .item .img img { max-width: 100%; object-fit: contain; }
+/* Reserve the original animated rail inside the canvas instead of clipping its centre. */
+.ai-support-page #overseas-support .section-2 .wp1320 { width: calc(100% - .8 * var(--product-rem)); margin-inline: auto; }
+.ai-support-page .ai-business .section-2 .cont-box .txt-box > :is(.lt,.rt) { min-width: 0; }
+.ai-support-page .ai-business .section-2 .cont-box .txt-box .rt { width: 54%; }
+.ai-support-page .programmer .section-2 .line .line-bg path { transform: translate(14px,13px); }
+.ai-support-page .programmer .section-2 .line .dotted-line { max-width: 100%; }
+@container product (max-width: 960px) {
+  .ai-support-page .merged-product { --product-rem: clamp(105px, calc((100cqw - 30px) / 5.5), 155px); }
+  .ai-support-page .ai-business .section-2 .cont-box .txt-box .rt { width: 100%; }
+  .ai-support-page .ai-business .section-2 .title .t { font-size: clamp(23px,4cqw,32px); }
+  .ai-support-page .ai-business .section-2 .title .p { font-size: clamp(14px,2cqw,17px); line-height: 1.7; }
+  .ai-support-page .programmer .section-2 .list .item .lt .text-box .p { font-size: max(14px,.13 * var(--product-rem)); line-height: 1.8; }
+  .ai-support-page .programmer .section-2 .list .item .grid-box .grid-item .p { font-size: max(14px,.13 * var(--product-rem)); line-height: 1.8; }
+  .ai-support-page .programmer .section-1 .img-box .item .img img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ai-support-page #overseas-support .section-2 .wp1320 { width: 100%; padding-inline: 16px; }
+  .ai-support-page #website-support .section-2 .item .txt-box { grid-template-columns: 1fr; }
+}
+@container product (max-width: 480px) {
+  .ai-support-page .programmer .section-2 .list .item .grid-box { grid-template-columns: 1fr; }
+  .ai-support-page .programmer .section-2 .list .item .tit { font-size: 23px; }
+  .ai-support-page .ai-business .section-2 .list .item .cont-box { padding: 30px 16px 20px; }
+  .ai-support-page .ai-business .section-2 .list .item .cont-box .num { font-size: 32px; top: -22px; left: 16px; }
+  .ai-support-page .isaac-process-visual { padding: 22px 16px; min-height: 0; }
+  .ai-support-page :is(.process-flow,.isaac-support-scene__flow) { flex-direction: column; align-items: stretch; }
+  .ai-support-page :is(.process-flow,.isaac-support-scene__flow) > b { align-self: center; transform: rotate(90deg); }
+  .ai-support-page :is(.process-flow,.isaac-support-scene__flow) > span { white-space: normal; text-align: center; }
+}
+@media (max-width: 900px) and (min-width: 681px) {
+  .ai-support-page .ai-support-layout { grid-template-columns: 136px minmax(0,1fr); gap: 18px; padding-inline: 12px; }
+  .ai-support-page .ai-support-index nav a { font-size: 12px; }
+}
+@media (max-width: 680px) {
+  .ai-support-page .ai-support-layout { display: block; padding-inline: 12px; }
+  .ai-support-page .ai-support-sidebar { position: static; margin-bottom: 28px; }
+  .ai-support-page .ai-support-back { margin-bottom: 8px; }
+  .ai-support-page .ai-support-index { max-height: none; overflow: visible; }
+  .ai-support-page .ai-support-index nav { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+/* Preserve the original drawing scale shared by both SVG layers. */
+.ai-support-page .ai-support-sidebar > .ai-support-back { border-bottom: 0; }
+.ai-support-page .ai-business .section-2 .title .t { color: #182b45; }
+.ai-support-page .ai-business .section-2 .title .p { color: #253b55; }
+
+@container product (max-width: 960px) {
+  .ai-support-page .programmer .section-2 .line .mobile-line { background: #d3e1ff; }
+}

@@ -1,0 +1,11 @@
+/* Disable the old attribute-triggered gradient cuts. Parent visibility and
+   opacity remain owned by the existing menu/game transitions. */
+.home-page .scene-shade{background:none!important}
+.home-page .scene-shade::before,.home-page .scene-shade::after{content:"";position:absolute;inset:0;pointer-events:none}
+.home-page .scene-shade::before{display:none}
+.home-page .scene-shade::after{background:linear-gradient(90deg,#060c0977,#0000 49%);opacity:var(--scene-shade-visible,1)}
+@media(max-width:700px){
+ .home-page .scene-shade::before{display:block;background:linear-gradient(#171a1211,#0000 51%,#171a12aa);opacity:var(--scene-shade-desk,1)}
+ .home-page .scene-shade::after{background:linear-gradient(#0000 38%,#060c09f0);opacity:var(--scene-shade-story,0)}
+}
+.home-page.scene-unavailable .scene-shade::before,.home-page.scene-unavailable .scene-shade::after{display:none}

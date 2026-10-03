@@ -1,0 +1,9 @@
+
+/* The shared site header replaces the small duplicate identity in the scene. */
+#application > .header{display:none}
+.page-explore__header{padding-top:7.5rem}
+body > header{margin-top:108px}
+@media(max-width:1100px){
+ .page-explore__header{padding-top:6rem}
+ body > header{margin-top:84px}
+}

@@ -1,0 +1,25 @@
+@font-face{font-family:Isaac Sans;src:url('./assets/isaac-sans.woff2') format('woff2');font-display:swap}
+body.isaac-product-page{margin:0;background:#000;color:#f2f2f2;font-family:Isaac Sans,'PingFang SC','Microsoft YaHei',sans-serif;overflow-x:hidden}
+.isaac-product-page main{padding-top:64px;background:#000;min-height:70vh}
+.isaac-product-page a:focus-visible,.isaac-product-page [role=button]:focus-visible{outline:2px solid #fff;outline-offset:5px}
+.isaac-product-page .art-banner-box,.isaac-product-page .art-banner,.isaac-product-page .new-product,.isaac-product-page .art-product,.isaac-product-page #web,.isaac-product-page .custom,.isaac-product-page .consult,.isaac-product-page .new-product>div,.isaac-product-page .consult>div,.isaac-product-page .custom>div,.isaac-product-page #web>div,.isaac-product-page .art-product>div,.isaac-product-page .advertise,.isaac-product-page .section-product,.isaac-product-page .section-logo,.isaac-product-page .section-knowledge{background:#000!important;background-image:none!important}
+.isaac-product-page .art-banner-box::before,.isaac-product-page .art-banner-box::after{background-image:none!important}
+.isaac-product-page .art-banner-box{padding-top:0}
+.isaac-product-page .reference-banner-art{display:none!important}
+.isaac-product-page .art-banner-box .art-banner{height:2.6rem!important;padding-bottom:0!important;background:#000}
+.isaac-product-page .art-banner-box .text-container,.isaac-product-page .art-banner-box .text-content{z-index:1}
+.isaac-product-page .section-title,.isaac-product-page .title,.isaac-product-page .t,.isaac-product-page h1,.isaac-product-page h2,.isaac-product-page h3{color:#f2f2f2}
+.isaac-product-page .section-title .s,.isaac-product-page .section-title .p,.isaac-product-page .text-box .s,.isaac-product-page .text-container .s,.isaac-product-page .desc,.isaac-product-page .p,.isaac-product-page .breadcrumb,.isaac-product-page .position{color:#b7b7b7}
+.isaac-product-page .categorys-list .item,.isaac-product-page .info .item,.isaac-product-page .info-1 .item{color:#eee}
+.isaac-product-page .price-page{background:#000}
+.isaac-product-page .section-2 .line-bg,.isaac-product-page .section-2 .line{background-color:transparent!important}
+.isaac-plan-bar{position:relative;padding:84px 5vw 16px;display:flex;gap:24px;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff25;background:#000;color:#fff;font-size:14px;line-height:1.5;z-index:2}
+.isaac-plan-bar a{color:inherit}.isaac-plan-bar>a:last-child{padding:9px 16px;border:1px solid #ffffff66;border-radius:30px;white-space:nowrap}
+.isaac-product-footer{display:flex;justify-content:space-between;gap:24px;margin:0 5vw;padding:48px 0;border-top:1px solid #ffffff30;font-size:14px;color:#aaa;line-height:1.7}.isaac-product-footer a{color:#fff}
+.isaac-source-note,.source-reference-note{font-size:12px!important;line-height:1.8!important;color:#999!important;margin:24px auto;max-width:1280px;padding:0 24px;letter-spacing:0!important}
+.source-reference-note{padding:20px 24px;text-align:center;margin-top:0}
+#isaac-consult{box-sizing:border-box;padding:36px;max-width:520px;width:calc(100% - 32px);border:1px solid #666;border-radius:12px;background:#111;color:#fff;font:16px/1.8 Isaac Sans,'PingFang SC',sans-serif;box-shadow:0 20px 100px #0008}
+#isaac-consult::backdrop{background:#000a;backdrop-filter:blur(8px)}#isaac-consult h2{font-size:34px;color:#fff;margin:16px 0}#isaac-consult p{margin:12px 0;font-size:16px}#isaac-consult .consult-kicker{font-size:12px;letter-spacing:.1em;color:#aaa}#isaac-consult button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}.consult-close{float:right;min-height:44px}.consult-primary{display:inline-flex;margin-top:20px;min-height:48px;padding:8px 24px;border:1px solid #ddd;border-radius:30px;color:#fff;text-decoration:none}
+[hidden]{display:none!important}
+@media(max-width:1024px){.isaac-plan-bar{padding:76px 20px 16px;gap:12px;font-size:12px}.isaac-plan-bar>span{display:none}.isaac-product-page main{padding-top:32px}.isaac-product-page .art-banner-box .art-banner{height:3.4rem!important}.isaac-product-footer{flex-wrap:wrap;font-size:13px}.isaac-product-footer span{width:100%}.isaac-source-note{padding:0 20px}#isaac-consult{padding:24px}}
+@media(prefers-reduced-motion:reduce){.isaac-product-page *, .isaac-product-page *::before,.isaac-product-page *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

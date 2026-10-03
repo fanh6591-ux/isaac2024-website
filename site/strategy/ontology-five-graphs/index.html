@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五张「图」讲明白：Ontology · Knowledge Graph · Context Graph · Code Graph · Graph Engineering</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #FAFBFC;
+  --text: #1E1E2E;
+  --text-secondary: #5B5B6E;
+  --text-tertiary: #8B8B9E;
+  --accent: #6C5CE7;
+  --accent-dark: #5A4BD1;
+  --accent-light: #F4F2FF;
+  --accent-glow: rgba(108, 92, 231, 0.15);
+  --edge: #00D2A0;
+  --edge-light: #E6FAF5;
+  --warm: #FF6B6B;
+  --warm-light: #FFF0F0;
+  /* 紫色系 = 描述世界 / 知道什么 */
+  --knows: #6C5CE7;
+  --knows-deep: #5A4BD1;
+  --knows-light: #F4F2FF;
+  --knows-mid: #E4DFFF;
+  --knows-border: #C7BBFA;
+  /* 琥珀系 = 描述执行 / 怎么干活 */
+  --acts: #F59E0B;
+  --acts-deep: #B45309;
+  --acts-light: #FFFCF0;
+  --acts-mid: #FDE68A;
+  --acts-border: #FDE68A;
+  --grey-50: #F8F8FA;
+  --grey-100: #F0F0F3;
+  --grey-200: #E4E4EB;
+  --grey-300: #D0D0DB;
+  --grey-400: #A0A0B2;
+  --grey-500: #78788A;
+  --grey-700: #5B5B6E;
+  --code-bg: #F7F6FD;
+  --shadow-sm: 0 1px 3px rgba(30,30,46,0.05);
+  --shadow-md: 0 4px 20px rgba(30,30,46,0.07);
+  --shadow-lg: 0 12px 40px rgba(30,30,46,0.10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --max-width: 920px;
+  --font-body: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "WenQuanYi Micro Hei", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono", "Consolas", "Menlo", monospace;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; font-size: 17px; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.82;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4 { font-weight: 700; line-height: 1.3; color: var(--text); }
+h1 { font-size: 2.8rem; letter-spacing: -0.025em; margin-bottom: 0.35em; }
+h2 { font-size: 1.75rem; margin: 3em 0 0.8em; padding-top: 0.4em; }
+h2::before { content: ''; display: block; width: 48px; height: 3px; background: var(--accent); margin-bottom: 0.6em; border-radius: 3px; }
+h3 { font-size: 1.25rem; margin: 2em 0 0.6em; }
+h4 { font-size: 1.05rem; margin: 1.5em 0 0.4em; }
+p { margin: 1em 0; }
+
+strong, b { color: var(--text); font-weight: 700; }
+.hl { color: var(--accent); font-weight: 700; }
+.hl-bg { background: var(--accent-light); padding: 0.1em 0.3em; border-radius: 3px; color: var(--accent); font-weight: 600; }
+.hl-yellow { background: #FFF3B0; padding: 0.05em 0.25em; border-radius: 2px; }
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  color: #1E1E2E;
+  border: 1px solid var(--grey-200);
+}
+
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  background: var(--grey-50);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+blockquote p { margin: 0.3em 0; }
+
+/* ===== LAYOUT ===== */
+.article-wrapper {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ===== TOP NAV ===== */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--grey-200);
+  padding: 0.6rem 0;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+.top-nav.visible { transform: translateY(0); }
+.top-nav-inner {
+  max-width: var(--max-width); margin: 0 auto; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-nav-title { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.top-nav-badge { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 6rem 0 1rem;
+  text-align: center;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-bottom: 1.2rem;
+  padding: 0.3em 0.9em;
+  border: 1.5px solid var(--accent);
+  border-radius: 20px;
+  position: relative;
+}
+
+.hero h1 { max-width: 820px; margin-left: auto; margin-right: auto; position: relative; }
+
+.hero-subtitle {
+  position: relative;
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin: 0.8em auto 1.2em;
+  line-height: 1.6;
+}
+
+/* ===== DIAGRAM CONTAINER ===== */
+.diagram-container {
+  position: relative;
+  margin: 2.5em 0;
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5em;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.diagram-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--grey-500);
+  margin-bottom: 1em;
+  text-align: center;
+}
+.diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.diagram-container img { display: block; margin: 0 auto; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--grey-200); }
+.diagram-caption {
+  text-align: center; font-size: 0.85rem; color: var(--grey-700);
+  margin-top: 1em;
+}
+
+/* ===== HERO MASTER GRAPH ===== */
+.hero-graph { background: #FAFBFC; }
+
+.hero-node { cursor: pointer; outline: none; }
+.hero-node > rect { transition: filter var(--transition), transform var(--transition); }
+.hero-node:hover > rect,
+.hero-node:focus-visible > rect {
+  filter: drop-shadow(0 3px 10px rgba(108,92,231,0.35));
+  transform: translateY(-2px);
+}
+.hero-node.acts-node:hover > rect,
+.hero-node.acts-node:focus-visible > rect {
+  filter: drop-shadow(0 3px 10px rgba(217,119,6,0.35));
+}
+
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+.draw-edge {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: drawLine 0.9s ease forwards;
+}
+
+@keyframes flowDash { to { stroke-dashoffset: -40; } }
+.flow-line {
+  stroke-dasharray: 8 6;
+  animation: flowDash 1.5s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.pulse-dot { animation: pulse 2s ease-in-out infinite; }
+
+/* ===== TABLE OF CONTENTS ===== */
+.toc {
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 1.8em 2em;
+  margin: 2em 0 3em;
+}
+.toc-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-500); margin-bottom: 1em; }
+.toc ol { list-style: none; counter-reset: toc-counter; }
+.toc li { counter-increment: toc-counter; margin: 0.4em 0; }
+.toc li::before {
+  content: counter(toc-counter, decimal-leading-zero);
+  font-size: 0.72rem; font-weight: 700; color: var(--grey-400);
+  margin-right: 0.8em; font-family: var(--font-mono);
+}
+.toc a {
+  color: var(--text); text-decoration: none; font-weight: 500;
+  transition: color var(--transition);
+  border-bottom: 1px solid transparent;
+}
+.toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ===== SECTIONS ===== */
+.section { margin: 2em 0; scroll-margin-top: 5rem; }
+
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* 章节编号 + 标题 */
+.sec-no {
+  display: inline-block; min-width: 1.7em; text-align: center;
+  font-family: var(--font-mono); font-size: 0.62em;
+  background: var(--accent-light); color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px; padding: 0.15em 0.4em;
+  vertical-align: 0.18em; margin-right: 0.4em;
+}
+.sec-tag { font-size: 0.8em; font-weight: 700; color: var(--text-secondary); }
+
+/* 一句话人话 */
+.lead-line {
+  font-size: 1.1rem; font-weight: 600; line-height: 1.7;
+  border-left: 3px solid var(--accent);
+  padding: 0.15em 0 0.15em 0.9em; margin: 1em 0 1.4em;
+  color: var(--text);
+}
+
+/* 什么时候用它 */
+.use-when {
+  margin: -0.2em 0 1.4em; font-size: 0.92rem; line-height: 1.7;
+  background: var(--knows-light); border: 1px solid var(--knows-border);
+  border-radius: var(--radius-md); padding: 0.7em 1em; color: var(--text);
+}
+.use-when strong { color: var(--knows-deep); }
+
+/* 概念名片 4 格 */
+.spec-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0.8em; margin: 1.4em 0;
+}
+.spec-cell {
+  background: #FFF; border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md); padding: 0.9em 1em;
+}
+.spec-cell .k {
+  display: block; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.05em; color: var(--grey-500);
+  text-transform: uppercase; margin-bottom: 0.35em;
+}
+.spec-cell .v { font-size: 0.88rem; line-height: 1.55; color: var(--text); }
+.spec-cell .v em { font-style: normal; color: var(--accent); font-weight: 700; }
+
+/* ===== 类比框 ===== */
+.analogy {
+  background: #FFF;
+  border-left: 3px solid var(--accent);
+  padding: 1em 1.3em;
+  margin: 1.2em 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.95em;
+  color: var(--text-secondary);
+}
+.analogy::before { content: '💡 类比：'; font-size: 0.85em; font-weight: 600; color: var(--accent); }
+.analogy strong { color: var(--accent); }
+.analogy.note { border-left-color: #D97706; }
+.analogy.note::before { content: '🔀 同名不同源：'; color: var(--acts-deep); }
+.analogy.note strong { color: var(--text); }
+
+/* ===== 等式框 ===== */
+.equation-box {
+  background: var(--knows-light);
+  border: 1px solid var(--knows-border);
+  border-radius: var(--radius-md);
+  padding: 1em 1.3em;
+  margin: 1.2em 0;
+}
+.equation-box .equation {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--knows-deep);
+  margin: 0 0 0.5em;
+  line-height: 1.6;
+}
+.equation-box .equation-zh {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+.eq { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--knows-deep); display: inline-block; margin-bottom: 0.35em; line-height: 1.5; }
+.eq.acts { color: var(--acts-deep); }
+
+/* ===== 图例行 ===== */
+.legend-row {
+  display: flex; flex-wrap: wrap; gap: 0.6em; justify-content: center;
+  margin: 1.2em 0 0.4em;
+}
+.legend-chip {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 0.3em 0.8em; border-radius: 14px;
+  background: #FFF; border: 1px solid var(--grey-200); color: var(--text-secondary);
+}
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+/* ===== 两层色块行（核心结论） ===== */
+.family-row {
+  display: flex; flex-wrap: wrap; gap: 1em; justify-content: center;
+  margin: 1.8em 0;
+}
+.family-chip {
+  display: inline-flex; flex-direction: column; align-items: center;
+  padding: 1em 1.4em; border-radius: var(--radius-md);
+  font-weight: 700; font-size: 0.95rem; line-height: 1.5;
+}
+.family-chip .sub { font-size: 0.78rem; font-weight: 500; margin-top: 0.25em; }
+.family-chip.knows { background: var(--knows-light); border: 1.5px solid var(--knows-border); color: var(--knows-deep); }
+.family-chip.knows .sub { color: var(--knows); }
+.family-chip.acts { background: var(--acts-light); border: 1.5px solid var(--acts-mid); color: var(--acts-deep); }
+.family-chip.acts .sub { color: var(--acts-deep); }
+
+/* ===== 对比表 ===== */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-md); }
+.comp-table {
+  width: 100%; border-collapse: collapse; margin: 1.5em 0;
+  font-size: 0.88rem; border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  min-width: 560px;
+}
+.comp-table thead { background: var(--text); color: #FFF; }
+.comp-table th { padding: 0.8em 0.9em; text-align: left; font-weight: 600; font-size: 0.82rem; }
+.comp-table td { padding: 0.7em 0.9em; border-bottom: 1px solid var(--grey-200); vertical-align: top; }
+.comp-table tbody tr { background: #FFF; }
+.comp-table tbody tr:nth-child(even) { background: var(--grey-50); }
+.comp-table tbody tr:hover { background: var(--accent-light); }
+.comp-table tbody tr.row-acts:hover { background: var(--acts-light); }
+.comp-table .c-name { font-weight: 700; white-space: nowrap; }
+.comp-table .c-name .en { font-size: 0.75rem; color: var(--grey-500); font-family: var(--font-mono); display: block; }
+.comp-table .row-acts .c-name { color: var(--acts-deep); }
+.comp-table .row-acts .c-name .en { color: var(--acts-deep); }
+
+/* 场景速查表 */
+.scene-table {
+  width: 100%; border-collapse: collapse; margin: 1.2em 0 1.8em;
+  font-size: 0.9rem; border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.scene-table thead { background: var(--text); color: #FFF; }
+.scene-table th { padding: 0.6em 1em; text-align: left; font-weight: 600; font-size: 0.82rem; }
+.scene-table td { padding: 0.55em 1em; border-bottom: 1px solid var(--grey-200); }
+.scene-table tbody tr { background: #FFF; }
+.scene-table tbody tr:nth-child(even) { background: var(--grey-50); }
+.scene-table tbody tr:hover { background: var(--accent-light); }
+.scene-table .scene-name { font-weight: 700; color: var(--knows-deep); white-space: nowrap; }
+.scene-table tr.row-acts .scene-name { color: var(--acts-deep); }
+.scene-table tr.row-acts:hover { background: var(--acts-light); }
+
+.table-note { font-size: 0.85rem; color: var(--text-secondary); margin: -0.4em 0 1.6em; }
+
+/* ===== 自由度光谱条 ===== */
+.spectrum {
+  margin: 1.6em 0; padding: 1.4em 1.6em;
+  background: #FFF; border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+}
+.spectrum-bar {
+  height: 10px; border-radius: 5px;
+  background: linear-gradient(90deg, #78788A 0%, #78788A 33%, #9B87F0 55%, #6C5CE7 80%, #5A4BD1 100%);
+  position: relative; margin: 0.4em 0 1.1em;
+}
+.spectrum-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--grey-700); font-weight: 600; }
+.spectrum-labels span { max-width: 30%; text-align: center; line-height: 1.5; }
+
+/* ===== 总结语录 ===== */
+.quote-box {
+  margin: 2.2em 0 0.4em; text-align: center;
+}
+.quote-box .big {
+  font-size: 1.55rem; font-weight: 700; line-height: 1.6;
+  color: var(--text);
+}
+.quote-box .big .q-blue { color: var(--knows-deep); }
+.quote-box .big .q-amber { color: var(--acts-deep); }
+.quote-box .small { margin-top: 0.8em; font-size: 0.95rem; color: var(--text-secondary); }
+
+/* ===== 参考文件列表 ===== */
+.ref-list { margin: 1.6em 0; padding: 0; list-style: none; counter-reset: ref-counter; }
+.ref-list li {
+  counter-increment: ref-counter; position: relative;
+  margin: 0.6em 0; padding-left: 2.2em; font-size: 0.95rem; line-height: 1.65;
+}
+.ref-list li::before {
+  content: '[' counter(ref-counter) ']'; position: absolute; left: 0; top: 0.15em;
+  font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--grey-400);
+}
+.ref-list a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.ref-list a:hover { text-decoration: underline; }
+.ref-list .meta { font-size: 0.82rem; color: var(--grey-500); }
+.ref-list .point { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* ===== FOOTER ===== */
+.article-footer {
+  margin-top: 4em; padding: 2em 0; border-top: 1px solid var(--grey-200);
+  color: var(--text-secondary); font-size: 0.88rem; text-align: center;
+}
+
+/* ===== SCROLL PROGRESS ===== */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--accent); z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  .article-wrapper { padding: 0 1.2rem; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.4rem; }
+  .hero { padding: 4rem 0 1rem; }
+  .diagram-container { padding: 1em; }
+  .spec-strip { grid-template-columns: 1fr 1fr; }
+  .quote-box .big { font-size: 1.25rem; }
+  .spectrum-labels span { max-width: 33%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .flow-line { animation: none; }
+  .pulse-dot { animation: none; }
+  .draw-edge { animation: none; stroke-dashoffset: 0; }
+}
+
+/* ===== PRINT ===== */
+@media print {
+  .top-nav, .scroll-progress { display: none; }
+  .reveal { opacity: 1; transform: none; }
+  .draw-edge { animation: none; stroke-dashoffset: 0; }
+  .flow-line, .pulse-dot { animation: none; }
+  body { font-size: 12pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .emo { display: none; }
+  .diagram-container { break-inside: avoid; }
+  .section { break-inside: auto; }
+}
+</style>
+<meta name="description" content="区分本体、知识图谱、上下文图谱、代码图谱与 Graph Engineering，理解它们怎样协同。"><link rel="canonical" href="https://isaac2024.online/strategy/ontology-five-graphs/"><link rel="stylesheet" href="/ontology-readings-20260930-v1/reading.css"></head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav class="top-nav" id="topNav">
+  <div class="top-nav-inner">
+    <span class="top-nav-title">五张「图」讲明白 · 图谱概念科普</span>
+    <span class="top-nav-badge">大白话图解</span>
+  </div>
+</nav>
+
+<div class="article-wrapper">
+
+<!-- ===== GLOBAL SVG DEFS ===== -->
+<svg width="0" height="0" aria-hidden="true">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1E1E2E" flood-opacity="0.10"/></filter>
+    <marker id="arrGray" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#78788A"/></marker>
+    <marker id="arrBlue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#6C5CE7"/></marker>
+    <marker id="arrAmber" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#D97706"/></marker>
+    <marker id="arrDark" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#1E1E2E"/></marker>
+    <marker id="arrRed" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#FF6B6B"/></marker>
+  </defs>
+</svg>
+
+<!-- ===== HERO ===== -->
+<header class="hero reveal">
+  <div class="hero-badge">零点未来 · 技术科普</div>
+  <h1>五张「图」，<span class="hl">一张图</span>讲明白</h1>
+  <p class="hero-subtitle">
+    Ontology · Knowledge Graph · Context Graph · Code Graph · Graph Engineering<br>
+    五个高频词，其实分两类：<strong>前四个回答「系统知道什么」</strong>，<strong>最后一个回答「系统怎么干活」</strong>。
+  </p>
+
+  <div class="diagram-container hero-graph reveal">
+    <div class="diagram-label">总览图 · 点击任意节点，直达对应章节</div>
+    <svg viewBox="0 0 960 545" role="img" aria-label="五大图谱概念总览图：左侧为知道什么，右侧为怎么干活">
+
+      <!-- 左右两个色域面板 -->
+      <rect x="20" y="88" width="440" height="440" rx="14" fill="#F4F2FF" stroke="#C7BBFA"/>
+      <rect x="500" y="88" width="440" height="440" rx="14" fill="#FFFCF0" stroke="#FDE68A"/>
+
+      <!-- AI SYSTEM -->
+      <g>
+        <rect x="380" y="14" width="200" height="44" rx="22" fill="#1E1E2E" filter="url(#shadow)"/>
+        <text x="480" y="42" text-anchor="middle" fill="#FFF" font-size="13" font-weight="700" letter-spacing="1" font-family="SF Mono, JetBrains Mono, Consolas, monospace">AI SYSTEM</text>
+        <circle cx="480" cy="14" r="3.5" fill="#F59E0B" class="pulse-dot"/>
+      </g>
+
+      <!-- 主干分叉 -->
+      <path d="M480,58 V66" stroke="#78788A" stroke-width="1.5" fill="none" class="draw-edge" style="animation-delay:0.05s"/>
+      <path d="M240,66 H720" stroke="#78788A" stroke-width="1.5" fill="none" class="draw-edge" style="animation-delay:0.15s"/>
+      <line x1="240" y1="66" x2="240" y2="85" stroke="#6C5CE7" stroke-width="2" marker-end="url(#arrBlue)" class="draw-edge" style="animation-delay:0.25s"/>
+      <line x1="720" y1="66" x2="720" y2="85" stroke="#D97706" stroke-width="2" marker-end="url(#arrAmber)" class="draw-edge" style="animation-delay:0.25s"/>
+
+      <!-- 两层标题 -->
+      <text x="240" y="112" text-anchor="middle" fill="#5A4BD1" font-size="13" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🧠</tspan> Knowledge / Context Layer · 知道什么</text>
+      <text x="720" y="112" text-anchor="middle" fill="#B45309" font-size="13" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">⚡</tspan> Execution Layer · 怎么干活</text>
+
+      <!-- ===== 左侧：知道什么 ===== -->
+      <g class="hero-node" data-target="#s1" tabindex="0" role="button" aria-label="跳转到 Ontology 章节">
+        <title>Ontology · 本体——跳转到对应章节</title>
+        <rect x="140" y="132" width="200" height="46" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+        <text x="240" y="160" text-anchor="middle" fill="#5A4BD1" font-size="13.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Ontology · 本体</text>
+      </g>
+      <line x1="240" y1="178" x2="240" y2="194" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)" class="draw-edge" style="animation-delay:0.35s"/>
+      <rect x="100" y="196" width="280" height="30" rx="15" fill="#E4DFFF"/>
+      <text x="240" y="216" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="600" font-family="PingFang SC, Microsoft YaHei, sans-serif">定义概念和关系 · 规则书</text>
+      <line x1="240" y1="226" x2="240" y2="242" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)" class="draw-edge" style="animation-delay:0.45s"/>
+
+      <g class="hero-node" data-target="#s2" tabindex="0" role="button" aria-label="跳转到 Knowledge Graph 章节">
+        <title>Knowledge Graph · 知识图谱——跳转到对应章节</title>
+        <rect x="140" y="244" width="200" height="46" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+        <text x="240" y="269" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Knowledge Graph</text>
+        <text x="240" y="283" text-anchor="middle" fill="#5B5B6E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">知识图谱</text>
+      </g>
+      <path d="M240,290 V300" stroke="#6C5CE7" stroke-width="1.5" fill="none" class="draw-edge" style="animation-delay:0.55s"/>
+      <path d="M150,300 H330" stroke="#6C5CE7" stroke-width="1.5" fill="none" class="draw-edge" style="animation-delay:0.6s"/>
+      <line x1="150" y1="300" x2="150" y2="314" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)" class="draw-edge" style="animation-delay:0.68s"/>
+      <line x1="330" y1="300" x2="330" y2="314" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)" class="draw-edge" style="animation-delay:0.68s"/>
+
+      <g class="hero-node" data-target="#s3" tabindex="0" role="button" aria-label="跳转到 Context Graph 章节">
+        <title>Context Graph · 上下文图谱——跳转到对应章节</title>
+        <rect x="60" y="316" width="180" height="46" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+        <text x="150" y="340" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Context Graph</text>
+        <text x="150" y="353" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">上下文图谱</text>
+      </g>
+      <g class="hero-node" data-target="#s4" tabindex="0" role="button" aria-label="跳转到 Code Graph 章节">
+        <title>Code Graph · 代码图谱——跳转到对应章节</title>
+        <rect x="240" y="316" width="180" height="46" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+        <text x="330" y="340" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Code Graph</text>
+        <text x="330" y="353" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">代码图谱</text>
+      </g>
+
+      <text x="150" y="392" text-anchor="middle" fill="#78788A" font-size="9" font-family="SF Mono, JetBrains Mono, Consolas, monospace">operational knowledge</text>
+      <text x="150" y="406" text-anchor="middle" fill="#1E1E2E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">任务状态 · 事件 · 历史 · 证据</text>
+      <text x="330" y="392" text-anchor="middle" fill="#78788A" font-size="9" font-family="SF Mono, JetBrains Mono, Consolas, monospace">software/code structure</text>
+      <text x="330" y="406" text-anchor="middle" fill="#1E1E2E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">代码结构 · 调用关系 · 依赖关系</text>
+
+      <rect x="40" y="460" width="400" height="36" rx="18" fill="#FFFFFF" stroke="#C7BBFA"/>
+      <text x="240" y="483" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">前四张图 = 系统知道什么（What it knows）</text>
+
+      <!-- ===== 右侧：怎么干活 ===== -->
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <title>Graph Engineering · 图谱工程——跳转到对应章节</title>
+        <rect x="620" y="132" width="200" height="46" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="2"/>
+        <text x="720" y="158" text-anchor="middle" fill="#B45309" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Graph Engineering</text>
+        <text x="720" y="172" text-anchor="middle" fill="#5B5B6E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">图谱工程</text>
+      </g>
+      <line x1="720" y1="178" x2="720" y2="194" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)" class="draw-edge" style="animation-delay:0.35s"/>
+      <rect x="580" y="196" width="280" height="30" rx="15" fill="#FDE68A"/>
+      <text x="720" y="216" text-anchor="middle" fill="#B45309" font-size="11.5" font-weight="600" font-family="PingFang SC, Microsoft YaHei, sans-serif">构建和运行 Graph 驱动的 AI 系统</text>
+      <line x1="720" y1="226" x2="720" y2="242" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)" class="draw-edge" style="animation-delay:0.45s"/>
+
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <title>Agent Graph · 智能体图——跳转到对应章节</title>
+        <rect x="620" y="244" width="200" height="46" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="2"/>
+        <text x="720" y="269" text-anchor="middle" fill="#B45309" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Agent Graph</text>
+        <text x="720" y="283" text-anchor="middle" fill="#5B5B6E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">智能体图</text>
+      </g>
+      <path d="M720,290 V302" stroke="#D97706" stroke-width="1.5" fill="none" class="draw-edge" style="animation-delay:0.55s"/>
+      <path d="M590,302 H850" stroke="#D97706" stroke-width="1.5" fill="none" class="draw-edge" style="animation-delay:0.6s"/>
+      <line x1="590" y1="302" x2="590" y2="312" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)" class="draw-edge" style="animation-delay:0.68s"/>
+      <line x1="720" y1="302" x2="720" y2="312" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)" class="draw-edge" style="animation-delay:0.68s"/>
+      <line x1="850" y1="302" x2="850" y2="312" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)" class="draw-edge" style="animation-delay:0.68s"/>
+
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <rect x="548" y="314" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+        <text x="590" y="334" text-anchor="middle" fill="#B45309" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🤖</tspan> Agent</text>
+      </g>
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <rect x="678" y="314" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+        <text x="720" y="334" text-anchor="middle" fill="#B45309" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🔧</tspan> Tool</text>
+      </g>
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <rect x="808" y="314" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+        <text x="850" y="334" text-anchor="middle" fill="#B45309" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🧠</tspan> LLM</text>
+      </g>
+      <line x1="590" y1="346" x2="590" y2="352" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)"/>
+      <line x1="720" y1="346" x2="720" y2="352" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)"/>
+      <line x1="850" y1="346" x2="850" y2="352" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)"/>
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <rect x="548" y="354" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+        <text x="590" y="374" text-anchor="middle" fill="#B45309" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">✅</tspan> Evaluator</text>
+      </g>
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <rect x="678" y="354" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+        <text x="720" y="374" text-anchor="middle" fill="#B45309" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">👤</tspan> Human</text>
+      </g>
+      <g class="hero-node acts-node" data-target="#s5" tabindex="0" role="button" aria-label="跳转到 Graph Engineering 章节">
+        <rect x="808" y="354" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+        <text x="850" y="374" text-anchor="middle" fill="#B45309" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🔁</tspan> Loop</text>
+      </g>
+
+      <text x="720" y="424" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">节点 = 数据处理、查询、推理、工具调用或 Agent 能力</text>
+      <text x="720" y="440" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">边 = 数据流、控制流或推理路径</text>
+
+      <rect x="520" y="460" width="400" height="36" rx="18" fill="#FFFFFF" stroke="#FDE68A"/>
+      <text x="720" y="483" text-anchor="middle" fill="#B45309" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">图谱工程 = 系统怎么干活（How it acts）</text>
+    </svg>
+    <p class="diagram-caption">🟣 紫色 = 描述世界（知道什么）　🟡 琥珀色 = 描述执行（怎么干活）——记住这两块颜色，后面每个图都按这个逻辑来。</p>
+  </div>
+</header>
+
+<!-- ===== TOC ===== -->
+<nav class="toc reveal" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <ol>
+    <li><a href="#s0">核心结论：知道什么 vs 怎么干活</a></li>
+    <li><a href="#s1">Palantir Ontology 本体 — 企业业务操作模型</a></li>
+    <li><a href="#s2">Knowledge Graph 知识图谱 — 填满事实的世界网</a></li>
+    <li><a href="#s3">Context Graph 上下文图谱 — Agent 当前任务的上下文图</a></li>
+    <li><a href="#s4">Code Graph 代码图谱 — 代码的内部管网图</a></li>
+    <li><a href="#s5">Graph Engineering 图谱工程 — 让 Agent 可靠运行</a></li>
+    
+    <li><a href="#refs">参考文件</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 0. 核心结论 ===== -->
+<section class="section reveal" id="s0">
+  <h2><span class="sec-no">0</span>核心结论：<span class="sec-tag">知道什么 vs 怎么干活</span></h2>
+
+  <p>这五个词里都带「图」，但其实是<strong>两类完全不同的东西</strong>：</p>
+
+  <div class="family-row">
+    <div class="family-chip knows">
+      🧠 知识层 · 描述世界
+      <span class="sub">Ontology · Knowledge Graph · Context Graph · Code Graph<br>回答「系统知道什么」——像地图与燃料</span>
+    </div>
+    <div class="family-chip acts">
+      ⚡ 最后一个 · 描述执行
+      <span class="sub">Graph Engineering<br>回答「系统怎么干活」——像轨道与发动机</span>
+    </div>
+  </div>
+
+  <blockquote>
+    <p><strong>知道什么</strong>，决定 Agent 答得<strong>对不对</strong>；<strong>怎么干活</strong>，决定 Agent 做得<strong>稳不稳</strong>。</p>
+  </blockquote>
+
+  <p>一个记法：前四个描述系统知道什么，Graph Engineering 负责让 Agent 使用这些知识完成任务。</p>
+</section>
+
+<!-- ===== 1. Ontology ===== -->
+<section class="section reveal" id="s1">
+  <h2><span class="sec-no">1</span>Ontology 本体 — <span class="sec-tag">定义业务世界、规则与可执行能力</span></h2>
+
+  <p class="lead-line">打个比方，本体就是公司的<span class="hl">「标准术语表 + 家规」</span>：它不记张三李四，只规定——「客户」这个词怎么定义、「客户」和「订单」之间允许有什么关系、哪些规则永远成立。它是字典和语法书的合体，而且严格到<strong>机器也能读懂</strong>。</p>
+
+  <div class="equation-box">
+    <p class="equation">Palantir Ontology = Objects + Links + Properties + Logic + Actions + Security</p>
+    <p class="equation-zh">对象 + 关系 + 属性 + 推理规则 + 可执行操作 + 权限安全——本体不只定义「有什么、什么关系」，还定义「谁能做什么、什么条件下能做」。<strong>注意</strong>：这里的「操作」是一条许可规则（比如「折扣超过 15% 需要 VP 审批」这条规矩本身），真正把多个操作串成一条可执行流程，是图谱工程（第 5 节）的活。</p>
+  </div>
+
+  <p class="use-when"><strong>什么时候用它：</strong>多个团队/系统要统一口径（医疗里的「诊断」绝不允许有两种意思）；要让机器自己推理出新知识（药 X 治 Y 病 + 患者有 Y 病 ⇒ 药 X 可能适用）；领域知识稳定、精度比速度重要（金融 FIBO、医疗 FHIR）。</p>
+
+  <div class="spec-strip">
+    <div class="spec-cell"><span class="k">装的是什么</span><span class="v">概念<em>类型</em>、属性、关系规则——<em>不是</em>实例数据</span></div>
+    <div class="spec-cell"><span class="k">回答什么问题</span><span class="v">「诊断」是医疗诊断还是软件缺陷？两种「收入」是不是一回事？</span></div>
+    <div class="spec-cell"><span class="k">多久变一次</span><span class="v"><em>很少变</em>，改一次走审批、留版本</span></div>
+    <div class="spec-cell"><span class="k">主要给谁用</span><span class="v">所有图共同遵守的<em>「语义契约」</em></span></div>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">规则书长什么样 · 类型 + 关系 + 推理</div>
+    <svg viewBox="0 0 860 250" role="img" aria-label="本体规则书示意图：允许存在的类型、允许的关系与规则、推理出新知识">
+      <!-- 类型面板 -->
+      <rect x="15" y="24" width="250" height="210" rx="10" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+      <text x="140" y="48" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📖</tspan> 允许存在的「类型」</text>
+      <rect x="30" y="64" width="220" height="42" rx="6" fill="#F4F2FF" stroke="#C7BBFA"/>
+      <text x="140" y="83" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Person 人</text>
+      <text x="140" y="97" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">属性：姓名 · 出生年</text>
+      <rect x="30" y="116" width="220" height="42" rx="6" fill="#F4F2FF" stroke="#C7BBFA"/>
+      <text x="140" y="135" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Company 公司</text>
+      <text x="140" y="149" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">属性：名称 · 行业</text>
+      <rect x="30" y="168" width="220" height="42" rx="6" fill="#F4F2FF" stroke="#C7BBFA"/>
+      <text x="140" y="187" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">City 城市</text>
+      <text x="140" y="201" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">属性：名称 · 国家</text>
+
+      <!-- 关系面板 -->
+      <rect x="295" y="24" width="270" height="210" rx="10" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+      <text x="430" y="48" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📜</tspan> 允许的关系与规则</text>
+      <text x="392" y="66" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">worksAt 就职于（一人可多家）</text>
+      <rect x="308" y="74" width="64" height="26" rx="13" fill="#E4DFFF"/>
+      <text x="340" y="91" text-anchor="middle" fill="#5A4BD1" font-size="10" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Person</text>
+      <line x1="375" y1="87" x2="408" y2="87" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <rect x="414" y="74" width="74" height="26" rx="13" fill="#E4DFFF"/>
+      <text x="451" y="91" text-anchor="middle" fill="#5A4BD1" font-size="10" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Company</text>
+      <text x="385" y="124" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">headquarteredIn 总部在（1 对 1）</text>
+      <rect x="308" y="132" width="74" height="26" rx="13" fill="#E4DFFF"/>
+      <text x="345" y="149" text-anchor="middle" fill="#5A4BD1" font-size="10" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Company</text>
+      <line x1="385" y1="145" x2="418" y2="145" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <rect x="424" y="132" width="50" height="26" rx="13" fill="#E4DFFF"/>
+      <text x="449" y="149" text-anchor="middle" fill="#5A4BD1" font-size="10" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">City</text>
+      <text x="430" y="176" text-anchor="middle" fill="#1E1E2E" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">✍️</tspan> 规则示例</text>
+      <text x="430" y="194" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">knows 是对称的：A 认识 B ⇒ B 认识 A</text>
+      <text x="430" y="212" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">约束：一张订单只能属于一个客户</text>
+
+      <!-- 推理面板 -->
+      <rect x="595" y="24" width="250" height="210" rx="10" fill="#F8F8FA" stroke="#D0D0DB"/>
+      <text x="720" y="48" text-anchor="middle" fill="#1E1E2E" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🔮</tspan> 规则能「推理」出新知识</text>
+      <rect x="610" y="76" width="58" height="32" rx="6" fill="#E4DFFF"/>
+      <text x="639" y="96" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">药 X</text>
+      <rect x="760" y="76" width="58" height="32" rx="6" fill="#E4DFFF"/>
+      <text x="789" y="96" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">病 Y</text>
+      <line x1="668" y1="92" x2="758" y2="92" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="714" y="86" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">treats 治疗</text>
+      <rect x="685" y="180" width="58" height="32" rx="6" fill="#E4DFFF"/>
+      <text x="714" y="200" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">患者 Z</text>
+      <path d="M789,108 L741,180" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <text x="796" y="150" text-anchor="start" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">has 患有</text>
+      <path d="M645,108 L700,180" stroke="#6C5CE7" stroke-width="1.5" stroke-dasharray="5 4" fill="none" marker-end="url(#arrBlue)"/>
+      <text x="722" y="130" text-anchor="middle" fill="#6C5CE7" font-size="9.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">⇒ 推断：或可治疗</text>
+      <text x="720" y="222" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">两条已知事实 ⇒ 一条新知识</text>
+    </svg>
+    <p class="diagram-caption">本体最值钱的本事是<strong>推理</strong>：不用人工写死「患者 Z 该吃什么药」，规则自己推出来。</p>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">本体的亲戚们 · 语义复杂度递增</div>
+    <svg viewBox="0 0 860 180" role="img" aria-label="分类法、词表、本体、知识图谱的语义复杂度阶梯">
+      <rect x="15" y="105" width="180" height="48" rx="8" fill="#F8F8FA" stroke="#D0D0DB"/>
+      <text x="105" y="125" text-anchor="middle" fill="#1E1E2E" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">① Taxonomy 分类法</text>
+      <text x="105" y="141" text-anchor="middle" fill="#5B5B6E" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">只管父子层级：水果＞苹果</text>
+
+      <rect x="235" y="85" width="180" height="48" rx="8" fill="#F8F8FA" stroke="#D0D0DB"/>
+      <text x="325" y="105" text-anchor="middle" fill="#1E1E2E" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">② Thesaurus 词表</text>
+      <text x="325" y="121" text-anchor="middle" fill="#5B5B6E" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">补同义词：SODA＝汽水</text>
+
+      <rect x="455" y="65" width="180" height="48" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+      <text x="545" y="85" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">③ Ontology 本体</text>
+      <text x="545" y="101" text-anchor="middle" fill="#5B5B6E" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">加规则与推理</text>
+
+      <rect x="675" y="45" width="170" height="48" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="760" y="65" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">④ Knowledge Graph</text>
+      <text x="760" y="81" text-anchor="middle" fill="#5B5B6E" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">填进实例与事实</text>
+
+      <path d="M195,129 L215,129 L215,109 L233,109" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <path d="M415,109 L435,109 L435,89 L453,89" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <path d="M635,89 L655,89 L655,69 L673,69" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+
+      <line x1="15" y1="158" x2="845" y2="158" stroke="#D0D0DB"/>
+      <text x="430" y="174" text-anchor="middle" fill="#78788A" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">语义复杂度递增 →</text>
+    </svg>
+    <p class="diagram-caption">四个词不是平级的：一个比一个装得多，本体站在「立规矩」这一级。</p>
+  </div>
+
+  <div class="analogy"><strong>本体像建筑规范</strong>：规定「墙要多厚、房间怎么连、承重怎么算」，但规范本身不盖房子。知识图谱就是照着规范盖出来的房子。</div>
+</section>
+
+<!-- ===== 2. Knowledge Graph ===== -->
+<section class="section reveal" id="s2">
+  <h2><span class="sec-no">2</span>Knowledge Graph 知识图谱 — <span class="sec-tag">填满事实的世界网</span></h2>
+
+  <p class="lead-line">把本体这套「规矩」真正用起来，往里面填进一个个真实的人和事，就织成了一张「谁——什么关系——谁」的网。你可以把它想成一本<span class="hl">长了神经的百科全书</span>：不光查得到条目，还能顺着关系一路问下去。它是<strong>世界模型</strong>：回答「什么是普遍为真的」这类常识问题。</p>
+
+  <div class="equation-box">
+    <p class="equation">Knowledge Graph = Ontology Schema + Object Instances + Relationships</p>
+    <p class="equation-zh">本体规则 + 具体实例 + 它们之间的关系——本体定义「客户」和「订单」能有什么关系，知识图谱把「张三」「订单 #8821」这些真实的人和事填进去，回答「企业有什么、它们怎么关联」。</p>
+  </div>
+
+  <p class="use-when"><strong>什么时候用它：</strong>回答通用常识（巴黎在哪个国家？谁在哪家公司？）；做推荐（「看过这部电影的人还喜欢…」）；让大模型顺着关系网检索而不是瞎猜（GraphRAG 玩法，不挑哪张图）、多跳问答。</p>
+
+  <div class="spec-strip">
+    <div class="spec-cell"><span class="k">装的是什么</span><span class="v"><em>实体实例</em> + 类型化关系（谁 → 什么关系 → 谁）</span></div>
+    <div class="spec-cell"><span class="k">回答什么问题</span><span class="v">巴黎在哪个国家？谁在哪家公司工作？这类<em>通用常识</em></span></div>
+    <div class="spec-cell"><span class="k">多久变一次</span><span class="v">按需增删，跟着数据走</span></div>
+    <div class="spec-cell"><span class="k">主要给谁用</span><span class="v">搜索、推荐、通用问答、<em>GraphRAG</em></span></div>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">实例网 · 点 = 实体，线 = 关系，小字 = 属性</div>
+    <svg viewBox="0 0 860 300" role="img" aria-label="知识图谱实例：张三就职于零点未来，零点未来总部在北京，李四也任职于零点未来">
+      <rect x="40" y="70" width="120" height="54" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="100" y="92" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">👤</tspan> 张三</text>
+      <text x="100" y="109" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">职位：工程师</text>
+
+      <rect x="350" y="70" width="150" height="54" rx="8" fill="#E4DFFF" stroke="#9B87F0"/>
+      <text x="425" y="92" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🏢</tspan> 零点未来</text>
+      <text x="425" y="109" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">行业：AI 软件</text>
+
+      <rect x="660" y="70" width="130" height="54" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="725" y="92" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🏙️</tspan> 北京</text>
+      <text x="725" y="109" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">国家：中国</text>
+
+      <rect x="40" y="190" width="120" height="54" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="100" y="212" text-anchor="middle" fill="#5A4BD1" font-size="12" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">👤</tspan> 李四</text>
+      <text x="100" y="229" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">职位：架构师</text>
+
+      <line x1="160" y1="97" x2="348" y2="97" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="254" y="89" text-anchor="middle" fill="#6C5CE7" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">worksAt 就职于</text>
+
+      <path d="M160,206 L398,126" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <text x="280" y="192" text-anchor="middle" fill="#6C5CE7" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">worksAt 就职于</text>
+
+      <line x1="500" y1="97" x2="658" y2="97" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="579" y="89" text-anchor="middle" fill="#6C5CE7" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">headquarteredIn 总部在</text>
+
+      <line x1="100" y1="124" x2="100" y2="188" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="108" y="160" text-anchor="start" fill="#6C5CE7" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">knows 认识</text>
+
+      <text x="430" y="274" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">● 节点 = 实体　● 边 = 类型化关系　● 盒内小字 = 属性</text>
+    </svg>
+    <p class="diagram-caption">血统：语义网老传统（RDF / OWL / SPARQL），2012 年 Google 知识图谱让它出圈，Wikidata 是代表。</p>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">本体 vs 知识图谱 · 规则书与填了内容的网</div>
+    <svg viewBox="0 0 860 170" role="img" aria-label="本体与知识图谱的对比：一个是空的规则书，一个是填满事实的网">
+      <text x="205" y="26" text-anchor="middle" fill="#1E1E2E" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Ontology · 空的规则书（Schema）</text>
+      <rect x="15" y="40" width="380" height="100" rx="10" fill="#F8F8FA" stroke="#D0D0DB"/>
+      <circle cx="110" cy="90" r="17" fill="#FFFFFF" stroke="#A0A0B2" stroke-dasharray="4 3"/>
+      <text x="110" y="94" text-anchor="middle" fill="#78788A" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">谁</text>
+      <line x1="132" y1="90" x2="238" y2="90" stroke="#A0A0B2" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrGray)"/>
+      <text x="185" y="80" text-anchor="middle" fill="#78788A" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">什么关系</text>
+      <circle cx="280" cy="90" r="17" fill="#FFFFFF" stroke="#A0A0B2" stroke-dasharray="4 3"/>
+      <text x="280" y="94" text-anchor="middle" fill="#78788A" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">谁</text>
+      <text x="205" y="125" text-anchor="middle" fill="#78788A" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">只有格式，没有具体的人和公司</text>
+
+      <line x1="400" y1="90" x2="438" y2="90" stroke="#6C5CE7" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+      <text x="419" y="78" text-anchor="middle" fill="#6C5CE7" font-size="9.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">填数据</text>
+
+      <text x="655" y="26" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Knowledge Graph · 填满事实的网（Data）</text>
+      <rect x="450" y="40" width="395" height="100" rx="10" fill="#F4F2FF" stroke="#C7BBFA"/>
+      <circle cx="515" cy="90" r="17" fill="#E4DFFF"/>
+      <text x="515" y="94" text-anchor="middle" fill="#5A4BD1" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">张三</text>
+      <line x1="537" y1="90" x2="598" y2="90" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <circle cx="640" cy="90" r="17" fill="#E4DFFF"/>
+      <text x="640" y="94" text-anchor="middle" fill="#5A4BD1" font-size="8" font-family="PingFang SC, Microsoft YaHei, sans-serif">零点未来</text>
+      <line x1="662" y1="90" x2="723" y2="90" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <circle cx="765" cy="90" r="17" fill="#E4DFFF"/>
+      <text x="765" y="94" text-anchor="middle" fill="#5A4BD1" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">北京</text>
+      <text x="655" y="125" text-anchor="middle" fill="#5A4BD1" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">张三 ─就职于→ 零点未来 ─总部在→ 北京</text>
+    </svg>
+  </div>
+
+  <div class="analogy"><strong>维基百科那样的「世界网」</strong>：谁和谁什么关系，全世界通用。但注意——它只知道「普遍为真」的事，不知道<strong>你们公司</strong>此刻发生了什么。这就引出下一张图。</div>
+</section>
+
+<!-- ===== 3. Context Graph ===== -->
+<section class="section reveal" id="s3">
+  <h2><span class="sec-no">3</span>Context Graph 上下文图谱 — <span class="sec-tag">任务上下文图</span></h2>
+
+  <p class="lead-line"><strong>Knowledge Graph 描述实体、关系和事实；Context Graph 在此基础上加入任务、状态、事件、证据和历史决策</strong>，形成面向 Agent 决策的<span class="hl">业务上下文地图</span>：哪张表现在质量如何、谁负责、改一处谁会坏、谁批准过什么例外，而且跟着业务<strong>实时更新</strong>。它是给 AI Agent 准备的<span class="hl">「可信业务上下文地图」</span>。</p>
+
+  <div class="equation-box">
+    <p class="equation">Context Graph = Knowledge Graph + Task Context + Runtime State + Events + Decisions + Evidence</p>
+    <p class="equation-zh">知识图谱 + 任务上下文 + 运行时状态 + 正在发生的事 + 决策 + 证据——不是缩小范围，而是在「有什么」的基础上叠一层「此时此刻」：现在什么状态、发生了什么事、谁批了什么、凭什么批的，让 Agent 知道当下该关注什么、该怎么决策。</p>
+  </div>
+
+  <p class="use-when"><strong>什么时候用它：</strong>AI Agent 要进公司干活、需要「可信业务上下文地图」时；做影响分析（改这张表，哪些仪表盘会坏）；审计合规要追溯「谁在何时、因为什么、批准了什么」。</p>
+
+  <div class="spec-strip">
+    <div class="spec-cell"><span class="k">装的是什么</span><span class="v">数据资产 + 血缘 + 负责人 + 质量 + 权限 + <em>决策轨迹</em></span></div>
+    <div class="spec-cell"><span class="k">回答什么问题</span><span class="v">哪个仪表盘可信？改了这列<em>谁会坏</em>？谁批的例外？</span></div>
+    <div class="spec-cell"><span class="k">多久变一次</span><span class="v"><em>持续更新</em>——管线、负责人、政策都在变</span></div>
+    <div class="spec-cell"><span class="k">主要给谁用</span><span class="v">企业 AI Agent 的<em>「锚定层」</em></span></div>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">企业 Agent 的可信业务上下文地图 · 资产 + 血缘 + 负责人 + 决策</div>
+    <svg viewBox="0 0 860 372" role="img" aria-label="上下文图谱示例：订单表经管线产出仪表盘，负责人批准决策，Agent 通过 MCP 查询">
+      <rect x="30" y="44" width="170" height="56" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+      <text x="115" y="70" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🗄️</tspan> sales.orders</text>
+      <text x="115" y="88" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">订单表</text>
+      <rect x="30" y="106" width="70" height="20" rx="10" fill="#E6FAF5" stroke="#7EEBD1"/>
+      <text x="65" y="120" text-anchor="middle" fill="#0D7377" font-size="8.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">质量 98%</text>
+
+      <rect x="280" y="44" width="140" height="56" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="350" y="70" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">⚙️</tspan> dbt 管线</text>
+      <text x="350" y="88" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">数据加工</text>
+
+      <rect x="500" y="44" width="160" height="56" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="580" y="70" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📊</tspan> Q3 收入</text>
+      <text x="580" y="88" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">仪表盘</text>
+      <rect x="545" y="106" width="70" height="20" rx="10" fill="#E6FAF5" stroke="#7EEBD1"/>
+      <text x="580" y="120" text-anchor="middle" fill="#0D7377" font-size="8.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">✅</tspan> 已认证</text>
+
+      <line x1="200" y1="72" x2="278" y2="72" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="239" y="64" text-anchor="middle" fill="#6C5CE7" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">feeds 喂养</text>
+      <line x1="420" y1="72" x2="498" y2="72" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="459" y="64" text-anchor="middle" fill="#6C5CE7" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">produces 产出</text>
+
+      <rect x="30" y="180" width="150" height="54" rx="8" fill="#F8F8FA" stroke="#D0D0DB"/>
+      <text x="105" y="202" text-anchor="middle" fill="#1E1E2E" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">👤</tspan> 王小明</text>
+      <text x="105" y="220" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">数据负责人</text>
+      <line x1="105" y1="180" x2="105" y2="102" stroke="#78788A" stroke-width="1.5" marker-end="url(#arrGray)"/>
+      <text x="113" y="156" text-anchor="start" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">owns 负责</text>
+
+      <rect x="280" y="180" width="230" height="74" rx="8" fill="#FFFCF0" stroke="#FDE68A"/>
+      <text x="395" y="202" text-anchor="middle" fill="#B45309" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📝</tspan> 决策轨迹</text>
+      <text x="395" y="220" text-anchor="middle" fill="#1E1E2E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">VP 批准 20% 折扣例外</text>
+      <text x="395" y="238" text-anchor="middle" fill="#78788A" font-size="8.5" font-family="SF Mono, JetBrains Mono, Consolas, monospace">approver · reason · precedent</text>
+      <line x1="180" y1="207" x2="278" y2="207" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)"/>
+      <text x="229" y="199" text-anchor="middle" fill="#B45309" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">approves 批准</text>
+
+      <rect x="590" y="180" width="150" height="54" rx="27" fill="#1E1E2E"/>
+      <text x="665" y="212" text-anchor="middle" fill="#FFF" font-size="12.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🤖</tspan> AI Agent</text>
+      <path d="M620,100 V178" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)" class="flow-line"/>
+      <text x="628" y="150" text-anchor="start" fill="#6C5CE7" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">MCP 查询</text>
+
+      <rect x="30" y="262" width="800" height="30" rx="8" fill="#F4F2FF" stroke="#C7BBFA"/>
+      <text x="70" y="281" text-anchor="start" fill="#5A4BD1" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">① 语义基础：本体——这些词是什么意思</text>
+      <rect x="30" y="298" width="800" height="30" rx="8" fill="#F0F0F3" stroke="#D0D0DB"/>
+      <text x="70" y="317" text-anchor="start" fill="#1E1E2E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">② 运行元数据：血缘 · 质量分 · 负责人 · 访问权限（怎么来的、能不能信）</text>
+      <rect x="30" y="334" width="800" height="30" rx="8" fill="#F0F0F3" stroke="#D0D0DB"/>
+      <text x="70" y="353" text-anchor="start" fill="#1E1E2E" font-size="10.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">③ 决策轨迹：谁批准了例外、为什么、先例是什么</text>
+    </svg>
+    <p class="diagram-caption">上面这些边（喂养、产出、负责、批准）才是这张图的核心——不是抽象的「关系」，而是能查出「谁负责、信不信得过、谁批准过什么」的运行记录。</p>
+  </div>
+
+  <div class="analogy note">这里说的「上下文图谱」是数据平台厂商（DataHub、Atlan）的用法——<strong>锚定一家公司</strong>，重决策轨迹和治理。学术圈还有一篇论文也叫《Context Graph》（IDEA Research，2024），讲的是另一件事：给放之四海皆准的知识图谱的每条边多打「时间 · 地点 · 出处 · 置信度」标签（例如「奥巴马 —总统→ 美国（2009–2017）」），解决「A 先生住在上海」和「A 先生住在北京」这类三元组因为丢了语境而自相矛盾的问题——它<strong>锚定的还是整个世界，不是一家公司</strong>，只是撞了同一个名字，别混为一谈。</div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">有什么 vs 现在该怎么办 · 事实之上叠一层决策上下文</div>
+    <svg viewBox="0 0 860 160" role="img" aria-label="知识图谱回答有什么，上下文图谱在事实上叠加任务状态和决策，回答现在该怎么办">
+      <text x="205" y="24" text-anchor="middle" fill="#1E1E2E" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Knowledge Graph · 有什么</text>
+      <rect x="15" y="36" width="380" height="88" rx="10" fill="#F8F8FA" stroke="#D0D0DB"/>
+      <text x="205" y="66" text-anchor="middle" fill="#1E1E2E" font-size="11" font-family="PingFang SC, Microsoft YaHei, sans-serif">什么是「客户」？巴黎在哪个国家？</text>
+      <text x="205" y="92" text-anchor="middle" fill="#78788A" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">静态事实，到处都成立</text>
+
+      <circle cx="432" cy="80" r="16" fill="#1E1E2E"/>
+      <text x="432" y="85" text-anchor="middle" fill="#FFF" font-size="8.5" font-weight="700" font-family="SF Mono, JetBrains Mono, Consolas, monospace">VS</text>
+
+      <text x="655" y="24" text-anchor="middle" fill="#B45309" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">Context Graph · 现在该怎么办</text>
+      <rect x="450" y="36" width="395" height="88" rx="10" fill="#FFFCF0" stroke="#FDE68A"/>
+      <text x="650" y="66" text-anchor="middle" fill="#B45309" font-size="11" font-family="PingFang SC, Microsoft YaHei, sans-serif">财务部现在该信哪张客户表？为什么？</text>
+      <text x="650" y="92" text-anchor="middle" fill="#78788A" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">事实 + 任务 + 状态 + 决策，实时更新</text>
+    </svg>
+    <p class="diagram-caption">不是缩小范围那么简单——上下文图谱在事实上面叠了任务、状态、事件和决策，回答的是「现在该关注什么、该怎么决策」，不只是换个「锚定点」。治理五件套：<strong>资产盘点 · 血缘 · 负责人 · 质量 · 权限</strong>——没治理的上下文图谱，幻觉更难被发现。</p>
+  </div>
+
+  <p class="lead-line"><strong>Knowledge Graph 告诉 Agent 「企业有什么」；Context Graph 告诉 Agent 「当前为什么重要，以及如何基于这些信息做决策」。</strong></p>
+</section>
+
+<!-- ===== 4. Code Graph ===== -->
+<section class="section reveal" id="s4">
+  <h2><span class="sec-no">4</span>Code Graph 代码图谱 — <span class="sec-tag">代码的内部管网图</span></h2>
+
+  <p class="lead-line">代码图谱是把代码的<span class="hl">「内部管网」</span>画出来：函数、类、模块是节点，谁调用谁、数据怎么流、谁继承谁、文档在哪是边。改一行代码之前，先顺着图看看<strong>「下游谁会遭殃」</strong>。</p>
+
+  <div class="equation-box">
+    <p class="equation">Code Graph = Source Code + AST + Dependencies + Execution Relationships</p>
+    <p class="equation-zh">源代码 + 抽象语法树（AST）+ 依赖关系 + 执行关系——源代码先解析成 AST，再从 AST 里提炼出「谁调用谁、数据怎么流」，把整个软件系统变成一张能查询的图。</p>
+  </div>
+
+  <p class="use-when"><strong>什么时候用它：</strong>仓库大到「人脑记不住谁调用了谁」时做代码导航；改公共 API 之前评估影响面；让 AI 编程 Agent 快速读懂陌生代码库、找 bug。</p>
+
+  <div class="spec-strip">
+    <div class="spec-cell"><span class="k">装的是什么</span><span class="v">类 / 函数 / 方法 + 调用 · 数据流 · 继承 + <em>文档链接</em></span></div>
+    <div class="spec-cell"><span class="k">回答什么问题</span><span class="v">这个函数被谁调用？改了 <em>read_csv</em> 谁受影响？</span></div>
+    <div class="spec-cell"><span class="k">多久变一次</span><span class="v">跟着提交走，<em>代码一变图就变</em></span></div>
+    <div class="spec-cell"><span class="k">主要给谁用</span><span class="v">代码导航、影响分析、<em>编程 Agent</em></span></div>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">代码图谱 · 调用 / 继承 / 文档 / 影响分析</div>
+    <svg viewBox="0 0 860 330" role="img" aria-label="代码图谱示例：脚本调用函数，类继承父类，函数链接文档，改动影响下游">
+      <rect x="30" y="40" width="140" height="54" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+      <text x="100" y="64" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📄</tspan> main.py</text>
+      <text x="100" y="82" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">入口脚本</text>
+
+      <rect x="30" y="160" width="140" height="54" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="2"/>
+      <text x="100" y="184" text-anchor="middle" fill="#5A4BD1" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📄</tspan> utils.py</text>
+      <text x="100" y="202" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">工具函数</text>
+
+      <rect x="30" y="280" width="150" height="44" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="105" y="298" text-anchor="middle" fill="#5A4BD1" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🧩</tspan> pandas.read_csv</text>
+      <text x="105" y="314" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">第三方函数</text>
+
+      <line x1="100" y1="94" x2="100" y2="158" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="108" y="130" text-anchor="start" fill="#6C5CE7" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">calls 调用</text>
+      <line x1="100" y1="214" x2="100" y2="278" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="108" y="250" text-anchor="start" fill="#6C5CE7" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">calls · flowsTo</text>
+
+      <rect x="300" y="100" width="160" height="54" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="380" y="124" text-anchor="middle" fill="#5A4BD1" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🧩</tspan> sklearn SVC.fit</text>
+      <text x="380" y="142" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">分类模型训练</text>
+
+      <rect x="300" y="220" width="160" height="54" rx="8" fill="#F4F2FF" stroke="#B8A8F2"/>
+      <text x="380" y="244" text-anchor="middle" fill="#5A4BD1" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🧩</tspan> BaseSVC</text>
+      <text x="380" y="262" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">父类 / 基类</text>
+      <line x1="380" y1="154" x2="380" y2="218" stroke="#78788A" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrGray)"/>
+      <text x="388" y="190" text-anchor="start" fill="#78788A" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">subClassOf 继承</text>
+
+      <rect x="560" y="100" width="200" height="54" rx="8" fill="#FFFCF0" stroke="#FDE68A"/>
+      <text x="660" y="124" text-anchor="middle" fill="#B45309" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📚</tspan> StackOverflow</text>
+      <text x="660" y="142" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">「SVC.fit 怎么用？」</text>
+      <line x1="460" y1="127" x2="558" y2="127" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrAmber)"/>
+      <text x="509" y="119" text-anchor="middle" fill="#B45309" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">文档 / 论坛链接</text>
+
+      <rect x="560" y="220" width="200" height="54" rx="8" fill="#FFF0F0" stroke="#FFB3B3"/>
+      <text x="660" y="244" text-anchor="middle" fill="#E63946" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">⚠️</tspan> 下游受影响</text>
+      <text x="660" y="262" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">utils.py · main.py</text>
+      <path d="M180,302 H470 V247 H558" stroke="#FF6B6B" stroke-width="1.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrRed)"/>
+      <text x="300" y="294" text-anchor="middle" fill="#FF6B6B" font-size="9.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">改这里 → 谁能坏？</text>
+
+      <text x="430" y="320" text-anchor="middle" fill="#5B5B6E" font-size="9.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">四种边：calls 调用 · flowsTo 数据流 · subClassOf 继承 · doc 文档链接</text>
+    </svg>
+    <p class="diagram-caption">真实案例：IBM 的 GraphGen4Code 拿 <strong>130 万份 Python 文件 + 4700 万论坛帖</strong>，建成 20 亿条三元组的代码知识图谱，服务程序搜索、代码理解、bug 检测。</p>
+  </div>
+
+  <div class="analogy"><strong>代码世界的「水电管网图」</strong>：管线怎么走、阀门在哪、关掉这里哪片会停水——改代码前的风险预演，全靠它。</div>
+</section>
+
+<!-- ===== 5. Graph Engineering ===== -->
+<section class="section reveal s5" id="s5">
+  <h2><span class="sec-no">5</span>Graph Engineering 图谱工程 — <span class="sec-tag">让 Agent 可靠运行</span></h2>
+
+  <p class="lead-line">图谱工程就是给 Agent 画<span class="hl">「流程图」</span>：一个节点 = 干一件事，一条边 = 干完去哪。<strong>哪些步骤必须按规矩走、哪些地方放手让模型自己判断</strong>，图上画得一清二楚——而不是让模型全程自由发挥、错了再补。</p>
+
+  <div class="equation-box">
+    <p class="equation">Graph Engineering = Data Engineering + Graph Modeling + Retrieval + Reasoning + Agent Orchestration</p>
+    <p class="equation-zh">数据工程 + 图建模 + 检索 + 推理 + Agent 编排——前四块「怎么把数据变成图、怎么查、怎么推理」，其实就是第 2～4 节在做的事；本节聚焦最后一块：<strong>怎么把这些查询和推理串成一条 Agent 能可靠执行的流程</strong>。</p>
+  </div>
+
+  <p class="use-when"><strong>什么时候用它：</strong>业务流程有固定套路、要稳定可预期（客服先分类再回答、合规审批后才能对外操作）；流程里需要重试、等人审批、回炉重做；要把多个子 Agent 编排成一条流水线（如 LangGraph）。</p>
+
+  <div class="spec-strip">
+    <div class="spec-cell"><span class="k">装的是什么</span><span class="v">节点 = 动作（代码 / LLM 调用 / 工具 / 子 Agent）<br>边 = 转移（固定 or 条件）</span></div>
+    <div class="spec-cell"><span class="k">回答什么问题</span><span class="v">先干什么后干什么？失败怎么<em>重试</em>？何时等人审批？</span></div>
+    <div class="spec-cell"><span class="k">多久变一次</span><span class="v">跟着业务流走，<em>经常调整</em></span></div>
+    <div class="spec-cell"><span class="k">主要给谁用</span><span class="v">Agent 编排（如 <em>LangGraph</em>）</span></div>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">一个真实工作流 · 把「改文档」这件事画成图</div>
+    <svg viewBox="0 0 920 240" role="img" aria-label="文档 Agent 工作流：Slack 请求经分类、两个子 Agent、综合，最终提交 PR">
+      <rect x="20" y="92" width="130" height="52" rx="26" fill="#1E1E2E"/>
+      <text x="85" y="123" text-anchor="middle" fill="#FFF" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">💬</tspan> Slack 请求</text>
+
+      <rect x="210" y="92" width="130" height="52" rx="8" fill="#E4DFFF" stroke="#9B87F0"/>
+      <text x="275" y="113" text-anchor="middle" fill="#5A4BD1" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">分类 classify</text>
+      <text x="275" y="130" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">一次 LLM 调用</text>
+
+      <rect x="400" y="28" width="180" height="56" rx="8" fill="#6C5CE7"/>
+      <text x="490" y="50" text-anchor="middle" fill="#FFFFFF" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">📖</tspan> 参考文档 Agent</text>
+      <text x="490" y="70" text-anchor="middle" fill="#E4DFFF" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">完整子 Agent</text>
+
+      <rect x="400" y="144" width="180" height="56" rx="8" fill="#6C5CE7"/>
+      <text x="490" y="166" text-anchor="middle" fill="#FFFFFF" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">💡</tspan> 概念文档 Agent</text>
+      <text x="490" y="186" text-anchor="middle" fill="#E4DFFF" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">完整子 Agent</text>
+
+      <rect x="640" y="92" width="130" height="52" rx="8" fill="#E4DFFF" stroke="#9B87F0"/>
+      <text x="705" y="113" text-anchor="middle" fill="#5A4BD1" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">综合 synthesize</text>
+      <text x="705" y="130" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">一次 LLM 调用</text>
+
+      <rect x="820" y="92" width="90" height="52" rx="26" fill="#E4E4EB" stroke="#A0A0B2"/>
+      <text x="865" y="123" text-anchor="middle" fill="#5B5B6E" font-size="10.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">✅</tspan> 提交 PR</text>
+
+      <line x1="150" y1="118" x2="208" y2="118" stroke="#78788A" stroke-width="1.5" marker-end="url(#arrGray)"/>
+      <path d="M340,110 L375,110 L375,56 L398,56" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <path d="M340,126 L375,126 L375,172 L398,172" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <path d="M580,56 L605,56 L605,110 L638,110" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <path d="M580,172 L605,172 L605,126 L638,126" stroke="#6C5CE7" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+      <line x1="770" y1="118" x2="818" y2="118" stroke="#78788A" stroke-width="1.5" marker-end="url(#arrGray)"/>
+
+      <text x="460" y="218" text-anchor="middle" fill="#5B5B6E" font-size="10" font-family="PingFang SC, Microsoft YaHei, sans-serif">同一个图里，不同节点自由度不同——这就是「确定性 ↔ 自由度」的混合</text>
+    </svg>
+    <div class="legend-row">
+      <span class="legend-chip"><span class="legend-dot" style="background:#E4E4EB;border:1px solid #A0A0B2;"></span>灰 = 确定性代码</span>
+      <span class="legend-chip"><span class="legend-dot" style="background:#E4DFFF;border:1px solid #9B87F0;"></span>紫 = 一次 LLM 调用</span>
+      <span class="legend-chip"><span class="legend-dot" style="background:#6C5CE7;border:1px solid #5A4BD1;"></span>深紫 = 完整子 Agent</span>
+    </div>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">生产级 Agent 图很少是「无环图」 · 循环是家常便饭</div>
+    <svg viewBox="0 0 860 260" role="img" aria-label="Agent 循环图：Agent 调工具、评估、不达标回炉、通过后人审批、放行结束">
+      <rect x="90" y="80" width="150" height="56" rx="28" fill="#1E1E2E"/>
+      <text x="165" y="113" text-anchor="middle" fill="#FFF" font-size="12.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🤖</tspan> Agent</text>
+
+      <rect x="340" y="80" width="140" height="56" rx="8" fill="#F4F2FF" stroke="#9B87F0"/>
+      <text x="410" y="104" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🔧</tspan> Tool 工具</text>
+      <text x="410" y="122" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">查询 · 写操作</text>
+
+      <rect x="580" y="80" width="140" height="56" rx="8" fill="#F4F2FF" stroke="#9B87F0"/>
+      <text x="650" y="104" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">✅</tspan> Evaluator</text>
+      <text x="650" y="122" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">检查干得咋样</text>
+
+      <rect x="580" y="190" width="140" height="56" rx="8" fill="#F4F2FF" stroke="#9B87F0"/>
+      <text x="650" y="214" text-anchor="middle" fill="#5A4BD1" font-size="11" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">👤</tspan> Human</text>
+      <text x="650" y="232" text-anchor="middle" fill="#5B5B6E" font-size="8.5" font-family="PingFang SC, Microsoft YaHei, sans-serif">审批 · 补充信息</text>
+
+      <rect x="340" y="190" width="140" height="56" rx="28" fill="#E4E4EB" stroke="#A0A0B2"/>
+      <text x="410" y="223" text-anchor="middle" fill="#5B5B6E" font-size="11.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif"><tspan class="emo">🏁</tspan> 结束</text>
+
+      <line x1="240" y1="108" x2="338" y2="108" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="289" y="100" text-anchor="middle" fill="#5A4BD1" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">干活</text>
+      <line x1="480" y1="108" x2="578" y2="108" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="529" y="100" text-anchor="middle" fill="#5A4BD1" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">检查</text>
+      <path d="M650,80 V36 H165 V78" stroke="#6C5CE7" stroke-width="1.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrBlue)"/>
+      <text x="408" y="48" text-anchor="middle" fill="#5A4BD1" font-size="9.5" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">不够好？回炉重试</text>
+      <line x1="650" y1="136" x2="650" y2="188" stroke="#6C5CE7" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+      <text x="658" y="166" text-anchor="start" fill="#5A4BD1" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">通过 → 等审批</text>
+      <line x1="580" y1="218" x2="482" y2="218" stroke="#78788A" stroke-width="1.5" marker-end="url(#arrGray)"/>
+      <text x="531" y="210" text-anchor="middle" fill="#78788A" font-size="9" font-family="PingFang SC, Microsoft YaHei, sans-serif">放行</text>
+    </svg>
+    <p class="diagram-caption">重试、追问、改答案、等审批，全是「回头路」——所以 Agent 图通常不是 DAG。<strong>循环其实就是最简单的图</strong>；一个节点里还能装下一整个子 Agent。</p>
+  </div>
+
+  <div class="spectrum reveal">
+    <div class="spectrum-bar"></div>
+    <div class="spectrum-labels">
+      <span>⚙️ 确定性代码<br>全自动，无模型</span>
+      <span>🧠 一次 LLM 调用<br>模型只判断一步</span>
+      <span>🤖 完整子 Agent<br>自由度最高</span>
+    </div>
+  </div>
+
+  <div class="analogy"><strong>给 LLM 装「轨道」</strong>：路口让模型自己判断，其余路段按既定轨道走——既给自由，又保靠谱。LangGraph 三年 6500 万月下载，靠的就是「确定性轨道 + 智能判断」这个平衡。</div>
+</section>
+
+<!-- ===== 6. 对比总表 ===== -->
+<section class="section reveal" id="s6">
+  <h2><span class="sec-no">6</span>五张图放一起比</h2>
+
+  <div class="table-scroll">
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>概念</th>
+        <th>一句话大白话</th>
+        <th>装的是什么</th>
+        <th>类比</th>
+        <th>回答什么问题</th>
+        <th>变多快</th>
+        <th>给谁用</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="c-name">Ontology<span class="en">本体</span></td>
+        <td>定义业务世界、规则与可执行能力</td>
+        <td>类型 · 关系 · 规则（没实例）</td>
+        <td>游戏规则、城市规划图</td>
+        <td>「诊断」到底指什么？</td>
+        <td>很少变，改一次走审批</td>
+        <td>所有图的语义契约</td>
+      </tr>
+      <tr>
+        <td class="c-name">Knowledge Graph<span class="en">知识图谱</span></td>
+        <td>填满事实的世界网</td>
+        <td>实例 + 类型化关系</td>
+        <td>游戏里的角色和建筑</td>
+        <td>巴黎在哪个国家？</td>
+        <td>按需增删</td>
+        <td>搜索 · 推荐 · 通用问答</td>
+      </tr>
+      <tr>
+        <td class="c-name">Context Graph<span class="en">上下文图谱</span></td>
+        <td>事实之上叠的决策上下文地图</td>
+        <td>资产 + 血缘 + 决策 + 权限</td>
+        <td>当前游戏关卡、任务目标、资源状态</td>
+        <td>哪个仪表盘可信？改这列谁坏？</td>
+        <td>持续更新</td>
+        <td>企业 Agent 的锚定层</td>
+      </tr>
+      <tr>
+        <td class="c-name">Code Graph<span class="en">代码图谱</span></td>
+        <td>代码的内部管网图</td>
+        <td>类 / 函数 + 调用 + 依赖</td>
+        <td>游戏引擎里的代码结构</td>
+        <td>谁调用了这个函数？</td>
+        <td>每次提交都可能变</td>
+        <td>代码导航 · 编程 Agent</td>
+      </tr>
+      <tr class="row-acts">
+        <td class="c-name">Graph Engineering<span class="en">图谱工程</span></td>
+        <td>让 Agent 可靠运行</td>
+        <td>节点 = 动作，边 = 下一步</td>
+        <td>游戏引擎和运行系统</td>
+        <td>先干什么？失败怎么重试？</td>
+        <td>跟着业务流常调</td>
+        <td>Agent 编排</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>一句话记忆法：<span class="hl">规则书 → 世界网 → 业务上下文地图 → 代码管网图</span>，最后一张是 <span class="hl-bg">Agent 轨道</span>。</p>
+
+  <h3>什么场景用哪张图 · 速查</h3>
+  <table class="scene-table">
+    <thead>
+      <tr><th>你的场景</th><th>用哪张图</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>多个团队要统一术语，或要机器自动推理出新结论</td><td class="scene-name">Ontology · 本体</td></tr>
+      <tr><td>通用常识问答、推荐、多跳问答</td><td class="scene-name">Knowledge Graph · 知识图谱</td></tr>
+      <tr><td>Agent 要进公司干活、影响分析、审计追溯</td><td class="scene-name">Context Graph · 上下文图谱</td></tr>
+      <tr><td>代码导航、改公共 API 前评估影响、编程 Agent</td><td class="scene-name">Code Graph · 代码图谱</td></tr>
+      <tr class="row-acts"><td>有套路的业务流程编排，要稳定可控的 Agent 流水线</td><td class="scene-name">Graph Engineering · 图谱工程</td></tr>
+    </tbody>
+  </table>
+
+  <p class="table-note">💡 补充：GraphRAG 不是某一张图，而是「顺着关系网检索」的玩法——知识图谱、上下文图谱都能接，别把玩法和图划等号。</p>
+</section>
+
+<!-- ===== 7. 串联 ===== -->
+<section class="section reveal" id="s7">
+  <h2><span class="sec-no">7</span>它们怎么串起来</h2>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">全景架构参考图（原始素材，英文，信息密度更高）</div>
+    <div class="isaac-missing-asset" role="note">原始架构图附件暂缺。原图描述：Define / Represent / Engineer / Application 四层；Ontology 定义 Schema、Logic Contract、Action Contract、Governance，连接 Knowledge Graph、Context Graph 与 Code Graph，再通过 Graph Engineering 支持 Agent 工作流。下方保留原文解读。</div>
+    <p class="diagram-caption">这张图把全文的主线画全了：最上层 <strong>Ontology</strong> 定规则；中间 <strong>Knowledge Graph / Context Graph / Code Graph</strong> 三张同形状、不同锚定范围的图；再往下 <strong>Graph Engineering</strong> 把它们变成可查询、可执行的系统；最底层 Agent 按「理解目标 → 查图 → 推理决策 → 执行动作 → 写回学习」把任务走完。原图信息密度高、术语为英文，<strong>点击可在新标签页打开大图</strong>看清细节。</p>
+  </div>
+
+  <h3>一个真实场景 · 采购供应商寻源 Agent</h3>
+  <p>场景：一个 Agent 要自动寻找、评估并推荐供应商——五张图分别在这个任务里干什么活：</p>
+  <table class="scene-table">
+    <thead>
+      <tr><th>Agent 要做的事</th><th>对应技术</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>定义采购业务世界：什么是供应商、品类、零件、工厂、合同、评价指标，以及它们之间的关系</td><td class="scene-name">Ontology</td></tr>
+      <tr><td>查询企业已有供应商、供应关系、历史采购记录、价格、质量、交付表现等事实数据</td><td class="scene-name">Knowledge Graph</td></tr>
+      <tr><td>根据当前寻源任务理解业务背景：本次采购品类、需求数量、目标成本、交付要求、区域限制、供应商策略、历史决策原因</td><td class="scene-name">Context Graph</td></tr>
+      <tr><td>理解供应商管理系统、SRM、ERP、采购平台的代码结构，分析新增寻源能力的影响范围</td><td class="scene-name">Code Graph</td></tr>
+      <tr class="row-acts"><td>构建 Agent 的数据接入、图查询、关系推理、供应商评分、候选推荐、流程编排、审批执行能力</td><td class="scene-name">Graph Engineering</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== 8. 总结 ===== -->
+<section class="section reveal" id="s8">
+  <h2><span class="sec-no">8</span>总结：<span class="sec-tag">两张图</span></h2>
+
+  <h3>五个等式 · 一眼看懂每张图装的是什么</h3>
+  <table class="scene-table">
+    <thead>
+      <tr><th>概念</th><th>一句话描述 / 等式</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="scene-name">Ontology</td>
+        <td><span class="eq">Palantir Ontology = Objects + Links + Properties + Logic + Actions + Security</span><br>对象 + 关系 + 属性 + 推理规则 + 可执行操作 + 权限安全——把企业数据、业务语义、计算逻辑和「能做什么」统一成一套业务操作模型。</td>
+      </tr>
+      <tr>
+        <td class="scene-name">Knowledge Graph</td>
+        <td><span class="eq">Knowledge Graph = Ontology Schema + Object Instances + Relationships</span><br>本体规则 + 实例 + 关系——本体定义对象和关系能有什么，知识图谱把具体的实例填进去，回答「企业有什么、怎么关联」。</td>
+      </tr>
+      <tr>
+        <td class="scene-name">Context Graph</td>
+        <td><span class="eq">Context Graph = Knowledge Graph + Task Context + Runtime State + Events + Decisions + Evidence</span><br>本体实例 + 运行时上下文 + 事件 + 决策 + 证据——在「有什么」上再叠一层「此时此刻」，让 Agent 理解现在该关注什么。</td>
+      </tr>
+      <tr>
+        <td class="scene-name">Code Graph</td>
+        <td><span class="eq">Code Graph = Source Code + AST + Dependencies + Execution Relationships</span><br>源代码 + 抽象语法树 + 依赖 + 执行关系——把软件系统转换成图结构，让 AI 理解代码对象、调用关系和修改影响范围。</td>
+      </tr>
+      <tr class="row-acts">
+        <td class="scene-name">Graph Engineering</td>
+        <td><span class="eq acts">Graph Engineering = Data Engineering + Graph Modeling + Retrieval + Reasoning + Agent Orchestration</span><br>数据工程 + 图建模 + 检索 + 推理 + Agent 编排——构建和运行基于图的 AI 系统，让 Agent 能可靠查询、推理和执行。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="quote-box reveal">
+    <p class="big">AI Agent 正在出现<span class="q-blue">「两张图」</span>：<br>一张<span class="q-blue">描述世界</span>，一张<span class="q-amber">描述执行</span>。</p>
+    <p class="small">前四张图回答「知道什么」，图谱工程回答「怎么干活」——两张都齐，Agent 才既懂行、又靠谱。</p>
+  </div>
+</section>
+
+<!-- ===== 参考文件 ===== -->
+<section class="section reveal" id="refs">
+  <h2><span class="sec-no">9</span>参考文件</h2>
+
+  <ol class="ref-list">
+    <li><a href="https://www.langchain.com/blog/3-years-of-graph-engineering-with-langgraph" target="_blank" rel="noopener">3 Years of Graph Engineering with LangGraph</a> <span class="meta">— LangChain Blog · 2026-07</span><br><span class="point">图谱工程三年实践：节点/边建模、生产 Agent 通常不是 DAG、循环是最简单的图、节点里可装完整子 Agent。</span></li>
+    <li><a href="https://datahub.com/blog/context-graph-vs-knowledge-graph/" target="_blank" rel="noopener">Context Graph vs Knowledge Graph: What's the Difference?</a> <span class="meta">— DataHub Blog · 2026-04-30</span><br><span class="point">核心区别不是结构而是「范围与锚定点」：知识图谱是世界模型，上下文图谱是组织模型。</span></li>
+    <li><a href="https://atlan.com/know/context-graph-vs-ontology/" target="_blank" rel="noopener">Context Graph vs. Ontology: Differences, Roles &amp; Use Cases</a> <span class="meta">— Atlan · 2026-01-27</span><br><span class="point">上下文图谱三层：语义基础、运行元数据、决策轨迹；治理五件套；Agent 通过 MCP 在推理时查询。</span></li>
+    <li><a href="https://neo4j.com/blog/knowledge-graph/taxonomy-vs-ontology-vs-knowledge-graph/" target="_blank" rel="noopener">Taxonomy vs. ontology vs. knowledge graph: What's the difference?</a> <span class="meta">— Neo4j Blog · 2026-06-17</span><br><span class="point">分类法是层级、本体是语义与规则、知识图谱是装数据的实现层——蓝图与成品的关系。</span></li>
+    <li>A Toolkit for Generating Code Knowledge Graphs（GraphGen4Code） <span class="meta">— IBM Research · 论文（arXiv:2002.09440）</span><br><span class="point">代码知识图谱工具包：130 万 Python 文件 + 4700 万论坛帖 → 20 亿三元组，服务程序搜索与 bug 检测。论文原文：<a href="https://arxiv.org/abs/2002.09440" target="_blank" rel="noopener">https://arxiv.org/abs/2002.09440</a></span></li>
+    <li>Context Graph（CGR3 推理范式） <span class="meta">— IDEA Research · 学术论文</span><br><span class="point">三元组缺「语境」：时间、地点、出处、置信度；CGR3 = 检索 → 排序 → 推理，迭代补充上下文。论文原文：<a href="https://arxiv.org/abs/2406.11160" target="_blank" rel="noopener">https://arxiv.org/abs/2406.11160</a></span></li>
+  </ol>
+
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="article-footer">
+  零点未来 · 技术科普 · 2026-08<br>
+  本文图表均为示意，观点综合自上方参考文件
+</footer>
+
+</div>
+
+<script src="/ontology-readings-20260930-v1/ontology-five-graphs-1.js"></script>
+
+
+
+<footer class="isaac-reading-end">本文收录自本地 HTML 阅读资料，原有署名与参考资料保留在文中。<br><a href="/strategy/">返回 AI 战略认知 · 全部文章</a></footer><a class="isaac-reading-return" href="/strategy/">← AI 战略认知 · 全部文章</a></body>
+</html>

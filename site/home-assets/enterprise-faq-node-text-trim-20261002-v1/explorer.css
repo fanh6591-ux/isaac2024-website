@@ -1,0 +1,196 @@
+/* Single-chart quote and cumulative value explorer. */
+body.reading-page.editorial-dark .editorial-canvas,
+body.reading-page.editorial-dark .editorial-canvas-inner,
+body.reading-page.editorial-dark #main,.faq-document{background:#050505}
+.faq-document{width:min(100% - 32px,1800px);margin:0 auto;padding:64px 0 24px}
+.faq-answer.value-explorer{border:0;padding:0;scroll-margin-top:64px}
+.value-explorer{--ve-paper:#050505;--ve-ink:#e7e6e2;--ve-muted:#aaa69e;--ve-rule:#292929;--ve-red:#ee8077;--ve-gold:#e6c777;--ve-blue:#79b5df;--ve-risk:var(--ve-gold);--ve-accent:var(--ve-blue);color:var(--ve-ink);color-scheme:dark;font-family:'Isaac Editorial Sans','Isaac FAQ Han','PingFang SC',sans-serif}
+.value-explorer[data-story=fde]{--ve-accent:var(--ve-red)}
+.value-explorer[data-story=return]{--ve-accent:var(--ve-gold)}
+.value-explorer[data-story=safety]{--ve-accent:var(--ve-risk)}
+.value-explorer *{box-sizing:border-box}
+.value-explorer [hidden]{display:none!important}
+.value-explorer button,.value-explorer input,.value-explorer select{font:inherit}
+.value-explorer button{border:0;background:none;color:inherit;cursor:pointer}
+.value-explorer button:disabled{opacity:.35;cursor:default}
+.value-explorer :is(button,a,input,select,summary):focus-visible{outline:2px solid var(--ve-accent);outline-offset:3px}
+.value-explorer .ve-workbench{border:0;border-radius:0;box-shadow:none;background:transparent;overflow:visible}
+.value-explorer .ve-workspace{display:grid;grid-template-columns:minmax(0,1fr) clamp(370px,29vw,460px);gap:10px;align-items:start}
+.value-explorer .ve-visual{min-width:0;display:flex;flex-direction:column;height:calc(100dvh - 78px);min-height:560px}
+.value-explorer .ve-visual>:not(.ve-plot){flex-shrink:0}
+.value-explorer select,.value-explorer input[type=number]{background:#101010;border:1px solid #3a3a3a;color:#e3ded5;border-radius:3px;min-height:36px;padding:5px 8px;max-width:100%}
+.value-explorer .ve-metrics{padding:0 22px}
+.value-explorer .ve-metrics-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:1.5}
+.value-explorer .ve-metrics-heading small{font-size:11px;color:#969189}
+.value-explorer .ve-metric-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 32px;gap:12px;align-items:start;margin-top:0}
+.value-explorer .ve-metric-values>div{display:flex;flex-direction:column;gap:2px}
+.value-explorer .ve-metric-values span{font-size:12px;color:#b7b1a6}
+.value-explorer .ve-metric-values button{padding:2px 0;min-height:24px;text-align:left;color:inherit;line-height:1.6;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .18s ease,color .18s ease}
+.value-explorer .ve-metric-values button:is(:hover,:focus-visible){color:#e8dfcf;text-decoration-color:currentColor}
+.value-explorer .ve-metric-values .ve-wide-button{display:grid;place-items:center;width:32px;height:32px;min-height:32px;padding:6px;margin-top:-4px;border-radius:4px;color:var(--ve-muted)}
+.value-explorer .ve-wide-button:hover,.value-explorer .ve-wide-button[aria-pressed=true]{background:#1a1815;color:var(--ve-ink)}
+.value-explorer .ve-wide-button .ve-collapse-icon{display:none}
+.value-explorer.is-wide .ve-wide-button .ve-expand-icon{display:none}
+.value-explorer.is-wide .ve-wide-button .ve-collapse-icon{display:block}
+.value-explorer .ve-metric-values output{font-family:inherit;font-variant-numeric:tabular-nums;font-size:clamp(27px,2.5vw,36px);font-weight:400;line-height:1.2;letter-spacing:-.035em;color:var(--ve-blue)}
+.value-explorer [data-metric-fde]{color:var(--ve-red)!important}
+.value-explorer [data-metric-return]{color:var(--ve-gold)!important}
+.value-explorer .ve-comparison-status{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:6px 18px;font-size:12px;color:#b5aea1;line-height:1.7;margin-top:8px}
+.value-explorer .ve-profit-result{flex:none;display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.value-explorer .ve-profit-result button{padding:4px 0;color:#d9d1c2;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px}
+.value-explorer .ve-profit-result button:is(:hover,:focus-visible){text-decoration-color:currentColor}
+.value-explorer .ve-profit-result output{display:inline-block;inline-size:14ch;text-align:left;font-size:25px;font-weight:400;line-height:1.3;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--ve-gold)}
+.value-explorer [data-profit-state=negative] .ve-profit-result output{color:var(--ve-red)}
+.value-explorer [data-profit-state=zero] .ve-profit-result output{color:var(--ve-muted)}
+.value-explorer .ve-comparison-status:empty{display:none}
+.value-explorer .ve-gesture-hint{display:flex;flex-direction:column;gap:2px;margin-top:8px;font-size:11px;line-height:1.7;color:var(--ve-muted)}
+.value-explorer .ve-gesture-hint>span:first-child{font-size:12px;color:var(--ve-ink)}
+.value-explorer .ve-plot{position:relative;flex:1 1 0;min-height:300px;margin-top:8px;overflow:hidden}
+.value-explorer .ve-chart{position:absolute;inset:0;width:100%;height:100%;background:var(--ve-paper);cursor:crosshair;touch-action:pan-y;-webkit-touch-callout:none}
+.value-explorer[data-pinned=true] .ve-chart{cursor:grab}
+.value-explorer[data-dragging=true] .ve-chart{cursor:grabbing;user-select:none;-webkit-user-select:none}
+.value-explorer .ve-chart:focus-visible{outline:2px solid var(--ve-gold);outline-offset:-3px}
+.value-explorer [data-end-links]{position:absolute;inset:0;z-index:3;pointer-events:none}
+.value-explorer [data-end-links] button{min-height:28px;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px}
+.value-explorer [data-end-links] button:is(:hover,:focus-visible){text-decoration-color:currentColor}
+.value-explorer .ve-plot-tools{position:absolute;bottom:2px;right:18px;z-index:4;display:flex;gap:2px;align-items:center;background:#101010ed;border:1px solid #2a2926;border-radius:4px;padding:2px 5px;color:#c7bcaa}
+.value-explorer .ve-axis-control{display:flex;align-items:center;gap:2px}
+.value-explorer .ve-axis-control+ .ve-axis-control{border-left:1px solid #393630;margin-left:5px;padding-left:7px}
+.value-explorer .ve-plot-tools span{min-width:68px;font-size:11px;font-variant-numeric:tabular-nums;padding:0 4px;white-space:nowrap}
+.value-explorer .ve-plot-tools button{min-width:30px;height:30px;font-size:16px;padding:0 5px}
+.value-explorer .ve-axis-control:first-child span{color:#e1c876}
+.value-explorer .ve-plot-tools button:hover{background:#26231e}
+.value-explorer .ve-load-error{position:absolute;inset:50px 24px;z-index:5;display:flex;align-items:center;justify-content:center;background:#050505;font-size:14px;color:#aaa}
+.value-explorer .ve-navigation{position:relative;padding:8px 22px 0}
+.value-explorer input[type=range]{appearance:none;-webkit-appearance:none;display:block;width:100%;height:24px;background:transparent;cursor:pointer;margin:0}
+.value-explorer input[type=range]::-webkit-slider-runnable-track{height:2px;background:#303a41}
+.value-explorer input[type=range]::-moz-range-track{height:2px;background:#303a41}
+.value-explorer input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border:2px solid #050505;border-radius:50%;background:var(--ve-blue);box-shadow:0 0 0 1px var(--ve-blue);margin-top:-5px}
+.value-explorer input[type=range]::-moz-range-thumb{width:9px;height:9px;border:2px solid #050505;border-radius:50%;background:var(--ve-blue);box-shadow:0 0 0 1px var(--ve-blue)}
+.value-explorer .ve-simulation{display:grid;grid-template-columns:92px 112px minmax(90px,1fr) auto;align-items:center;column-gap:12px;min-height:38px;color:#b9b3a8;font-size:11px}
+.value-explorer .ve-simulation-stage{display:flex;align-items:baseline;gap:7px;color:#817d75;white-space:nowrap}
+.value-explorer .ve-simulation button{min-width:90px;height:32px;border:1px solid #514631;border-radius:3px;color:var(--ve-gold);font-size:11px;text-align:center;padding:0 8px;white-space:nowrap}
+.value-explorer .ve-simulation button:hover,.value-explorer .ve-simulation button[aria-pressed=true]{border-color:var(--ve-gold);background:#201c13}
+.value-explorer .ve-simulation input[type=range]::-webkit-slider-thumb{background:var(--ve-gold);box-shadow:0 0 0 1px var(--ve-gold)}
+.value-explorer .ve-simulation input[type=range]::-moz-range-thumb{background:var(--ve-gold)}
+.value-explorer .ve-simulation output{color:#d1c39d;min-width:108px;text-align:right;font-variant-numeric:tabular-nums}
+.value-explorer .ve-simulation [data-phase]{min-width:0;text-align:left;color:#b7ad92;white-space:nowrap}
+.value-explorer .ve-legend{flex:1 1 480px;min-width:0;display:grid;grid-template-columns:1.25fr 1fr 1fr 1.1fr;gap:4px;padding:0}
+.value-explorer .ve-legend button{display:flex;align-items:center;gap:6px;min-height:38px;padding:6px;font-size:12px;color:#bbb4aa;border-radius:3px;text-align:left;white-space:nowrap}
+.value-explorer .ve-legend button>span:last-child{margin-left:auto;font-size:11px;color:#827d74}
+.value-explorer .ve-legend button[data-current=true]{color:#e9dfcc;background:#171512}
+.value-explorer .ve-legend [data-risk][aria-pressed=true]{color:#f0a097;background:#281714}
+.value-explorer .ve-bomb-icon{flex:none;color:currentColor}
+.value-explorer .ve-legend [data-risk-state]{font-size:10px;letter-spacing:.02em}
+.value-explorer .ve-legend [data-risk][aria-pressed=true] [data-risk-state]{color:#f0a097}
+.value-explorer .ve-swatch{height:2px;width:16px;flex-shrink:0;background:var(--ve-blue)}
+.value-explorer .ve-swatch-fde{background:var(--ve-red)}
+.value-explorer .ve-swatch-return{background:var(--ve-gold)}
+.value-explorer .ve-decomposition{padding:0 22px}
+/* Article selection lives in the reader; do not repeat that navigation under the plot. */
+@media(min-width:961px){
+ .value-explorer .ve-decomposition{display:none}
+}
+.value-explorer :is(.ve-note-links,.ve-chain,.ve-equation,.ve-breakdown){display:flex;align-items:center;flex-wrap:wrap;gap:3px 16px;color:#857f74}
+.value-explorer .ve-decomposition button{min-height:30px;padding:4px 0;font-size:12px;color:#a7a093}
+.value-explorer .ve-decomposition button[aria-pressed=true]{color:var(--ve-accent)}
+.value-explorer .ve-breakdown button>span:first-child{display:none}
+.value-explorer .ve-loop-return{display:none}
+.value-explorer .ve-read-on-mobile{display:none}
+.value-explorer .ve-inspector{height:calc(100dvh - 78px);min-height:560px;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#45413a #050505;border-left:1px solid #262626;padding:6px 18px 24px 28px;scroll-padding:12px}
+.value-explorer .ve-inspector>[data-panel]{display:grid;grid-template-columns:minmax(0,1fr) 32px;column-gap:8px;align-items:start;min-width:0;scroll-margin-top:76px}
+.value-explorer .ve-inspector>[data-panel]>:not(.ve-fragment-nav){grid-column:1}
+.value-explorer .ve-inspector h3{font-family:'Isaac Editorial Serif','Isaac FAQ Song','Songti SC',serif;font-size:26px;font-weight:400;line-height:1.5;letter-spacing:-.025em;color:#eee7da;margin:0 0 14px;overflow-wrap:anywhere}
+.value-explorer .ve-lead{font-size:13px;line-height:1.8;color:#b0a99b;margin:0 0 18px}
+.value-explorer .ve-fragment-nav{grid-column:2;grid-row:1 / span 4;position:sticky;top:12px;z-index:12;align-self:start}
+.value-explorer .ve-dot-list{display:flex;flex-direction:column;align-items:center;gap:2px}
+.value-explorer .ve-section-dot{position:relative;display:grid;place-items:center;width:32px;height:27px;padding:0;flex:none}
+.value-explorer .ve-dot-core{display:block;width:7px;height:7px;border-radius:50%;background:#78746d;transition:transform .18s ease,background .18s ease}
+.value-explorer .ve-section-dot:hover .ve-dot-core,.value-explorer .ve-section-dot:focus-visible .ve-dot-core{background:#e5dcc9;transform:scale(1.35)}
+.value-explorer .ve-section-dot[aria-current=step] .ve-dot-core{width:9px;height:9px;background:var(--ve-accent);box-shadow:0 0 0 3px #302b22}
+.value-explorer .ve-dot-short{display:none}
+.value-explorer .ve-dot-preview{display:none;position:absolute;right:35px;top:0;width:min(265px,calc(100vw - 95px));padding:12px 14px;background:#181715;border:1px solid #4a4236;border-radius:4px;text-align:left;box-shadow:0 10px 30px #000b;pointer-events:none;z-index:20}
+.value-explorer .ve-dot-preview strong{display:block;color:#eee4d1;font-size:12px;font-weight:500;line-height:1.5;margin-bottom:4px}
+.value-explorer .ve-dot-preview>span{display:block;color:#b4ab9b;font-size:11px;line-height:1.55;white-space:normal}
+.value-explorer .ve-section-dot:is(:hover,:focus-visible) .ve-dot-preview{display:block}
+.value-explorer .ve-fragment{outline-offset:5px}
+.value-explorer .ve-fragment-section{display:block;padding:0 0 20px;margin:0 0 23px;border-bottom:1px solid #25231f;scroll-margin-top:22px}
+.value-explorer .ve-fragment-section:last-child{border-bottom:0;margin-bottom:0}
+.value-explorer .ve-fragment h4{font-size:15px;font-weight:500;line-height:1.8;margin:0 0 12px;color:#ece4d5}
+.value-explorer .ve-fragment p,.value-explorer .ve-fragment li{font-size:14px;line-height:2;color:#c8c0b3;overflow-wrap:anywhere;margin:0 0 16px}
+.value-explorer .ve-fragment ul{padding-left:1.2em;list-style:disc;margin:0}
+.value-explorer .ve-fragment li::marker{color:var(--ve-accent)}
+.value-explorer .ve-risk-controls{padding:6px 22px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;font-size:12px;line-height:1.5;color:#bdb5a6}
+.value-explorer .ve-risk-controls[hidden]{display:none}
+.value-explorer .ve-risk-controls output{color:var(--ve-gold);font-variant-numeric:tabular-nums}
+.value-explorer .ve-risk-controls small{font-size:11px;color:#928a7d}
+.value-explorer .ve-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0}
+.value-explorer.is-wide{position:fixed;inset:0;z-index:2147482000;background:#050505;overflow:auto;padding:16px}
+.value-explorer.is-wide .ve-workspace{grid-template-columns:1fr}
+.value-explorer.is-wide .ve-visual{height:calc(100dvh - 32px);min-height:540px}
+.value-explorer.is-wide .ve-inspector{height:auto;min-height:0;overflow:visible;border:0;padding:28px 22px}
+.value-explorer.is-wide .ve-inspector>[data-panel]{max-width:800px;margin:auto;scroll-margin-top:20px}
+.value-explorer.is-wide .ve-decomposition{display:none}
+@media(max-width:1100px) and (min-width:961px){
+ .value-explorer .ve-workspace{grid-template-columns:minmax(0,1fr) 340px;gap:0}
+ .value-explorer .ve-inspector{padding-left:22px}
+ .value-explorer .ve-visual{min-height:640px}
+}
+@media(max-width:960px){
+ .value-explorer .ve-workspace{display:block}
+ .value-explorer .ve-visual{height:auto;min-height:0}
+ .value-explorer .ve-plot{flex:none;height:clamp(350px,52dvh,540px);min-height:0}
+ .value-explorer .ve-inspector{height:auto;min-height:0;overflow:visible;border-left:0;border-top:1px solid #292722;padding:26px 22px;margin-top:16px}
+ .value-explorer .ve-inspector>[data-panel]{max-width:720px;margin:auto;display:block}
+ .value-explorer .ve-fragment-nav{position:sticky;top:0;margin:0 0 16px;padding:7px 0;background:#050505f2}
+ .value-explorer .ve-dot-list{flex-direction:row;align-items:center;gap:5px;overflow-x:auto;scrollbar-width:thin;padding:2px 0 7px}
+ .value-explorer .ve-section-dot{width:auto;min-width:42px;max-width:155px;height:38px;padding:5px 9px;display:flex;gap:7px;white-space:nowrap;border:1px solid #292723;border-radius:3px;color:#aaa195}
+ .value-explorer .ve-section-dot[aria-current=step]{border-color:var(--ve-accent);color:#e8dfcd}
+ .value-explorer .ve-dot-short{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis}
+ .value-explorer .ve-dot-preview{display:none!important}
+ .value-explorer .ve-fragment-section{scroll-margin-top:85px}
+ .value-explorer .ve-read-on-mobile{display:block!important;color:var(--ve-accent)!important;min-height:40px!important;margin-left:auto}
+ .value-explorer.is-wide .ve-visual{height:auto;min-height:calc(100dvh - 32px)}
+ .value-explorer.is-wide .ve-plot{height:clamp(350px,52dvh,540px)}
+}
+@media(max-width:540px){
+ .faq-document{width:100%;padding-top:64px}
+ .value-explorer .ve-metrics{padding:0 16px}
+ .value-explorer .ve-metric-values{grid-template-columns:repeat(3,minmax(0,1fr)) 32px;gap:6px}
+ .value-explorer .ve-metric-values span{font-size:11px}
+ .value-explorer .ve-metric-values output{font-size:26px}
+ .value-explorer .ve-metrics-heading small{font-size:10px}
+ .value-explorer .ve-legend{flex-basis:100%;grid-template-columns:repeat(2,minmax(0,1fr));padding:0}
+ .value-explorer .ve-legend button{min-height:40px}
+ .value-explorer .ve-navigation{padding-left:16px;padding-right:16px}
+ .value-explorer .ve-simulation{grid-template-columns:90px minmax(0,1fr) auto;gap:3px 8px}
+ .value-explorer .ve-simulation-stage{grid-column:2/-1}
+ .value-explorer .ve-simulation input[type=range]{grid-column:1/3}
+ .value-explorer .ve-simulation [data-month-label]{grid-column:3;min-width:78px;font-size:10px}
+ .value-explorer .ve-decomposition{padding:0 16px}
+ .value-explorer .ve-decomposition button{min-height:40px}
+ .value-explorer .ve-inspector{padding:24px 20px}
+ .value-explorer .ve-risk-controls{padding:8px 16px}
+ .value-explorer .ve-risk-controls{gap:6px 12px}
+ .value-explorer.is-wide{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){.value-explorer *{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* Curve legend samples and a compact click affordance. */
+.value-explorer svg.ve-swatch{display:block;width:26px;height:16px;flex:0 0 26px;background:none;color:var(--ve-blue);overflow:visible}
+.value-explorer svg.ve-swatch-fde{color:var(--ve-red)}
+.value-explorer svg.ve-swatch-return{color:var(--ve-gold)}
+.value-explorer .ve-legend button>.ve-open-hint{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:0 0 22px;margin-left:auto;border:1px solid #454139;border-radius:5px;background:#141311;color:#aaa295;transition:color .15s,border-color .15s,background .15s}
+.value-explorer .ve-open-hint svg{display:block;pointer-events:none}
+.value-explorer .ve-legend button:is(:hover,:focus-visible)>.ve-open-hint{color:#f2e7d3;border-color:#8d826f;background:#242019}
+.value-explorer .ve-legend button[data-current=true]>.ve-open-hint{color:#e9dfcc;border-color:#6b6253;background:#211d17}
+@media(prefers-reduced-motion:reduce){.value-explorer .ve-legend button>.ve-open-hint{transition:none}}
+
+/* A stable profit row leaves the curve controls independent of numeric width. */
+.value-explorer .ve-comparison-status>.ve-legend{width:100%;min-width:0}
+.value-explorer .ve-time-nodes{position:absolute;inset:0;z-index:4;pointer-events:none}
+.value-explorer .ve-time-node{position:absolute;transform:translateX(-50%);pointer-events:auto;min-width:52px;height:32px;padding:0 4px;white-space:nowrap;font-size:11px;color:#9a958a;background:#050505;border-radius:3px;font-variant-numeric:tabular-nums}
+.value-explorer .ve-time-node:is(:hover,:focus-visible),.value-explorer .ve-time-node[aria-pressed=true]{color:var(--ve-gold);background:#201c13}
+@media(max-width:960px){
+ .value-explorer .ve-time-node{min-width:44px;height:44px;font-size:10px}
+}

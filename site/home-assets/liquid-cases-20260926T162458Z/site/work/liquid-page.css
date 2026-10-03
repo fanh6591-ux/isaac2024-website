@@ -1,0 +1,23 @@
+:root{--font-geist-sans:Geist,"Isaac Sans",sans-serif;--font-geist-mono:"Geist Mono",monospace;color-scheme:dark}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0a0a0a;color:#fff;font-family:var(--font-geist-sans);overscroll-behavior:none}
+isaac-site-navigation{position:fixed;z-index:1000}
+#liquid-root{position:fixed;inset:0}
+#liquid-drag-surface:focus-visible{outline:1px solid #fff8;outline-offset:-8px}
+.isaac-card-shade{background:linear-gradient(180deg,#030b0e22,#030b0e08 25%,#030b0e85)}
+.isaac-card-title{font-family:"Isaac Sans",sans-serif;letter-spacing:-.055em!important;line-height:1.05!important;font-size:10cqw!important;text-wrap:balance;text-shadow:0 2px 25px #0004}
+.isaac-card-description p{font-family:"Isaac Sans",sans-serif;line-height:1.65;max-width:70cqw}
+.initial-loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;font:40px Georgia,serif}
+.initial-loader span{font:12px var(--font-geist-sans);color:#fff8;letter-spacing:.08em}
+.gallery-instructions{position:fixed;left:3.2%;bottom:38px;z-index:25;pointer-events:none;text-shadow:0 2px 16px #000b}
+.gallery-instructions h1{font-size:20px;font-weight:500;letter-spacing:.08em;margin:0 0 8px}
+.gallery-instructions p{margin:0;font-size:11px;letter-spacing:.12em;color:#ffffffb8}
+.case-links{position:fixed;right:3.2%;bottom:38px;z-index:35;font-size:12px}
+.case-links summary{cursor:pointer;list-style:none;border:1px solid #ffffff50;border-radius:100px;padding:14px 20px;min-height:44px;background:#ffffff12;backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 #ffffff33;letter-spacing:.1em}
+.case-links summary::-webkit-details-marker{display:none}.case-links summary span{margin-left:28px}
+.case-link-panel{position:absolute;right:0;bottom:65px;width:230px;padding:10px 18px;border:1px solid #ffffff40;border-radius:18px;background:#091019ec;backdrop-filter:blur(25px)}
+.case-link-panel a,#liquid-fallback a{display:flex;justify-content:space-between;align-items:center;min-height:50px;text-decoration:none;color:#fff;border-bottom:1px solid #ffffff26}.case-link-panel a:last-child{border:0}
+.effect-credit{position:fixed;bottom:10px;right:3.2%;z-index:25;font-size:9px;letter-spacing:.07em;color:#ffffff70;text-decoration:none}
+#liquid-fallback{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:min(90vw,420px);z-index:500;border:1px solid #ffffff40;border-radius:20px;padding:30px;background:#111b27f5;box-shadow:0 20px 80px #0009}
+#liquid-fallback[hidden]{display:none}#liquid-fallback h2{font-size:22px;font-weight:500}#liquid-fallback p{margin:12px 0;color:#c1c9d2;font-size:13px}
+html[data-liquid-failed=true] #liquid-root{visibility:hidden}
+@media(max-width:600px){.gallery-instructions{left:20px;bottom:calc(30px + env(safe-area-inset-bottom))}.gallery-instructions h1{font-size:16px}.gallery-instructions p{font-size:10px;letter-spacing:.04em}.case-links{right:20px;bottom:calc(30px + env(safe-area-inset-bottom))}.case-links summary{padding:12px 15px}.case-links summary span{margin-left:12px}.effect-credit{right:20px;bottom:calc(8px + env(safe-area-inset-bottom))}}

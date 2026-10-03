@@ -1,0 +1,9 @@
+html.isaac-merged-root{font-size:200px}
+body.isaac-merged-page{font-family:Isaac Sans,'PingFang SC','Microsoft YaHei',sans-serif}
+.isaac-merged-page main{padding-top:64px}
+.product-panel{background:#000;scroll-margin-top:64px}
+.product-panel[hidden]{display:none!important}
+.merged-product{overflow-x:clip;position:relative}
+.merged-product .isaac-source-note{margin-bottom:40px}
+@media(min-width:1025px) and (max-width:1680px){html.isaac-merged-root{font-size:12vw}}
+@media(max-width:1024px){html.isaac-merged-root{font-size:26.6666666667vw}.isaac-merged-page main{padding-top:60px}.product-panel{scroll-margin-top:60px}}

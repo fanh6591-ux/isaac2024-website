@@ -1,0 +1,67 @@
+.services-document {
+  --product-muted: #bcbcbc;
+  --product-rule: #343434;
+  --product-lab: #c4d8cf;
+}
+.product-group { scroll-margin-top: 146px; }
+.product-group-heading {
+  padding: 38px 0 30px;
+  border-top: 1px solid var(--product-rule);
+}
+.product-group-heading .product-group-label {
+  display: block;
+  color: var(--product-muted);
+  font-size: 11px;
+  letter-spacing: .09em;
+  margin-bottom: 16px;
+}
+.product-group-heading h2 { margin-bottom: 18px; }
+.product-group-heading p { color: var(--product-muted); margin-bottom: 12px; }
+.product-group-heading p:last-child { margin-bottom: 0; }
+.product-group--lab .product-group-heading { border-top-color: var(--product-lab); }
+.product-group--lab .product-group-label { color: var(--product-lab); }
+.product-group--lab .product-group-heading h2 { color: var(--product-lab); }
+.services-document .product-group .service-summary h3 {
+  font-family: 'Isaac Editorial Serif', 'Isaac Editorial Song', 'Isaac FAQ Song', serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -.015em;
+  margin: 0 0 22px;
+}
+.services-document .lab-status {
+  color: var(--product-lab);
+  font-size: 12px;
+  margin: 0 0 24px;
+}
+.product-group--ordinary { margin-top: 16px; }
+.faq-index .product-index-heading {
+  grid-template-columns: minmax(0, 1fr);
+  color: var(--product-muted);
+  font-size: 11px;
+  letter-spacing: .04em;
+  border-top: 1px solid var(--product-rule);
+  padding-top: 18px;
+  margin-top: 12px;
+}
+.faq-index .product-index-heading:first-child { border: 0; margin: 0; padding-top: 0; }
+.faq-index .product-index-heading--lab { color: var(--product-lab); }
+.plc-lab-document .back-link { display: inline-flex; min-height: 44px; align-items: center; margin-bottom: 24px; }
+.plc-lab-document .faq-document-heading { margin-bottom: 48px; }
+.plc-lab-document .lab-detail-label { color: var(--product-lab); font-size: 12px; margin-bottom: 14px; letter-spacing: .06em; }
+.plc-lab-document .lab-detail-lead { font-size: 22px; color: #fff; margin-top: 24px; }
+.plc-lab-document .lab-detail-note { font-size: 14px; color: var(--product-muted); }
+.plc-lab-document .lab-flow { list-style: decimal; padding-left: 1.5em; margin: 24px 0 0; }
+.plc-lab-document .lab-flow li { margin-bottom: 24px; }
+.plc-lab-document .lab-flow strong { display: block; font-weight: 500; color: #fff; }
+.plc-lab-document .lab-source-link { font-size: 14px; text-underline-offset: 4px; }
+.plc-lab-document a:focus-visible { outline: 1px solid #fff; outline-offset: 5px; }
+@media (max-width: 1000px) {
+  .faq-index .product-index-heading { padding-top: 16px; margin-top: 6px; }
+  .faq-index .product-index-heading:first-child { padding-top: 12px; }
+}
+@media (max-width: 760px) {
+  .product-group-heading { padding: 28px 0 24px; }
+  .services-document .product-group .service-summary h3 { font-size: 24px; }
+  .plc-lab-document .lab-detail-lead { font-size: 19px; }
+}

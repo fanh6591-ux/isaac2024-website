@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="零点未来">
+<meta name="description" content="本体论设计最佳实践 — 零点未来技术科普，基于 Palantir Foundry 官方设计指南与行业实践经验。2026.07">
+<title>本体论设计的四项核心原则与典型反例 — 零点未来技术科普 2026.07</title>
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --bg: #FFFFFF;
+  --text: #1A1A1A;
+  --text-secondary: #555555;
+  --accent: #3B82F6;
+  --accent-dark: #2563EB;
+  --accent-light: #EFF6FF;
+  --grey-50: #FAFAFA;
+  --grey-100: #F5F5F5;
+  --grey-200: #EEEEEE;
+  --grey-300: #E0E0E0;
+  --grey-400: #BDBDBD;
+  --grey-500: #9E9E9E;
+  --grey-700: #616161;
+  --code-bg: #F8F8F8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --max-width: 920px;
+  --font-body: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+  --font-mono: "SF Mono", "Cascadia Code", "Fira Code", "Consolas", "Menlo", monospace;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 17px; }
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.78;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4 { font-weight: 700; line-height: 1.3; color: var(--text); }
+h1 { font-size: 2.6rem; letter-spacing: -0.02em; margin-bottom: 0.4em; }
+h2 { font-size: 1.75rem; margin: 2.8em 0 0.8em; padding-top: 0.4em; }
+h2::before { content: ''; display: block; width: 48px; height: 3px; background: var(--accent); margin-bottom: 0.5em; border-radius: 2px; }
+h3 { font-size: 1.25rem; margin: 2em 0 0.6em; }
+h4 { font-size: 1.05rem; margin: 1.5em 0 0.4em; }
+p { margin: 1em 0; color: var(--text-secondary); }
+strong, b { color: var(--text); font-weight: 700; }
+.hl { background: #FFF3B0; padding: 0.05em 0.25em; border-radius: 2px; font-weight: 600; }
+.hl-blue { color: var(--accent); font-weight: 700; }
+code {
+  font-family: var(--font-mono); font-size: 0.88em;
+  background: var(--code-bg); padding: 0.15em 0.4em;
+  border-radius: 3px; color: #333; border: 1px solid var(--grey-200);
+}
+
+/* ===== LAYOUT ===== */
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 2rem; }
+section { padding: 2rem 0; }
+
+/* ===== SCROLL PROGRESS ===== */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--accent); z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ===== TOP NAV ===== */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--grey-200);
+  padding: 0.6rem 0;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+.top-nav.visible { transform: translateY(0); }
+.top-nav-inner {
+  max-width: var(--max-width); margin: 0 auto; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-nav-title { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.top-nav-badge { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 6rem 0 3rem; text-align: center; position: relative;
+}
+.hero-badge {
+  display: inline-block; font-size: 0.78rem; font-weight: 700;
+  color: var(--accent); letter-spacing: 0.04em; margin-bottom: 1.2rem;
+  padding: 0.3em 0.9em; border: 1.5px solid var(--accent); border-radius: 20px;
+}
+.hero h1 { max-width: 800px; margin-left: auto; margin-right: auto; }
+.hero-subtitle {
+  font-size: 1.15rem; color: var(--text-secondary);
+  max-width: 680px; margin: 0.8em auto 2em; line-height: 1.6;
+}
+.hero-formula {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 0.4em; margin: 2.5em auto; max-width: 720px;
+  font-size: 0.9rem; font-family: var(--font-mono);
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 1.4em 1.6em;
+}
+.hero-formula-chip {
+  display: inline-flex; align-items: center; padding: 0.35em 0.8em;
+  border-radius: 20px; font-weight: 700; font-size: 0.82rem;
+  font-family: var(--font-body); white-space: nowrap;
+}
+.hero-formula-chip.ddd { background: var(--accent); color: #FFF; }
+.hero-formula-chip.dry { background: var(--grey-200); color: var(--text); }
+.hero-formula-chip.ext { background: var(--grey-300); color: var(--text); }
+.hero-formula-chip.comp { background: var(--text); color: #FFF; }
+.hero-formula-plus { color: var(--grey-400); font-size: 1.2rem; font-weight: 300; }
+
+/* ===== TOC ===== */
+.toc {
+  max-width: var(--max-width); margin: 2em auto 3em; padding: 1.8em 2em;
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg);
+}
+.toc-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-500); margin-bottom: 1em; }
+.toc ol { list-style: none; counter-reset: toc-counter; display: grid; grid-template-columns: 1fr 1fr; gap: 0.2em 2em; }
+.toc li { counter-increment: toc-counter; margin: 0.35em 0; }
+.toc li::before {
+  content: counter(toc-counter, decimal-leading-zero);
+  font-size: 0.72rem; font-weight: 700; color: var(--grey-400);
+  margin-right: 0.6em; font-family: var(--font-mono);
+}
+.toc a {
+  color: var(--text); text-decoration: none; font-weight: 500;
+  transition: color var(--transition); border-bottom: 1px solid transparent;
+}
+.toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ===== ENTITY CLASSIFICATION ===== */
+.entity-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2em; margin-top: 2rem;
+}
+.entity-card {
+  background: #FFF; border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md); padding: 1.4em;
+  transition: box-shadow var(--transition);
+  position: relative; overflow: hidden;
+}
+.entity-card:hover { box-shadow: var(--shadow-md); }
+.entity-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.entity-card.business::before { background: var(--accent); }
+.entity-card.process::before { background: #F59E0B; }
+.entity-card.result::before { background: #10B981; }
+.entity-card .icon { font-size: 1.6rem; margin-bottom: 0.5em; display: block; }
+.entity-card h3 { font-size: 1.05rem; margin: 0 0 0.3em; }
+.entity-card p { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0; }
+
+/* ===== FLOW DIAGRAM ===== */
+.diagram-container {
+  position: relative; margin: 2.5em 0;
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 1.5em; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.diagram-label {
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--grey-500); margin-bottom: 1em; text-align: center;
+}
+.diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+/* ===== PRINCIPLE HEADER ===== */
+.principle-header {
+  display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;
+}
+.principle-number {
+  font-size: 3rem; font-weight: 900; color: var(--accent); line-height: 1;
+  opacity: 0.15; user-select: none; letter-spacing: -0.03em;
+}
+.pair-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 1.75rem; }
+
+/* ===== DO / DON'T CARDS ===== */
+.do-card, .dont-card { padding: 1.75rem 1.5rem; }
+.dont-card {
+  background: #FFF5F5; border: 1px solid #FECACA; border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+.do-card {
+  background: #F5FAF5; border: 1px solid #BBF7D0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.card-badge {
+  display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+  padding: 0.2em 0.7em; border-radius: 12px; margin-bottom: 0.75rem;
+}
+.dont-card .card-badge { background: #FECACA; color: #991B1B; }
+.do-card .card-badge { background: #BBF7D0; color: #166534; }
+
+/* ===== EXAMPLE BLOCK ===== */
+.example-block {
+  background: #fff; border-radius: var(--radius-sm); padding: 1rem; margin-top: 1rem;
+  font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; overflow-x: auto;
+  border: 1px solid var(--grey-200);
+}
+.example-block .label {
+  font-family: var(--font-body); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.06em; margin-bottom: 0.4rem; display: block;
+}
+.example-block.dont .label { color: #991B1B; }
+.example-block.do .label { color: #166534; }
+
+/* ===== COMPARISON TABLE ===== */
+.comp-table {
+  width: 100%; border-collapse: collapse; margin: 1.5em 0;
+  font-size: 0.92rem; border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.comp-table thead { background: var(--text); color: #FFF; }
+.comp-table th { padding: 0.8em 1em; text-align: left; font-weight: 600; font-size: 0.85rem; }
+.comp-table td { padding: 0.75em 1em; border-bottom: 1px solid var(--grey-200); }
+.comp-table tbody tr { background: #FFF; }
+.comp-table tbody tr:nth-child(even) { background: var(--grey-50); }
+.comp-table tbody tr:hover { background: var(--accent-light); }
+
+/* ===== STRUCTURAL PATTERNS ===== */
+.pattern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; margin-top: 1.75rem; }
+.pattern-card {
+  background: #FFF; border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md); padding: 1.4em;
+  transition: box-shadow var(--transition);
+}
+.pattern-card:hover { box-shadow: var(--shadow-md); }
+.pattern-card h3 { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; margin-top: 0; }
+.pattern-icon {
+  width: 34px; height: 34px; border-radius: 8px; background: var(--accent-light);
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+
+/* ===== DECISION FRAMEWORK ===== */
+.decision-flow {
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 1.6em 2em; margin-top: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.decision-step {
+  display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.85rem 0;
+  border-bottom: 1px solid var(--grey-200);
+}
+.decision-step:last-child { border-bottom: none; }
+.step-num {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+  font-size: 0.8rem; flex-shrink: 0;
+}
+.step-content h4 { margin-bottom: 0.2rem; font-size: 0.95rem; }
+.step-content p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0; }
+
+/* ===== TOOL MATRIX ===== */
+.tool-matrix {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem; margin-top: 1.5rem;
+}
+.tool-item {
+  background: #FFF; border: 1px solid var(--grey-200); border-radius: var(--radius-sm);
+  padding: 0.9em 1.1em; border-left: 3px solid var(--accent);
+  transition: box-shadow var(--transition);
+}
+.tool-item:hover { box-shadow: var(--shadow-sm); }
+.tool-item h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+.tool-item .good { color: #166534; font-size: 0.78rem; }
+.tool-item .bad  { color: #991B1B; font-size: 0.78rem; }
+
+/* ===== INDUSTRY SUPPLEMENT ===== */
+.supplement-item {
+  border-left: 3px solid var(--accent); padding: 0.9rem 1.25rem; margin-bottom: 1.25rem;
+  background: var(--grey-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.supplement-item h3 { font-size: 0.95rem; margin: 0 0 0.35em; }
+.supplement-item p { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0; }
+.source-tag {
+  display: inline-block; font-size: 0.7rem; color: var(--grey-500); background: var(--grey-100);
+  padding: 0.1em 0.5em; border-radius: 3px; margin-top: 0.4rem;
+}
+
+/* ===== INFO BOX / BLOCKQUOTE ===== */
+.info-box {
+  background: var(--grey-50); border-left: 3px solid var(--accent);
+  margin: 1.5em 0; padding: 0.8em 1.2em;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.info-box p { margin: 0.3em 0; font-size: 0.9rem; }
+
+/* ===== SECTION HEADER ===== */
+.section-eyebrow {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem;
+}
+
+/* ===== TAKEAWAY ===== */
+.takeaway {
+  background: #FFFBEB; border: 1px solid #FDE68A;
+  border-radius: var(--radius-lg); padding: 2.5rem; text-align: center;
+  margin: 3.5rem 0;
+}
+.takeaway h2 { margin-bottom: 0.75rem; }
+.takeaway p { font-size: 1rem; max-width: 600px; margin: 0 auto; color: var(--text-secondary); }
+
+/* ===== FOOTER ===== */
+.article-footer {
+  margin-top: 4em; padding: 2em 0; border-top: 1px solid var(--grey-200);
+  color: var(--text-secondary); font-size: 0.88rem; text-align: center;
+}
+.article-footer a { color: var(--accent); text-decoration: none; }
+
+/* ===== SCROLL REVEAL ===== */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  .container { padding: 0 1.2rem; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.4rem; }
+  .hero { padding: 4rem 0 2rem; }
+  .hero-formula { font-size: 0.75rem; padding: 1em; gap: 0.3em; }
+  .hero-formula-chip { font-size: 0.7rem; padding: 0.25em 0.55em; }
+  .entity-grid, .pair-cards, .pattern-grid { grid-template-columns: 1fr; }
+  .tool-matrix { grid-template-columns: 1fr; }
+  .toc ol { grid-template-columns: 1fr; }
+  .dont-card { border-right: 1px solid #FECACA; border-radius: var(--radius-md) var(--radius-md) 0 0; }
+  .do-card { border-radius: 0 0 var(--radius-md) var(--radius-md); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ===== PRINT ===== */
+@media print {
+  .top-nav, .scroll-progress { display: none; }
+  .reveal { opacity: 1; transform: none; }
+  body { font-size: 12pt; }
+}
+
+/* ===== SVG DIAGRAM STYLES ===== */
+.diagram-box { fill: #fff; stroke: var(--accent); stroke-width: 2; rx: 6; }
+.diagram-box-warn { fill: #FFF5F5; stroke: #991B1B; stroke-width: 2; rx: 6; }
+.diagram-box-good { fill: #F5FAF5; stroke: #166534; stroke-width: 2; rx: 6; }
+.diagram-label { font-family: var(--font-body); font-size: 12px; fill: var(--text); text-anchor: middle; }
+.diagram-arrow { stroke: var(--accent); stroke-width: 2; fill: none; marker-end: url(#arrowDown); }
+.diagram-arrow-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrowDownRed); }
+.diagram-dash { stroke: var(--grey-400); stroke-width: 1.5; fill: none; stroke-dasharray: 5,5; }
+</style>
+<meta name="description" content="结合设计原则、结构指引与典型反例，理解业务本体的建模取舍。"><link rel="canonical" href="https://isaac2024.online/strategy/ontology-design-principles/"><link rel="stylesheet" href="/ontology-readings-20260930-v1/reading.css"></head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav class="top-nav" id="topNav">
+  <div class="top-nav-inner">
+    <span class="top-nav-title">本体论设计最佳实践</span>
+    <span class="top-nav-badge">零点未来 · 技术科普</span>
+  </div>
+</nav>
+
+<!-- ===== SVG ARROW DEFS ===== -->
+<svg width="0" height="0" aria-hidden="true">
+  <defs>
+    <marker id="arrowDown" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#3B82F6"/>
+    </marker>
+    <marker id="arrowDownRed" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#991B1B"/>
+    </marker>
+    <marker id="arrowDownGreen" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#166534"/>
+    </marker>
+  </defs>
+</svg>
+
+<!-- ===== HERO ===== -->
+<header class="hero reveal">
+  <div class="hero-badge">零点未来 · 技术科普</div>
+  <h1>本体论设计的<span class="hl">四项核心原则</span>与典型反例</h1>
+  <p class="hero-subtitle">
+    基于 Palantir Foundry 官方设计指南与行业实践经验，构建"像真实世界一样直观"的企业知识图谱。<br>四项原则按优先级排序，七个典型反例正反对照呈现。
+  </p>
+
+  <div class="hero-formula" aria-label="四项核心原则">
+    <span class="hero-formula-chip ddd">领域驱动设计</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip dry">不要重复构建相似实体</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip ext">对扩展开放</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip comp">组合优于继承</span>
+  </div>
+</header>
+
+<!-- ===== TOC ===== -->
+<nav class="toc reveal" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <ol>
+    <li><a href="#principle-1">领域驱动设计 ↔ 不作筛选直接映射</a></li>
+    <li><a href="#principle-2">不要重复构建相似实体 ↔ 部门孤岛</a></li>
+    <li><a href="#principle-3">对扩展开放，对修改关闭 ↔ 上帝对象</a></li>
+    <li><a href="#principle-4">组合优于深层继承</a></li>
+    <li><a href="#structural">四大结构模式</a></li>
+    <li><a href="#antipatterns">典型反例图鉴</a></li>
+    <li><a href="#decisions">工具选择决策框架</a></li>
+    <li><a href="#naming-security">命名规范与安全设计</a></li>
+    <li><a href="#industry">行业实践补充</a></li>
+    <li><a href="#references">参考链接与数据来源</a></li>
+  </ol>
+</nav>
+
+<!-- ===== SECTION: PRINCIPLE 1 — Domain-Driven Design ===== -->
+<section id="principle-1" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">核心原则 · 最高优先级</div>
+    <div class="principle-header">
+      <span class="principle-number">01</span>
+      <div>
+        <h2 style="margin-bottom:0;">领域驱动设计</h2>
+        <p style="color:#555;margin-bottom:0;">Domain-Driven Design — 本体论建模真实世界，而非源数据</p>
+      </div>
+    </div>
+
+    <p>
+      <span class="hl">本体论的对象应代表语义上有意义的真实世界概念</span>（如"患者""工单""船舶"），而非数据库表、API 响应或电子表格标签页。
+      链接应代表真实关系（如"该患者到访了该设施"），而非外键或 JOIN 关系的产物。
+    </p>
+
+    <!-- DDD 3-Step Diagram -->
+    <div class="diagram-container">
+      <div class="diagram-label">建模三步法：领域 → 模型 → 数据</div>
+      <svg viewBox="0 0 820 140" width="100%" height="100%" style="max-width:820px;">
+        <!-- Step 1 -->
+        <rect x="10" y="10" width="230" height="62" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2.5"/>
+        <text x="125" y="36" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-weight="700" font-size="13" fill="#1A1A1A">1. 理解业务领域</text>
+        <text x="125" y="56" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="10" fill="#555">识别真实世界实体与关系</text>
+        <text x="125" y="68" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">Understand the Domain</text>
+
+        <!-- Arrow 1→2 -->
+        <line x1="245" y1="41" x2="295" y2="41" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+        <!-- Step 2 -->
+        <rect x="305" y="10" width="210" height="62" rx="8" fill="#FFF7ED" stroke="#F59E0B" stroke-width="2.5"/>
+        <text x="410" y="36" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-weight="700" font-size="13" fill="#1A1A1A">2. 设计本体论模型</text>
+        <text x="410" y="56" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="10" fill="#555">定义对象 · 属性 · 链接 · 接口</text>
+        <text x="410" y="68" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">Design the Ontology</text>
+
+        <!-- Arrow 2→3 -->
+        <line x1="520" y1="41" x2="570" y2="41" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+        <!-- Step 3 -->
+        <rect x="580" y="10" width="230" height="62" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="2.5"/>
+        <text x="695" y="36" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-weight="700" font-size="13" fill="#1A1A1A">3. 映射源数据与逻辑</text>
+        <text x="695" y="56" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="10" fill="#555">管道 · 聚合 · 清洗 · 写入</text>
+        <text x="695" y="68" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">Map Source Data & Logic</text>
+
+        <!-- Bottom rule -->
+        <text x="410" y="115" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="11" fill="#888" font-style="italic">不要从源数据结构出发反推模型设计，先理解领域</text>
+      </svg>
+    </div>
+
+    <!-- Pair: Do vs Don't -->
+    <div class="pair-cards">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·不作筛选直接映射（Kitchen Sink）</span>
+        <h3>错误做法</h3>
+        <p>拿到一个数据集或 CSV，<strong>不做任何领域分析</strong>，直接将每一列映射为一个属性，把技术元数据（<code>_crm_extracted_at</code>、<code>_crm_sequence</code>）混入业务模型。源数据长什么样，本体论就长什么样。</p>
+        <div class="example-block dont">
+          <span class="label">❌ 避免 — 从数据出发，1:1 映射</span>
+          <code>
+            // 一个 CSV 行 → 一个对象类型，所有列直接映射<br>
+            OrderData {<br>
+            &nbsp;&nbsp;order_id, customer_name, customer_email,<br>
+            &nbsp;&nbsp;product_sku, quantity,<br>
+            &nbsp;&nbsp;_crm_extracted_at, _crm_sequence,  // 技术列也混入<br>
+            }
+          </code>
+        </div>
+      </div>
+
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 最佳实践</span>
+        <h3>正确做法</h3>
+        <p>先理解领域，再设计模型，最后映射数据源。一条 CSV 可能隐藏了多个实体（订单、客户、产品），需要<strong>拆分为独立对象类型</strong>并用语义链接关联。技术元数据留在后台数据集，不进入本体论。</p>
+        <div class="example-block do">
+          <span class="label">✅ 推荐 — 领域分析 → 模型设计 → 数据映射</span>
+          <code>
+            // 从同一个 CSV 中识别出三个实体<br>
+            Order { order_id, quantity } → 链接到 Customer、Product<br>
+            Customer { name, email }<br>
+            Product { sku }<br>
+            // 技术列只存在于后台管道中，不出现在本体论
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Before / After visual comparison -->
+    <table class="comp-table">
+      <thead>
+        <tr><th>❌ 典型反例：从数据出发</th><th>✅ 正确模式：从领域出发</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>看到数据集 → 直接建模</td><td>理解领域 → 设计模型 → 映射数据</td></tr>
+        <tr><td>属性从源字段 1:1 映射，无筛选</td><td>属性经过精心筛选，只保留有业务含义的字段</td></tr>
+        <tr><td>命名使用源系统缩写（dtLastInspMod）</td><td>命名使用业务语言（lastInspectionDate）</td></tr>
+        <tr><td>一个 CSV 行直接变成一个对象类型</td><td>一条数据可能拆分出多个实体（订单→客户+产品+订单）</td></tr>
+        <tr><td>技术元数据（_crm_extracted_at）混入业务模型</td><td>技术元数据留在后台数据集，不出现在本体论中</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <p><strong>🎯 判断标准：</strong>一个用户或 AI 代理应该能够<span class="hl">无需查阅文档，仅凭直觉</span>就能在本体论中导航——因为它的结构匹配他们对领域的认知方式。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: PRINCIPLE 2 — Don't Repeat Yourself ===== -->
+<section id="principle-2" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">核心原则 · 第二优先级</div>
+    <div class="principle-header">
+      <span class="principle-number">02</span>
+      <div>
+        <h2 style="margin-bottom:0;">不要重复构建相似实体</h2>
+        <p style="color:#555;margin-bottom:0;">Don't Repeat Yourself — 同一实体只建一次，三次出现则重构</p>
+      </div>
+    </div>
+
+    <p>
+      重复的对象类型、冗余的属性和复制粘贴的工作流<span class="hl">是维护噩梦和上下文管理问题</span>——对人类和 AI 代理都是如此。
+      目标是每个概念有唯一的规范化表示，每个操作有唯一的规范化工作流。
+    </p>
+
+    <!-- DRY Resolution Diagram: 3 duplicates → single type OR interface -->
+    <div class="diagram-container">
+      <div class="diagram-label">一次是巧合，两次是模式，三次必须重构</div>
+      <svg viewBox="0 0 830 230" width="100%" height="100%" style="max-width:830px;">
+        <!-- Three duplicate types -->
+        <rect x="15" y="5" width="240" height="52" rx="6" fill="#FFF5F5" stroke="#991B1B" stroke-width="2"/>
+        <text x="135" y="26" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="12" fill="#991B1B" font-weight="600">Sales Customer</text>
+        <text x="135" y="44" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">{ name, email, phone, dealSize }</text>
+
+        <rect x="295" y="5" width="240" height="52" rx="6" fill="#FFF5F5" stroke="#991B1B" stroke-width="2"/>
+        <text x="415" y="26" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="12" fill="#991B1B" font-weight="600">Support Customer</text>
+        <text x="415" y="44" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">{ name, email, phone, ticketHistory }</text>
+
+        <rect x="575" y="5" width="240" height="52" rx="6" fill="#FFF5F5" stroke="#991B1B" stroke-width="2"/>
+        <text x="695" y="26" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="12" fill="#991B1B" font-weight="600">Billing Customer</text>
+        <text x="695" y="44" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">{ name, email, phone, paymentMethod }</text>
+
+        <!-- Arrow down -->
+        <line x1="415" y1="60" x2="415" y2="85" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowDown)"/>
+        <text x="460" y="78" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="11" fill="#3B82F6" font-weight="600">三次法则触发重构 →</text>
+
+        <!-- Resolution A -->
+        <rect x="20" y="100" width="360" height="52" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="2.5"/>
+        <text x="200" y="122" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="12" fill="#166534" font-weight="700">方案 A：单一规范化类型</text>
+        <text x="200" y="142" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="10" fill="#444">Customer { name, email, phone, lifecycleStage }</text>
+
+        <text x="400" y="130" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="13" fill="#888" font-weight="700">或</text>
+
+        <!-- Resolution B -->
+        <rect x="450" y="100" width="360" height="52" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2.5"/>
+        <text x="630" y="122" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="12" fill="#3B82F6" font-weight="700">方案 B：接口共享</text>
+        <text x="630" y="142" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="10" fill="#444">interface CustomerBase { name, email, phone }</text>
+
+        <!-- Bottom note -->
+        <text x="415" y="178" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="10" fill="#3B82F6">接口：定义一组共享属性，多个对象类型去实现它 — 后面结构模式章节会详细展开</text>
+        <text x="415" y="198" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="9" fill="#888">多个类型 implements 同一个 interface → 共享的部分定义一次，特殊部分各自扩展</text>
+      </svg>
+    </div>
+
+    <div class="pair-cards">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·部门孤岛（Department Silos）</span>
+        <h3>错误做法</h3>
+        <p>三个部门各自独立创建客户对象类型：Sales Customer、Support Customer、Billing Customer——每个都有 name/email/phone，加上各自的特殊字段。三套 Action、三套维护负担，同一客户信息还不一致。</p>
+        <div class="example-block dont">
+          <span class="label">❌ 避免 — 三个孤立团队各自建模</span>
+          <code>
+            Sales_Customer { name, email, phone, dealSize }<br>
+            Support_Customer { name, email, phone, ticketHistory }<br>
+            Billing_Customer { name, email, phone, paymentMethod }<br>
+            // 同一客户在三个类型中都有记录，信息不一致
+          </code>
+        </div>
+      </div>
+
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 最佳实践</span>
+        <h3>正确做法</h3>
+        <p>创建单一规范化 Customer 类型（方案 A），或使用 <strong>Interface</strong> 定义共享形状（方案 B）。<span class="hl">一次出现是巧合，两次形成模式，三次必须重构。</span></p>
+        <div class="example-block do">
+          <span class="label">✅ 推荐 — 规范化 + 接口共享</span>
+          <code>
+            // 方案 A：单一规范类型（推荐大多数情况）<br>
+            Customer { name, email, phone, lifecycleStage }<br>
+            <br>
+            // 方案 B：接口共享（类型形状确有本质差异时）<br>
+            interface CustomerBase { name, email, phone }<br>
+            SalesLead implements CustomerBase { + dealSize }<br>
+            SupportContact implements CustomerBase { + ticketHistory }
+          </code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: PRINCIPLE 3 — Open for Extension ===== -->
+<section id="principle-3" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">核心原则 · 第三优先级</div>
+    <div class="principle-header">
+      <span class="principle-number">03</span>
+      <div>
+        <h2 style="margin-bottom:0;">对扩展开放，对修改关闭</h2>
+        <p style="color:#555;margin-bottom:0;">Open for Extension, Closed for Modification — 保护核心模型，让构建者扩展它们</p>
+      </div>
+    </div>
+
+    <p>
+      一旦一个对象类型、接口或工作流<span class="hl">经过验证并投入生产，其核心结构就应保持稳定</span>。
+      其他团队应该能在不修改核心模型的前提下，通过扩展来添加新能力。
+    </p>
+
+    <div class="pair-cards">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·上帝对象</span>
+        <h3>错误做法</h3>
+        <p>新需求来了就往核心类型上塞属性。Equipment 类型本来只有基本字段，后来加入了认证信息、维护记录、财务折旧……最终膨胀为 150+ 属性、大部分为 null 的"万能对象"。</p>
+        <div class="example-block dont">
+          <span class="label">❌ 避免 — 不断往核心类型加字段</span>
+          <code>
+            Equipment {<br>
+            &nbsp;&nbsp;serialNumber, model, location,  // 核心<br>
+            &nbsp;&nbsp;certificationAuthority, certExpiry, certStatus,  // 认证团队加的<br>
+            &nbsp;&nbsp;depreciationMethod, bookValue, fiscalYear,  // 财务团队加的<br>
+            &nbsp;&nbsp;lastMaintenanceDate, mtbf, sparePartsList,  // 维护团队加的<br>
+            &nbsp;&nbsp;// ... 150+ 属性，大多为 null<br>
+            }
+          </code>
+        </div>
+      </div>
+
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 最佳实践</span>
+        <h3>正确做法</h3>
+        <p>核心类型保持精简，通过<strong>链接扩展类型</strong>和<strong>接口实现</strong>来添加新能力。核心类型不受影响，新能力按需扩展。</p>
+        <div class="example-block do">
+          <span class="label">✅ 推荐 — 链接扩展 + 接口</span>
+          <code>
+            // 核心类型保持稳定<br>
+            Equipment { serialNumber, model, location }<br>
+            <br>
+            // 认证能力：链接到扩展类型<br>
+            Equipment → EquipmentCertification { authority, expiry, status }<br>
+            <br>
+            // 可巡检能力：实现接口<br>
+            Equipment implements Inspectable { lastInspectionDate, inspectionStatus }
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin:2.5rem 0;">
+      <svg viewBox="0 0 700 220" width="100%" height="100%" style="max-width:700px;">
+        <!-- Core type (locked) -->
+        <rect x="250" y="10" width="200" height="50" rx="8" fill="#E3F2FD" stroke="#1565C0" stroke-width="3"/>
+        <text x="350" y="32" class="diagram-label" font-weight="700">Equipment</text>
+        <text x="350" y="50" class="diagram-label" font-size="10" fill="#1565C0">🔒 核心模型 · 锁定不变</text>
+
+        <!-- Lock icon -->
+        <text x="465" y="35" font-size="20" fill="#1565C0">🔒</text>
+
+        <!-- Extension types below -->
+        <line x1="350" y1="60" x2="120" y2="100" stroke="#1565C0" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="350" y1="60" x2="350" y2="100" stroke="#1565C0" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="350" y1="60" x2="580" y2="100" stroke="#1565C0" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+        <rect x="30" y="100" width="180" height="45" rx="6" fill="#F1F8E9" stroke="#2E7D32" stroke-width="2"/>
+        <text x="120" y="118" class="diagram-label" font-size="12" font-weight="600">EquipmentCertification</text>
+        <text x="120" y="135" class="diagram-label" font-size="10" fill="#666">链接扩展类型</text>
+
+        <rect x="260" y="100" width="180" height="45" rx="6" fill="#F1F8E9" stroke="#2E7D32" stroke-width="2"/>
+        <text x="350" y="118" class="diagram-label" font-size="12" font-weight="600">Inspectable 接口</text>
+        <text x="350" y="135" class="diagram-label" font-size="10" fill="#666">接口实现</text>
+
+        <rect x="490" y="100" width="180" height="45" rx="6" fill="#F1F8E9" stroke="#2E7D32" stroke-width="2"/>
+        <text x="580" y="118" class="diagram-label" font-size="12" font-weight="600">MaintenanceRecord</text>
+        <text x="580" y="135" class="diagram-label" font-size="10" fill="#666">链接扩展类型</text>
+
+        <!-- Label at bottom -->
+        <text x="350" y="185" class="diagram-label" font-size="12" fill="#888">⬆ 核心类型不变，新能力通过链接 + 接口扩展 ⬆</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: PRINCIPLE 4 — Composition ===== -->
+<section id="principle-4" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">核心原则 · 第四优先级</div>
+    <div class="principle-header">
+      <span class="principle-number">04</span>
+      <div>
+        <h2 style="margin-bottom:0;">组合优于深层继承</h2>
+        <p style="color:#555;margin-bottom:0;">Composition over Deep Hierarchies — 多接口实现，保持可插拔</p>
+      </div>
+    </div>
+
+    <p>
+      Foundry 本体论<span class="hl">支持通过接口实现多重继承</span>——一个实体可以从多个聚焦的抽象中组合行为，
+      而不需要陷入单一继承链的泥潭。
+    </p>
+
+    <!-- Composition vs Inheritance diagram -->
+    <div style="text-align:center; margin:2rem 0;">
+      <svg viewBox="0 0 750 260" width="100%" height="100%" style="max-width:750px;">
+
+        <!-- INHERITANCE (Bad) -->
+        <text x="160" y="22" class="diagram-label" font-weight="700" fill="#C62828">❌ 深层继承链（错误）</text>
+        <rect x="80" y="35" width="160" height="32" rx="6" fill="#FFF3F0" stroke="#C62828" stroke-width="1.5"/>
+        <text x="160" y="55" class="diagram-label" font-size="11" fill="#C62828">Asset</text>
+        <line x1="160" y1="67" x2="160" y2="82" stroke="#C62828" stroke-width="1.5" marker-end="url(#arrowDownRed)"/>
+        <rect x="80" y="85" width="160" height="32" rx="6" fill="#FFF3F0" stroke="#C62828" stroke-width="1.5"/>
+        <text x="160" y="105" class="diagram-label" font-size="11" fill="#C62828">PhysicalAsset</text>
+        <line x1="160" y1="117" x2="160" y2="132" stroke="#C62828" stroke-width="1.5" marker-end="url(#arrowDownRed)"/>
+        <rect x="80" y="135" width="160" height="32" rx="6" fill="#FFF3F0" stroke="#C62828" stroke-width="1.5"/>
+        <text x="160" y="155" class="diagram-label" font-size="11" fill="#C62828">Building</text>
+        <line x1="160" y1="167" x2="160" y2="182" stroke="#C62828" stroke-width="1.5" marker-end="url(#arrowDownRed)"/>
+        <rect x="80" y="185" width="160" height="32" rx="6" fill="#FFF3F0" stroke="#C62828" stroke-width="1.5"/>
+        <text x="160" y="205" class="diagram-label" font-size="11" fill="#C62828">SchedulableBuilding</text>
+
+        <!-- Cross -->
+        <text x="290" y="150" font-size="36" fill="#C62828">✕</text>
+
+        <!-- COMPOSITION (Good) -->
+        <text x="480" y="22" class="diagram-label" font-weight="700" fill="#2E7D32">✅ 接口组合（正确）</text>
+
+        <rect x="520" y="50" width="140" height="32" rx="6" fill="#E3F2FD" stroke="#1565C0" stroke-width="2"/>
+        <text x="590" y="70" class="diagram-label" font-size="11" fill="#1565C0" font-weight="600">Building</text>
+        <text x="590" y="92" class="diagram-label" font-size="9" fill="#666">{ address, sqft }</text>
+
+        <rect x="520" y="105" width="140" height="32" rx="6" fill="#E3F2FD" stroke="#1565C0" stroke-width="2"/>
+        <text x="590" y="125" class="diagram-label" font-size="11" fill="#1565C0" font-weight="600">SchedulableResource</text>
+        <text x="590" y="147" class="diagram-label" font-size="9" fill="#666">{ calendar, bookingPolicy }</text>
+
+        <!-- Arrows from interfaces to Arena -->
+        <line x1="520" y1="66" x2="420" y2="160" stroke="#2E7D32" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="520" y1="121" x2="420" y2="175" stroke="#2E7D32" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+        <text x="455" y="130" class="diagram-label" font-size="9" fill="#2E7D32">implements</text>
+
+        <rect x="340" y="155" width="160" height="50" rx="8" fill="#F1F8E9" stroke="#2E7D32" stroke-width="2.5"/>
+        <text x="420" y="177" class="diagram-label" font-size="13" fill="#2E7D32" font-weight="700">Arena</text>
+        <text x="420" y="195" class="diagram-label" font-size="10" fill="#444">{ arenaName, seatingCapacity }</text>
+      </svg>
+    </div>
+
+    <div class="info-box">
+      <p><strong>💡 关键洞察：</strong>构建在 <code>SchedulableResource</code> 接口上的工作流，<span class="hl">不做任何修改就能用于 Arena、会议室和车辆</span>——深层继承链永远做不到这一点。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: STRUCTURAL PATTERNS ===== -->
+<section id="structural" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">结构设计指南</div>
+    <h2>四大结构模式：构建高效本体论的"语法"</h2>
+    <p>除了四项核心原则，Palantir 还提供了四个关键的结构设计模式，它们是本体论的<span class="hl">"语法规则"</span>。</p>
+
+    <div class="pattern-grid">
+      <!-- Normalization -->
+      <div class="pattern-card fade-in">
+        <h3><span class="pattern-icon">📐</span> 规范化与派生属性</h3>
+        <p>"每个事实只存一次。用<strong>派生属性</strong>提供便利访问。"</p>
+        <div style="margin-top:1rem;">
+          <table class="comp-table" style="font-size:0.8rem;">
+            <tr><td style="color:#C62828;">❌ Manager.directReportCount = 5（手动维护整数）</td></tr>
+            <tr><td style="color:#2E7D32;">✅ Manager.directReportCount = 派生属性（自动计数）</td></tr>
+            <tr><td style="color:#C62828;">❌ Employee.managerName = "Alice"（复制值）</td></tr>
+            <tr><td style="color:#2E7D32;">✅ Employee → manager（链接，自动获取 name）</td></tr>
+          </table>
+        </div>
+        <p style="font-size:0.8rem;color:#888;margin-top:0.75rem;">
+          ⚠️ 超过 ~10k 对象/查询时，考虑有意识地反规范化。
+        </p>
+      </div>
+
+      <!-- Structs -->
+      <div class="pattern-card fade-in">
+        <h3><span class="pattern-icon">📦</span> 结构体</h3>
+        <p>"将语义相关的字段组合为<strong>结构体</strong>，而非平铺为独立属性。"</p>
+        <div style="margin-top:1rem;">
+          <table class="comp-table" style="font-size:0.8rem;">
+            <tr><td style="color:#C62828;">❌ addressStreet, addressCity, addressState, addressPostalCode…（10 个独立属性）</td></tr>
+            <tr><td style="color:#2E7D32;">✅ address { street, city, state, postalCode, geopoint, llmConfidence }（一个结构体）</td></tr>
+          </table>
+        </div>
+        <p style="font-size:0.8rem;color:#888;margin-top:0.75rem;">
+          💡 特别适用于 AI 输出场景：将主结果、置信度、推理依据打包在一起。
+        </p>
+      </div>
+
+      <!-- Interfaces -->
+      <div class="pattern-card fade-in">
+        <h3><span class="pattern-icon">🔌</span> 接口</h3>
+        <p>"用接口构建<strong>可复用、面向未来</strong>的抽象层。"</p>
+        <div style="margin-top:1rem;">
+          <table class="comp-table" style="font-size:0.8rem;">
+            <tr><td style="color:#C62828;">❌ Vehicle、Equipment、Facility 各自独立维护 inspectionDate + inspectionStatus</td></tr>
+            <tr><td style="color:#2E7D32;">✅ interface Inspectable { lastInspectionDate, inspectionStatus } — 一次定义，多处实现</td></tr>
+          </table>
+        </div>
+        <p style="font-size:0.8rem;color:#888;margin-top:0.75rem;">
+          🔑 能力接口（Inspectable, Schedulable）+ 分类接口（MilitaryAsset, MedicalDevice）
+        </p>
+      </div>
+
+      <!-- Links -->
+      <div class="pattern-card fade-in">
+        <h3><span class="pattern-icon">🔗</span> 链接与对象化链接</h3>
+        <p>"链接应代表<strong>有语义意义的真实关系</strong>，而非外键。"</p>
+        <div style="margin-top:1rem;">
+          <table class="comp-table" style="font-size:0.8rem;">
+            <tr><td style="color:#C62828;">❌ Employee → Venture（直接链接，无法记录 role/startDate/allocation）</td></tr>
+            <tr><td style="color:#2E7D32;">✅ Employee → VentureStaffing { role, startDate, allocation } → Venture（对象化链接承载元数据）</td></tr>
+          </table>
+        </div>
+        <p style="font-size:0.8rem;color:#888;margin-top:0.75rem;">
+          📌 关系本身有元数据（日期、角色、状态）→ 使用对象化链接类型。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: ANTI-PATTERNS GALLERY ===== -->
+<section id="antipatterns" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">典型反例图鉴</div>
+    <h2>四个典型的反例：每个本体论设计者都应警惕</h2>
+    <p>以下典型反例与前述四项核心原则并非一一对应——它们代表<span class="hl">不同维度的常见错误</span>。理解它们的本质，比背诵分类更重要。</p>
+
+    <!-- Golden Hammer -->
+    <div class="pair-cards" style="margin-top:2.5rem;">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·单一工具依赖</span>
+        <h3>The Golden Hammer</h3>
+        <p><strong>症状：</strong>手里只有锤子，看什么都像钉子。过度依赖某一种工具来解决所有问题。</p>
+        <div class="example-block dont">
+          <span class="label">❌ 典型错误</span>
+          <code>
+            // 用 Action 计算区域销售总额（用户需手动触发）<br>
+            // 用 Pipeline 每分钟轮询一次新传感器数据<br>
+            // 用 Function 计算 fullName = firstName + lastName<br>
+            // 每项都用 Pipeline，每项都用 Action...
+          </code>
+        </div>
+      </div>
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 解决方案</span>
+        <h3>为每个任务选择正确的工具</h3>
+        <div class="example-block do">
+          <span class="label">✅ 工具与场景匹配</span>
+          <code>
+            Action → 需要人工判断或用户输入的操作<br>
+            Pipeline（批量）→ 聚合、清洗、预计算<br>
+            Pipeline（流式）→ 持续低延迟处理<br>
+            Automation → 事件驱动：变化了→该做什么<br>
+            Function → 跨对象复杂实时计算<br>
+            派生属性 → 基于链接的动态值
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Sprawl -->
+    <div class="pair-cards" style="margin-top:2rem;">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·操作碎片化</span>
+        <h3>Action Sprawl</h3>
+        <p><strong>症状：</strong>为一个对象类型创建 20+ 个单属性 Action——UpdateFirstName, UpdateLastName, UpdateEmail... 把数据库 CRUD 操作直接暴露给用户。</p>
+        <div class="example-block dont">
+          <span class="label">❌ 错误做法 — 单属性 Action</span>
+          <code>
+            Employee 的 Action 列表：<br>
+            · Update Employee First Name<br>
+            · Update Employee Last Name<br>
+            · Update Employee Email<br>
+            · Update Employee Phone<br>
+            · Update Employee Department<br>
+            · Update Employee Manager<br>
+            // ... 20+ 个 Action
+          </code>
+        </div>
+      </div>
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 解决方案</span>
+        <h3>围绕业务操作设计 Action，而非数据库更新</h3>
+        <div class="example-block do">
+          <span class="label">✅ 正确做法 — 业务操作 Action</span>
+          <code>
+            Employee 的 Action 列表：<br>
+            · Update Contact Information<br>
+            &nbsp;&nbsp;{ firstName, lastName, email, phone }<br>
+            · Transfer to New Department<br>
+            &nbsp;&nbsp;{ department, manager, location, effectiveDate }<br>
+            · Onboard New Employee<br>
+            &nbsp;&nbsp;{ all required + downstream triggers }
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Machine -->
+    <div class="pair-cards" style="margin-top:2rem;">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·版本即是对象</span>
+        <h3>The Time Machine</h3>
+        <p><strong>症状：</strong>把历史版本建模为独立对象或对象类型——Contract v1, Contract v2, Contract v3 或 Contract 2023, Contract 2024。</p>
+        <div class="example-block dont">
+          <span class="label">❌ 错误做法 — 版本即对象</span>
+          <code>
+            Contract_v1 { value: 100K, status: active }<br>
+            Contract_v2 { value: 120K, status: active }<br>
+            Contract_v3 { value: 120K, status: amended }<br>
+            // 哪个是当前版本？链接该指向哪个？
+          </code>
+        </div>
+      </div>
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 解决方案</span>
+        <h3>一个实体一个对象，历史用链接或时序属性</h3>
+        <div class="example-block do">
+          <span class="label">✅ 正确做法 — 当前状态 + 变更历史</span>
+          <code>
+            Contract { currentValue: 120K, status: active }<br>
+            &nbsp;&nbsp;→ ContractAmendment {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;amendmentDate, previousValue, newValue, reason }<br>
+            &nbsp;&nbsp;→ ContractAmendment { ... }<br>
+            // 一个 Contract 对象 + 链接的变更记录
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Misnomer -->
+    <div class="pair-cards" style="margin-top:2rem;">
+      <div class="dont-card fade-in">
+        <span class="card-badge">❌ 典型反例 ·命名不当</span>
+        <h3>The Misnomer</h3>
+        <p><strong>症状：</strong>使用模糊、通用或误导性的名称。用户频繁问"这个属性是什么意思？"</p>
+        <div class="example-block dont">
+          <span class="label">❌ 模糊命名</span>
+          <code>
+            对象类型：Item（什么东西？）<br>
+            属性：value（金额？数量？评分？）<br>
+            属性：type（什么的类型？）<br>
+            属性：date（创建？修改？到期？）<br>
+            链接：Item → Related Item（什么关系？）
+          </code>
+        </div>
+      </div>
+      <div class="do-card fade-in">
+        <span class="card-badge">✅ 解决方案</span>
+        <h3>名称应自解释——无需文档就能理解</h3>
+        <div class="example-block do">
+          <span class="label">✅ 明确命名</span>
+          <code>
+            对象类型：Product / SalesOrderLineItem<br>
+            属性：monetaryValue / quantityOnHand / riskScore<br>
+            属性：productCategory / serviceTier<br>
+            属性：orderPlacedDate / contractEffectiveDate<br>
+            链接：Product → Purchasing Customer<br>
+            链接：Employee → Supervisor
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Naming comparison table -->
+    <table class="comp-table" style="margin-top:2rem;">
+      <thead>
+        <tr><th>❌ 反模式命名</th><th>✅ 推荐命名</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Item</code></td><td><code>Product</code> / <code>WarehouseInventoryRecord</code></td></tr>
+        <tr><td><code>dtLastInspMod</code></td><td><code>lastInspectionDate</code></td></tr>
+        <tr><td><code>nVAL01</code></td><td><code>monetaryValue</code></td></tr>
+        <tr><td><code>relatedItems</code>（链接）</td><td><code>purchasingCustomers</code> / <code>supplier</code></td></tr>
+        <tr><td><code>value</code></td><td><code>monetaryValue</code> / <code>quantityOnHand</code> / <code>riskScore</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== SECTION: DECISION FRAMEWORK ===== -->
+<section id="decisions" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">决策框架</div>
+    <h2>工具选择：为每个任务匹配合适的工具</h2>
+    <p>单一工具依赖的解药是<span class="hl">一个清晰的决策框架</span>。每当你准备实现一个操作时，按以下步骤自查：</p>
+
+    <div class="decision-flow">
+      <div class="decision-step fade-in">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <h4>这个操作需要<span class="hl">人工判断或用户输入</span>吗？</h4>
+          <p>是 → <strong>Action Type</strong>（人类或 AI 代理驱动的决策与输入）</p>
+        </div>
+      </div>
+      <div class="decision-step fade-in">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <h4>这是一个<span class="hl">数据转换或聚合</span>操作吗？</h4>
+          <p>是 → 需要持续低延迟？→ <strong>Streaming Pipeline</strong>；否则 → <strong>Batch Pipeline</strong></p>
+        </div>
+      </div>
+      <div class="decision-step fade-in">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <h4>是"<span class="hl">某件事发生了变化</span>→ 应该触发某件事"吗？</h4>
+          <p>是 → <strong>Automation</strong>（事件驱动，监听本体论变化并编排 Action / 通知）</p>
+        </div>
+      </div>
+      <div class="decision-step fade-in">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <h4>需要<span class="hl">跨对象的复杂实时计算</span>，且输入值会随 Action 变化？</h4>
+          <p>是 → <strong>Function</strong>（实时计算）或 <strong>派生属性</strong>（基于链接的查询时计算）</p>
+        </div>
+      </div>
+      <div class="decision-step fade-in">
+        <span class="step-num">5</span>
+        <div class="step-content">
+          <h4>是一个<span class="hl">简单的、输入稳定的计算</span>（如 fullName = first + last）？</h4>
+          <p>是 → <strong>Pipeline Transform</strong>（在数据管道中预计算，零运行时开销）</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool reference matrix -->
+    <h3 style="margin-top:2.5rem;">工具速查矩阵</h3>
+    <div class="tool-matrix">
+      <div class="tool-item fade-in">
+        <h4>🔘 Action Type</h4>
+        <p class="good">✅ 人工决策 · 用户编辑 · 输入驱动变更</p>
+        <p class="bad">❌ 批量计算 · 定时更新 · 无人工事件</p>
+      </div>
+      <div class="tool-item fade-in">
+        <h4>📊 Batch Pipeline</h4>
+        <p class="good">✅ 批量处理 · 聚合 · 清洗 · 预计算</p>
+        <p class="bad">❌ 实时响应 · 需人工输入 · 对象级事件</p>
+      </div>
+      <div class="tool-item fade-in">
+        <h4>⚡ Streaming Pipeline</h4>
+        <p class="good">✅ 持续低延迟 · 实时看板 · 实时增强</p>
+        <p class="bad">❌ 低频更新 · 人工输入 · 本体论事件</p>
+      </div>
+      <div class="tool-item fade-in">
+        <h4>🤖 Automation</h4>
+        <p class="good">✅ 事件驱动 · 编排 Action · 触发通知</p>
+        <p class="bad">❌ 重数据处理 · 复杂多表 JOIN</p>
+      </div>
+      <div class="tool-item fade-in">
+        <h4>⚙️ Function</h4>
+        <p class="good">✅ 跨对象实时计算 · 校验 · 实时派生</p>
+        <p class="bad">❌ 简单管道计算 · 大批量处理</p>
+      </div>
+      <div class="tool-item fade-in">
+        <h4>📐 派生属性</h4>
+        <p class="good">✅ 基于链接的动态计算 · 自动保持正确</p>
+        <p class="bad">❌ 高频查询（>10k）· 复杂多跳逻辑</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: INDUSTRY SUPPLEMENT ===== -->
+<section id="industry" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">行业实践补充</div>
+    <h2>超越 Palantir：来自行业权威的补充实践</h2>
+    <p>
+      以下实践来自学术研究和企业架构社区的共识，<span class="hl">与 Palantir 的核心原则互补而非竞争</span>，为你的本体论设计提供更全面的视角。
+    </p>
+
+    <div class="supplement-item fade-in">
+      <h3>1. 使用上层本体论（Upper Ontology）避免重复造轮子</h3>
+      <p>
+        采用成熟的上层本体论框架（如 gist、BFO、IDEAS）中已定义的通用概念——人、组织、协议、物理事物、时间、事件——而非每次从零开始。
+        <strong>gist</strong> 是其中最具实践性的选择，已包含企业建模中最常用的基础类别和关系。
+      </p>
+      <span class="source-tag">来源：Semantic Arts · gist Ontology · Enterprise Architecture Community</span>
+    </div>
+
+    <div class="supplement-item fade-in">
+      <h3>2. 语义提升（Semantic Lifting）：从模型到本体论的桥梁</h3>
+      <p>
+        将现有的 BPMN 流程图、ER 图、UML 模型通过<strong>语义标注</strong>转化为本体论实体和关系。例如：BPMN 的活动节点 → 过程实体，数据对象 → 业务实体，决策网关 → 结果实体。
+        这使得现有企业架构投资可以平滑迁移到语义层，而非推倒重来。
+      </p>
+      <span class="source-tag">来源：Semantic Lifting Methodology (2024) · BPMN-to-OWL Transformation</span>
+    </div>
+
+    <div class="supplement-item fade-in">
+      <h3>3. RACI 治理属性：明确所有权与责任</h3>
+      <p>
+        为每个本体论实体和属性定义治理元数据：<strong>Owner</strong>（负责人）、<strong>Steward</strong>（数据管家）、<strong>Sponsor</strong>（业务发起人）。
+        这与 Palantir 的"跨团队协作"原则形成补充——光有协作精神不够，还需要<strong>明确的问责机制</strong>。
+      </p>
+      <span class="source-tag">来源：Enterprise Ontology Governance · Essential Project · DAMA DMBOK</span>
+    </div>
+
+    <div class="supplement-item fade-in">
+      <h3>4. 实体分类框架：三种本体论实体</h3>
+      <p>
+        在设计本体论之前，<strong>先对实体进行分类</strong>，是避免模型混乱的第一道防线。
+        我们建议将所有实体归入三种类型：<strong>业务/数据实体</strong>（客观存在的"名词"——客户、产品、设备）、<strong>过程实体</strong>（业务流程中产生的"动词"——巡检、审批、预警）、<strong>结果实体</strong>（决策输出后的"产出"——报告、推荐方案、预测结果）。
+        每创建一个对象类型时，先问：它是哪类实体？如果无法清晰归类，说明领域理解还需加深。
+      </p>
+
+      <!-- Entity flow diagram -->
+      <div class="diagram-container" style="margin-top:1rem;">
+        <svg viewBox="0 0 800 160" width="100%" height="100%" style="max-width:800px;">
+          <rect x="20" y="50" width="180" height="60" class="diagram-box"/>
+          <text x="110" y="76" class="diagram-label" font-weight="700">业务/数据实体</text>
+          <text x="110" y="96" class="diagram-label" font-size="11" fill="#888">客户 · 产品 · 设备</text>
+          <line x1="200" y1="80" x2="270" y2="80" class="diagram-arrow"/>
+          <rect x="280" y="50" width="180" height="60" rx="8" fill="#FFF8E1" stroke="#FFB300" stroke-width="2"/>
+          <text x="370" y="76" class="diagram-label" font-weight="700">过程实体</text>
+          <text x="370" y="96" class="diagram-label" font-size="11" fill="#888">巡检 · 审批 · 预警</text>
+          <line x1="460" y1="80" x2="530" y2="80" class="diagram-arrow"/>
+          <rect x="540" y="50" width="180" height="60" rx="8" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/>
+          <text x="630" y="76" class="diagram-label" font-weight="700">结果实体</text>
+          <text x="630" y="96" class="diagram-label" font-size="11" fill="#888">报告 · 推荐 · 预测</text>
+          <path d="M 630 115 L 630 140 L 110 140 L 110 115" stroke="#999" stroke-width="1.5" fill="none" stroke-dasharray="6,3" marker-end="url(#arrowDown)"/>
+          <text x="370" y="152" class="diagram-label" font-size="11" fill="#999">反馈与迭代（结果实体可被下游查询或推送）</text>
+        </svg>
+      </div>
+
+      <span class="source-tag">来源：零点未来 Ontology Design Framework · 企业本体论设计实践经验</span>
+    </div>
+
+    <div class="supplement-item fade-in">
+      <h3>5. 集中式本体论，分布式填充</h3>
+      <p>
+        核心本体论（对象类型、接口、链接的定义）应<strong>集中治理</strong>以确保一致性；但数据填充和领域扩展可以由各业务域<strong>分布式</strong>负责。
+        这与 Palantir 的"对扩展开放"原则一脉相承：核心模型统一管控，扩展由各团队自主完成。
+      </p>
+      <span class="source-tag">来源：Enterprise Ontology Rollout Patterns · Essential Cloud · Knowledge Graph Community</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: NAMING & SECURITY QUICK REF ===== -->
+<section id="naming-security" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">两大基石</div>
+    <h2>命名规范与安全设计：最难修复的两件事</h2>
+
+    <div class="pattern-grid">
+      <div class="pattern-card fade-in">
+        <h3><span class="pattern-icon">🏷️</span> 命名规范</h3>
+        <p><span class="hl">不一致的命名是本体论最大的"技术债"——后期修复代价极高。</span></p>
+        <table class="comp-table" style="font-size:0.85rem;margin-top:1rem;">
+          <thead><tr><th>元素</th><th>规范</th></tr></thead>
+          <tbody>
+            <tr><td>对象类型</td><td>单数、具体名词：<code>Patient</code>、<code>WorkOrder</code></td></tr>
+            <tr><td>属性</td><td>简洁自明：<code>lastInspectionDate</code>（非 <code>dtLastInspMod</code>）</td></tr>
+            <tr><td>日期</td><td>统一后缀：<code>createdDate</code>、<code>effectiveDate</code></td></tr>
+            <tr><td>链接</td><td>双向可读：<code>department</code> ↔ <code>employees</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pattern-card fade-in">
+        <h3><span class="pattern-icon">🔐</span> 安全设计</h3>
+        <p><span class="hl">用语义化的安全策略，而非复制对象类型来实现访问控制。</span></p>
+        <table class="comp-table" style="font-size:0.85rem;margin-top:1rem;">
+          <thead><tr><th>层级</th><th>控制</th></tr></thead>
+          <tbody>
+            <tr><td>行级</td><td>VIP 患者仅高级员工可见</td></tr>
+            <tr><td>列级</td><td>临床记录仅护理团队可见</td></tr>
+            <tr><td>单元级</td><td>VIP + 临床记录 → 仅高级护理团队</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.8rem;color:#888;margin-top:0.75rem;">
+          🚫 不要为安全而复制对象类型（PublicPatient / RestrictedPatient）
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REFERENCES ===== -->
+<section id="references" class="section reveal">
+  <div class="container">
+    <div class="section-eyebrow">来源</div>
+    <h2>参考链接与数据来源</h2>
+
+    <div style="margin-top:2rem;">
+      <h3 style="font-size:1rem;color:#1565C0;margin-bottom:0.75rem;">📖 Palantir 官方文档</h3>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Ontology Best Practices</strong> — 四项核心设计原则（领域驱动设计、DRY、开闭原则、组合优于继承）</p>
+        <a href="https://www.palantir.com/docs/foundry/ontology/ontology-best-practices" target="_blank" rel="noopener" style="font-size:0.85rem;color:#1565C0;">palantir.com/docs/foundry/ontology/ontology-best-practices</a>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Ontology Structural Guidance</strong> — 规范化与派生属性、结构体、接口、链接类型、命名规范、安全设计</p>
+        <a href="https://www.palantir.com/docs/foundry/ontology/ontology-structural-guidance/" target="_blank" rel="noopener" style="font-size:0.85rem;color:#1565C0;">palantir.com/docs/foundry/ontology/ontology-structural-guidance</a>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Ontology Anti-Patterns</strong> — 八个典型反例：系统孤岛、不作筛选直接映射、部门孤岛、上帝对象、单一工具依赖、操作碎片化、版本即是对象、命名不当</p>
+        <a href="https://www.palantir.com/docs/foundry/ontology/ontology-anti-patterns/" target="_blank" rel="noopener" style="font-size:0.85rem;color:#1565C0;">palantir.com/docs/foundry/ontology/ontology-anti-patterns</a>
+      </div>
+    </div>
+
+    <div style="margin-top:2.5rem;">
+      <h3 style="font-size:1rem;color:#1565C0;margin-bottom:0.75rem;">🏭 行业实践来源</h3>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>gist Upper Ontology</strong> — Semantic Arts 开发的上层企业本体论，包含人、组织、协议、事物、时间、事件等通用概念</p>
+        <span class="source-tag">semanticarts.com/gist</span>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Semantic Lifting Methodology (2024)</strong> — BPMN 模型到 OWL 本体论的语义标注与转换方法论</p>
+        <span class="source-tag">Knowledge Engineering · BPMN-to-OWL Transformation</span>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Enterprise Ontology Governance</strong> — DAMA DMBOK、Essential Project 的企业本体论治理框架</p>
+        <span class="source-tag">DAMA International · Enterprise Architecture Community</span>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Ontology-Based Development of Industry 4.0 and 5.0 Solutions</strong> — Abonyi, Nagy, Ruppert (Springer, 2024)，知识图谱与语义建模优化复杂系统</p>
+        <span class="source-tag">Springer · 2024</span>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>W3C Semantic Web Standards</strong> — OWL、SPARQL、SHACL、R2RML 等语义网标准</p>
+        <span class="source-tag">w3.org/standards/semanticweb</span>
+      </div>
+      <div class="supplement-item">
+        <p style="margin-bottom:0.25rem;"><strong>Enterprise Ontology Rollout Patterns</strong> — 集中式治理 + 分布式填充的推行模式</p>
+        <span class="source-tag">Essential Cloud · Knowledge Graph Community</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TAKEAWAY ===== -->
+<div class="container">
+  <div class="takeaway">
+    <h2>本体论是驱动组织的软件</h2>
+    <p>
+      四项核心原则是优先级排序的指南——<span class="hl">发生冲突时，高优先级原则胜出</span>。
+      理想设计不一定能即刻实现，但命名质量、语义清晰度和安全设计<span class="hl">是后期难以修复的不变量</span>——在这些方面绝不妥协。
+    </p>
+    <p style="margin-top:1.5rem;font-size:0.95rem;color:#666;">
+      <strong>一个在实际使用中产生价值的小缺陷本体论，远胜于仍在设计中的完美理论模型。</strong>
+    </p>
+  </div>
+</div>
+
+<footer class="article-footer">
+  <div class="container">
+    <p style="font-weight:700;color:#1A1A1A;">零点未来 · 技术科普</p>
+    <p style="margin-top:0.25rem;">2026.07 · 本体论设计最佳实践</p>
+    <p style="margin-top:0.75rem;">基于 Palantir Foundry Ontology 官方文档与行业权威研究整理</p>
+  </div>
+</footer>
+
+<script src="/ontology-readings-20260930-v1/ontology-design-principles-1.js"></script>
+
+<footer class="isaac-reading-end">本文收录自本地 HTML 阅读资料，原有署名与参考资料保留在文中。<br><a href="/strategy/">返回 AI 战略认知 · 全部文章</a></footer><a class="isaac-reading-return" href="/strategy/">← AI 战略认知 · 全部文章</a></body>
+</html>

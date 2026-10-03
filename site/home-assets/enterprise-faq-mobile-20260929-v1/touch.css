@@ -1,0 +1,24 @@
+/* Mobile graph controls: preserve the existing chart and projection model. */
+.value-explorer .ve-touch-hint{display:none}
+@media(max-width:960px),(pointer:coarse){
+ .value-explorer .ve-desktop-hint{display:none}
+ .value-explorer .ve-touch-hint{display:block}
+ .value-explorer .ve-plot-tools{left:16px;right:16px;bottom:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:4px 8px}
+ .value-explorer .ve-axis-control{display:grid;grid-template-columns:repeat(2,44px);gap:0 4px;justify-content:center}
+ .value-explorer .ve-axis-control+.ve-axis-control{margin-left:0;padding-left:0}
+ .value-explorer .ve-plot-tools span{grid-column:1/-1;min-width:0;padding:0;text-align:center;line-height:20px}
+ .value-explorer .ve-plot-tools button{width:44px;min-width:44px;height:44px;min-height:44px;padding:0}
+ .value-explorer .ve-metric-values{grid-template-columns:repeat(3,minmax(0,1fr)) 44px}
+ .value-explorer .ve-metric-values .ve-wide-button{width:44px;min-width:44px;height:44px;min-height:44px;margin-top:0}
+ .value-explorer .ve-plot{padding-bottom:80px}
+ .value-explorer .ve-chart{height:calc(100% - 80px);bottom:80px}
+ .value-explorer [data-end-links]{bottom:80px}
+ .value-explorer input[type=range]{height:44px}
+ .value-explorer .ve-section-dot{min-width:44px;min-height:44px}
+}
+@media(max-width:960px){
+ .value-explorer .ve-plot,.value-explorer.is-wide .ve-plot{height:calc(clamp(350px,52dvh,540px) + 80px)}
+}
+@media(max-width:540px){
+ .value-explorer .ve-metric-values output{font-size:clamp(20px,6vw,26px)}
+}

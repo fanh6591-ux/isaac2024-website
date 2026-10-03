@@ -1,0 +1,53 @@
+.isaac-merged-page .isaac-process-visual {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 270px;
+  padding: clamp(24px, 3vw, 48px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  border: 1px solid #3166ba;
+  border-radius: 24px;
+  background: radial-gradient(circle at 85% 12%, #2e6de23d, transparent 45%),
+              linear-gradient(145deg, #101c33, #080d18);
+  color: #f7faff;
+  box-shadow: 0 28px 70px #0005;
+}
+.isaac-merged-page .process-kicker {
+  color: #84afff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+.isaac-merged-page .process-title {
+  font-size: clamp(23px, 2.4vw, 36px);
+  line-height: 1.2;
+}
+.isaac-merged-page .process-flow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.isaac-merged-page .process-flow span {
+  padding: 12px 18px;
+  border: 1px solid #ffffff4a;
+  border-radius: 12px;
+  background: #ffffff14;
+  font-size: clamp(15px, 1.3vw, 19px);
+}
+.isaac-merged-page .process-flow b {
+  color: #7ca8ff;
+  font-size: 28px;
+  font-weight: 400;
+}
+.isaac-merged-page .process-caption {
+  color: #b8cae8;
+  font-size: 15px;
+}
+@media (max-width: 760px) {
+  .isaac-merged-page .isaac-process-visual { min-height: 220px; padding: 24px; }
+  .isaac-merged-page .process-flow { gap: 8px; }
+  .isaac-merged-page .process-flow span { padding: 9px 12px; }
+}

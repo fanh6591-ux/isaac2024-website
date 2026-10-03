@@ -1,0 +1,24 @@
+.services-document .catalog-clickable {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color .16s ease, box-shadow .16s ease;
+}
+.services-document .catalog-clickable.catalog-member,
+.services-document .catalog-standalone-list > .catalog-clickable.catalog-standalone {
+  display: flex;
+}
+.services-document .catalog-clickable:hover {
+  background-color: rgba(255, 255, 255, .045);
+  box-shadow: inset 2px 0 rgba(255, 255, 255, .45);
+}
+.services-document .catalog-clickable:focus-visible {
+  outline: 1px solid #ddd;
+  outline-offset: 4px;
+  background-color: rgba(255, 255, 255, .045);
+}
+@media (prefers-reduced-motion: reduce) {
+  .services-document .catalog-clickable { transition: none; }
+}

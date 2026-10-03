@@ -1,0 +1,4 @@
+/* Keep the return control over the game; scrolling must never lift the canvas. */
+.in-game #game-mount{transform:none!important;transition:none!important}
+.game-return-dock{padding:0!important;background:none!important;border-radius:0;transform:translateX(-50%);bottom:max(24px,env(safe-area-inset-bottom))}
+.game-return-dock>p{display:none!important}

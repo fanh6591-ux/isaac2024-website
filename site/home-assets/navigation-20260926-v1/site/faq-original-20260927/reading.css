@@ -1,0 +1,25 @@
+@font-face{font-family:'Isaac FAQ Han';src:url('./fonts/noto-sans-sc.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Isaac FAQ Song';src:url('./fonts/noto-serif-sc.woff2') format('woff2');font-weight:200 900;font-display:swap}
+.faq-document{width:min(100% - 96px,820px);margin:0 auto;padding:150px 0 100px;color:#fff;font-family:'Isaac Editorial Sans','Isaac FAQ Han','PingFang SC',sans-serif}
+.faq-document-heading{margin:0 0 64px}
+.faq-document h1{font-family:'Isaac Editorial Serif','Isaac FAQ Song',serif;font-size:clamp(36px,4.5vw,60px);font-weight:400;line-height:1.4;letter-spacing:-.025em;margin:0}
+.faq-answer{border-top:1px solid #343434;padding:40px 0 64px;scroll-margin-top:110px}
+.faq-answer:last-child{padding-bottom:0}
+.faq-document h2{font-family:'Isaac Editorial Serif','Isaac FAQ Song',serif;font-size:32px;font-weight:500;line-height:1.6;letter-spacing:-.015em;margin:0 0 32px;text-wrap:pretty}
+.faq-document h3{font-size:20px;line-height:1.8;font-weight:500;margin:40px 0 20px}
+.faq-document p,.faq-document li{font-size:17px;font-weight:400;line-height:2;color:#e7e7e7;overflow-wrap:break-word}
+.faq-document p{margin:0 0 20px}
+.faq-document ul{margin:22px 0 28px;padding:0 0 0 1.4em;list-style:disc}
+.faq-document li{padding-left:.3em;margin:0 0 14px}
+.faq-document li::marker{color:#bdbdbd}
+@media(max-width:760px){
+ .faq-document{width:calc(100% - 40px);padding:114px 0 64px}
+ .faq-document-heading{margin-bottom:38px}
+ .faq-document h1{font-size:clamp(28px,7.4vw,42px);letter-spacing:-.025em}
+ .faq-answer{padding:28px 0 44px;scroll-margin-top:90px}
+ .faq-document h2{font-size:24px;line-height:1.65;margin-bottom:24px}
+ .faq-document h3{font-size:18px;margin:32px 0 16px}
+ .faq-document p,.faq-document li{font-size:16px;line-height:1.95}
+ .faq-document p{margin-bottom:18px}
+ .faq-document ul{padding-left:1.2em}
+}

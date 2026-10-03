@@ -1,0 +1,24 @@
+html:has(body.is-loading){overflow:hidden;scroll-behavior:auto}
+body.is-loading{position:fixed;inset:0;overflow:hidden;overscroll-behavior:none}
+.entry-gate{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#0b0e0c;color:#d4d5c7;padding:24px;box-sizing:border-box;font-family:'Isaac Sans','PingFang SC',sans-serif}
+.entry-gate[hidden],.entry-gate [hidden]{display:none!important}
+.entry-card{text-align:center}
+.scene-loading{display:block;width:25px;height:25px;border:1.5px solid #f0e8d426;border-top-color:#e8dfc8;border-radius:50%;animation:entry-orbit 1.2s linear infinite}
+.entry-spinner{display:block;width:58px;height:58px;margin:0 auto;overflow:visible;transform:rotate(-90deg);animation:entry-orbit 2.8s linear infinite}
+.entry-ring-track,.entry-ring-progress{fill:none;stroke-width:1.35}
+.entry-ring-track{stroke:#f0e8d421}
+.entry-ring-progress{stroke:#e8dfc8;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 * (1 - var(--entry-progress,.08)));transition:stroke-dashoffset .35s ease}
+.entry-gate[data-state="closing"] .entry-spinner{animation-play-state:paused}
+.entry-gate[data-state="closing"]{opacity:0;transition:opacity .30s ease .32s}
+.entry-gate[data-state="closing"] .entry-ring-progress{stroke-dashoffset:0}
+.entry-card [data-entry-title]{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.entry-card [data-entry-title]{font-size:12px;font-weight:400;letter-spacing:.13em;margin:0}
+.entry-detail{font-size:12px;line-height:1.7;color:#9ca99f;margin:18px 0 0}
+.entry-secondary{font:inherit;font-size:12px;border:0;background:none;color:#d2d7c7;text-decoration:underline;text-underline-offset:4px;padding:12px;cursor:pointer}
+.entry-secondary:focus-visible{outline:1px solid #e8dfc8;outline-offset:3px}
+.scene-loading{position:fixed;right:26px;bottom:26px;z-index:15;width:18px;height:18px;pointer-events:none}
+.scene-loading[hidden]{display:none}
+@keyframes entry-orbit{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.scene-loading{animation:none;border-top-color:#e8dfc8;border-right-color:#e8dfc8}}
+
+@media(prefers-reduced-motion:reduce){.entry-spinner{animation:none}.entry-gate[data-state="closing"]{transition:none}}

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用 LLM 构建 Ontology：五种方法流派详解</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--text:#1a1a1a;--text-light:#4a5568;--text-muted:#718096;
+  --accent:#1a56db;--accent-light:#e8f0fe;--border:#e2e8f0;--border-strong:#cbd5e0;
+  --card:#f8fafc;--ok:#059669;--warn:#d97706;--err:#dc2626;
+  --ma:#1d4ed8;--mb:#7c3aed;--mc:#0891b2;--md:#059669;--me:#d97706;
+}
+html{scroll-behavior:smooth}
+body{font-family:"Microsoft YaHei","微软雅黑","PingFang SC","苹方",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.8;font-size:16px}
+
+/* ── Typography ── */
+h1,h2,h3,h4{font-weight:700;line-height:1.3;color:var(--text)}
+h1{font-size:2.6rem;letter-spacing:-.02em}
+h2{font-size:1.7rem;margin-bottom:1.25rem}
+h3{font-size:1.15rem;margin-bottom:.75rem;margin-top:1.5rem}
+p{margin-bottom:.9rem}
+
+/* ── Layout ── */
+.container{max-width:900px;margin:0 auto;padding:0 24px}
+section{padding:56px 0;border-bottom:1px solid var(--border)}
+
+/* ── Nav ── */
+nav{position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);z-index:50;padding:12px 0}
+.nav-inner{max-width:900px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.05em}
+.nav-links{display:flex;gap:18px;list-style:none}
+.nav-links a{font-size:13px;color:var(--text-light);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--accent)}
+
+/* ── Hero ── */
+.hero{padding:72px 0 56px;border-bottom:1px solid var(--border)}
+.hero-label{display:inline-block;background:var(--accent-light);color:var(--accent);
+  font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 12px;
+  border-radius:100px;margin-bottom:20px;text-transform:uppercase}
+.hero h1{margin-bottom:18px}
+.hero-sub{font-size:1.1rem;color:var(--text-light);max-width:620px;margin-bottom:28px}
+.hero-meta{display:flex;gap:20px;font-size:13px;color:var(--text-muted)}
+.hero-meta span{display:flex;align-items:center;gap:6px}
+.hero-meta span::before{content:"·";color:var(--accent);font-size:18px}
+
+/* ── Tooltips ── */
+.term{color:var(--accent);border-bottom:1px dashed var(--accent);cursor:help;font-weight:600}
+#tip{position:fixed;background:#0f172a;color:#f1f5f9;padding:9px 15px;border-radius:8px;
+  font-size:13px;line-height:1.6;max-width:280px;pointer-events:none;z-index:9999;
+  opacity:0;transition:opacity .15s;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+#tip.on{opacity:1}
+
+/* ── Section label ── */
+.slabel{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--text-muted);
+  text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Callout ── */
+.callout{background:var(--accent-light);border:1px solid #bfdbfe;border-radius:10px;
+  padding:18px 22px;margin:22px 0;font-size:15px;line-height:1.7}
+.callout strong{color:var(--accent)}
+
+/* ── 2-col grid ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+
+/* ── Story cards ── */
+.story-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:26px}
+.story-card .snum{font-size:11px;font-weight:700;color:var(--accent);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.story-card p{font-size:14px;color:var(--text-light);margin-bottom:0}
+.story-card p+p{margin-top:.5rem}
+
+/* ── Challenge items ── */
+.ch-item{display:flex;gap:14px;padding:18px;border:1px solid var(--border);
+  border-radius:10px;background:var(--card)}
+.ch-icon{width:40px;height:40px;border-radius:8px;background:var(--accent-light);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ch-text h4{font-size:14px;margin-bottom:4px}
+.ch-text p{font-size:13px;color:var(--text-light);margin:0}
+
+/* ── Method section ── */
+.method-wrap{padding:40px 0}
+.method-wrap+.method-wrap{border-top:2px solid var(--border)}
+.method-header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.mbadge{width:48px;height:48px;border-radius:12px;font-weight:700;font-size:18px;
+  color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mbadge.a{background:var(--ma)} .mbadge.b{background:var(--mb)}
+.mbadge.c{background:var(--mc)} .mbadge.d{background:var(--md)} .mbadge.e{background:var(--me)}
+.method-header h2{margin-bottom:3px}
+.method-header .tag{font-size:13px;color:var(--text-muted)}
+.meta-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.mt{font-size:12px;padding:3px 11px;border-radius:100px;border:1px solid var(--border-strong);color:var(--text-light)}
+.mt.lo{border-color:#86efac;color:var(--ok);background:#f0fdf4}
+.mt.md{border-color:#fcd34d;color:var(--warn);background:#fffbeb}
+.mt.hi{border-color:#fca5a5;color:var(--err);background:#fef2f2}
+
+/* ── Method nav pills ── */
+.mnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.mpill{padding:7px 16px;border-radius:100px;font-size:13px;font-weight:600;
+  text-decoration:none;border:2px solid;transition:all .18s}
+.mpill.a{color:var(--ma);border-color:var(--ma)} .mpill.a:hover{background:var(--ma);color:#fff}
+.mpill.b{color:var(--mb);border-color:var(--mb)} .mpill.b:hover{background:var(--mb);color:#fff}
+.mpill.c{color:var(--mc);border-color:var(--mc)} .mpill.c:hover{background:var(--mc);color:#fff}
+.mpill.d{color:var(--md);border-color:var(--md)} .mpill.d:hover{background:var(--md);color:#fff}
+.mpill.e{color:var(--me);border-color:var(--me)} .mpill.e:hover{background:var(--me);color:#fff}
+
+/* ── Flow diagrams ── */
+.flow{overflow-x:auto;margin:20px 0;padding:4px 0}
+.flow-row{display:flex;align-items:center;gap:0;min-width:max-content}
+.fstep{display:flex;flex-direction:column;align-items:center;gap:5px}
+.fbox{padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;
+  text-align:center;min-width:84px;border:2px solid;background:#fff;line-height:1.3}
+.fbox.hl{background:var(--accent-light) !important}
+.flabel{font-size:11px;color:var(--text-muted);font-weight:600}
+.farr{font-size:20px;padding:0 6px;align-self:center;margin-bottom:18px;flex-shrink:0}
+
+/* color variants */
+.ca .fbox{border-color:var(--ma);color:var(--ma)} .ca .farr{color:var(--ma)}
+.cb .fbox{border-color:var(--mb);color:var(--mb)} .cb .farr{color:var(--mb)}
+.cc .fbox{border-color:var(--mc);color:var(--mc)} .cc .farr{color:var(--mc)}
+.cd .fbox{border-color:var(--md);color:var(--md)} .cd .farr{color:var(--md)}
+.ce .fbox{border-color:var(--me);color:var(--me)} .ce .farr{color:var(--me)}
+
+/* ── Pros/cons ── */
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+.pros,.cons{padding:16px 18px;border-radius:8px;font-size:14px}
+.pros{background:#f0fdf4;border:1px solid #86efac}
+.cons{background:#fef2f2;border:1px solid #fca5a5}
+.pros h4{color:var(--ok);font-size:13px;margin-bottom:7px}
+.cons h4{color:var(--err);font-size:13px;margin-bottom:7px}
+.pros ul,.cons ul{list-style:none;padding:0}
+.pros li::before{content:"✓ ";color:var(--ok)}
+.cons li::before{content:"✗ ";color:var(--err)}
+.pros li,.cons li{margin-bottom:5px;line-height:1.5}
+
+/* ── Compare boxes ── */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.cmp-bad,.cmp-ok{padding:14px 18px;border-radius:8px;font-size:14px;line-height:1.6}
+.cmp-bad{background:#fef2f2;border-left:3px solid var(--err)}
+.cmp-ok{background:#f0fdf4;border-left:3px solid var(--ok)}
+.cmp-bad .lb{color:var(--err);font-weight:700;font-size:12px;margin-bottom:6px}
+.cmp-ok .lb{color:var(--ok);font-weight:700;font-size:12px;margin-bottom:6px}
+
+/* ── Case study ── */
+.cs{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:8px;padding:18px 22px;margin:18px 0}
+.cs-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:7px}
+.cs h4{font-size:15px;margin-bottom:7px}
+.cs p{font-size:14px;color:var(--text-light);margin:0}
+
+/* ── HT-R-O timeline ── */
+.htr{display:flex;flex-direction:column;margin:18px 0}
+.htr-step{display:flex;gap:14px;align-items:flex-start}
+.htr-left{display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.htr-dot{width:12px;height:12px;border-radius:50%;background:var(--mb);flex-shrink:0}
+.htr-line{width:2px;flex:1;background:var(--mb);opacity:.25;min-height:36px;margin:3px 0}
+.htr-body{padding-bottom:18px}
+.htr-step-lbl{font-size:11px;font-weight:700;color:var(--mb);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:3px}
+.htr-step-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.htr-ex{font-size:13px;color:var(--text-muted);background:var(--card);
+  padding:7px 12px;border-radius:6px;border:1px solid var(--border);
+  font-family:"Courier New",monospace;line-height:1.7}
+
+/* ── Validation branch ── */
+.vbranch{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.vpass,.vfail{padding:10px 14px;border-radius:8px;font-size:14px}
+.vpass{background:#f0fdf4;border:1px solid #86efac}
+.vfail{background:#fef2f2;border:1px solid #fca5a5}
+.vpass .lb{color:var(--ok);font-weight:700;font-size:12px;margin-bottom:3px}
+.vfail .lb{color:var(--err);font-weight:700;font-size:12px;margin-bottom:3px}
+
+/* ── Comparison table ── */
+.ctable{width:100%;border-collapse:collapse;font-size:14px;margin-top:22px}
+.ctable th{background:#0f172a;color:#fff;padding:11px 14px;text-align:left;font-size:13px;font-weight:600}
+.ctable th:first-child{border-radius:8px 0 0 0} .ctable th:last-child{border-radius:0 8px 0 0}
+.ctable td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ctable tr:nth-child(even) td{background:var(--card)}
+.ctable tr:hover td{background:var(--accent-light)}
+.rdot{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600}
+.rdot::before{content:'';width:8px;height:8px;border-radius:50%;display:inline-block}
+.rdot.lo::before{background:var(--ok)} .rdot.lo{color:var(--ok)}
+.rdot.md::before{background:var(--warn)} .rdot.md{color:var(--warn)}
+.rdot.hi::before{background:var(--err)} .rdot.hi{color:var(--err)}
+.cbar{display:flex;gap:3px}
+.cbar span{width:18px;height:6px;border-radius:3px;background:var(--border-strong)}
+.cbar.lo span:nth-child(1){background:var(--ok)}
+.cbar.md span:nth-child(-n+2){background:var(--warn)}
+.cbar.hi span{background:var(--err)}
+
+/* ── Decision items ── */
+.dec-list{display:flex;flex-direction:column;gap:10px}
+.dec-item{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;
+  padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.dec-q{font-size:14px;font-weight:600}
+.dec-arr{color:var(--text-muted);font-size:18px}
+.dec-ans{display:flex;align-items:center;gap:10px}
+.dec-badge{padding:4px 12px;border-radius:100px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+
+/* ── Lesson cards ── */
+.lesson-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.lesson-card{padding:22px;border:1px solid var(--border);border-radius:12px;background:var(--card)}
+.lesson-num{font-size:34px;font-weight:700;color:var(--border-strong);line-height:1;margin-bottom:10px}
+.lesson-card h4{font-size:15px;margin-bottom:7px}
+.lesson-card p{font-size:14px;color:var(--text-light);margin:0}
+
+/* ── Trends ── */
+.trend-list{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+.trend-item{display:flex;gap:14px;padding:18px;border:1px solid var(--border);border-radius:10px}
+.trend-icon{width:44px;height:44px;border-radius:10px;background:var(--accent-light);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.trend-item h4{font-size:15px;margin-bottom:5px}
+.trend-item p{font-size:14px;color:var(--text-light);margin:0}
+
+/* ── Glossary ── */
+.glos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.g-item{display:flex;gap:10px;padding:11px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px}
+.g-term{font-weight:700;color:var(--accent);min-width:72px;flex-shrink:0}
+.g-def{color:var(--text-light)}
+
+/* ── Code block ── */
+.code-block{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:18px 20px;font-family:"Courier New",monospace;font-size:13px;line-height:1.8;margin:16px 0}
+
+/* ── Footer ── */
+footer{padding:36px 0;text-align:center;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border)}
+
+/* ── Responsive ── */
+@media(max-width:680px){
+  .grid2,.pc,.cmp,.glos,.lesson-grid,.vbranch{grid-template-columns:1fr}
+  h1{font-size:1.8rem} h2{font-size:1.3rem}
+  .nav-links{display:none}
+  .dec-item{grid-template-columns:1fr;gap:6px}
+  .dec-arr{display:none}
+}
+</style>
+<meta name="description" content="从构建难点到五种方法，比较 LLM 参与本体构建的路径与适用条件。"><link rel="canonical" href="https://isaac2024.online/strategy/llm-ontology-methods/"><link rel="stylesheet" href="/ontology-readings-20260930-v1/reading.css"></head>
+<body>
+
+<div id="tip"></div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">零点未来 · 技术科普</span>
+    <ul class="nav-links">
+      <li><a href="#why">为什么需要</a></li>
+      <li><a href="#challenge">四道坎</a></li>
+      <li><a href="#methods">五种流派</a></li>
+      <li><a href="#compare">横向对比</a></li>
+      <li><a href="#choose">怎么选</a></li>
+      <li><a href="#lessons">实战经验</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<div class="container">
+  <div class="hero">
+    <div class="hero-label">AI 知识工程 · 技术指南</div>
+    <h1>用 LLM 构建 Ontology<br>五种方法流派详解</h1>
+    <p class="hero-sub">从"把文档直接扔给 AI"到"建一张 AI 能理解的世界地图"——本文带你看懂 2025–2026 年学术界和工业界探索出的五条路。</p>
+    <div class="hero-meta">
+      <span>阅读约 15 分钟</span>
+      <span>适合 AI 工程师 / 技术爱好者</span>
+      <span>2026 年 5 月</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── WHY ─── -->
+<div class="container" id="why">
+  <section>
+    <div class="slabel">背景理解</div>
+    <h2>先搞清楚：Ontology 是什么，为什么重要？</h2>
+
+    <p><span class="term" data-tip="Ontology（本体）：对某个领域的概念、关系、规则的形式化描述，相当于一张「知识地图」。它告诉计算机：这个世界里有什么，它们之间是什么关系。">Ontology（本体）</span>是一张"知识地图"——它不只存储信息，还定义信息之间的<strong>关系和规则</strong>。用一个场景感受它的价值：</p>
+
+    <div class="grid2" style="margin-bottom:22px">
+      <div class="story-card">
+        <div class="snum">没有 Ontology 的情况</div>
+        <h3 style="margin-top:0">把文档直接扔给 LLM</h3>
+        <p style="font-style:italic;color:var(--text-muted)">"供应商 A 的评分是多少？"</p>
+        <p>LLM 今天说 85，明天说 92，后天说 78。每次都在猜——因为它没有真正理解"供应商""评分""日期"之间的关系。</p>
+      </div>
+      <div class="story-card" style="border-color:#86efac">
+        <div class="snum" style="color:var(--ok)">有了 Ontology 的情况</div>
+        <h3 style="margin-top:0">先建知识地图，再让 LLM 用</h3>
+        <p>你定义好：供应商有名称、评分、地区；材料有库存量、安全阈值；供应商和材料是"供应"关系。</p>
+        <p>LLM 直接从图里查，不再猜。还能推理出"这个材料缺货会影响哪条产线"。</p>
+      </div>
+    </div>
+
+    <div class="callout"><strong>核心价值：</strong>Ontology 把"世界"翻译成 LLM 能理解的结构化地图。有了它，AI 从"随机猜测"变成"有据可查"。</div>
+
+    <h3>传统建 Ontology 的三大矛盾</h3>
+    <p>在 <span class="term" data-tip="LLM（Large Language Model）：大语言模型，如 GPT-4、Claude、LLaMA——能理解和生成人类语言的 AI 模型。">LLM</span> 出现之前，建 Ontology 基本是：知识工程师 + 领域专家坐在一起，花几个月画白板、争论、修改。有三个根本矛盾：</p>
+    <div class="grid2">
+      <div class="ch-item"><div class="ch-icon">⏱️</div>
+        <div class="ch-text"><h4>速度矛盾</h4><p>手工建模太慢，跟不上业务变化。等建完了，业务已经变了。</p></div>
+      </div>
+      <div class="ch-item"><div class="ch-icon">🧑‍💻</div>
+        <div class="ch-text"><h4>人才矛盾</h4><p>既懂 <span class="term" data-tip="OWL（Web Ontology Language）：W3C 标准的本体描述语言，用逻辑形式定义概念和关系的约束。">OWL</span>/<span class="term" data-tip="SHACL（Shapes Constraint Language）：W3C 标准的数据验证语言，用来检查图数据是否符合预设规则，比如「每个订单必须有客户 ID」。">SHACL</span> 又懂具体业务的人极少。</p></div>
+      </div>
+      <div class="ch-item"><div class="ch-icon">📦</div>
+        <div class="ch-text"><h4>维护矛盾</h4><p>建完就没人维护，慢慢变成"死模型"，无法跟随业务演化。</p></div>
+      </div>
+      <div class="ch-item"><div class="ch-icon">📊</div>
+        <div class="ch-text"><h4>规模矛盾</h4><p>手工方式无法处理大量文档，文档规模一上去就崩溃。</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ─── CHALLENGE ─── -->
+<div class="container" id="challenge">
+  <section>
+    <div class="slabel">问题拆解</div>
+    <h2>LLM 来了——但面临四道"坎"</h2>
+
+    <p>LLM 恰好具备三项能力：从非结构化文本提取结构化信息、理解领域语义、生成 <span class="term" data-tip="JSON（JavaScript Object Notation）：一种轻量级的数据交换格式，人和机器都容易读写，常用于 API 和配置文件。">JSON</span>/<span class="term" data-tip="OWL（Web Ontology Language）：W3C 标准的本体描述语言。">OWL</span> 等标准格式。但用 LLM 建 Ontology 绕不开四道坎：</p>
+
+    <div class="grid2" style="margin-top:20px">
+      <div class="ch-item"><div class="ch-icon" style="background:#fef2f2">❓</div>
+        <div class="ch-text"><h4>坎一：不知道有多少类型</h4><p>建一个领域的 Ontology 前，你根本不知道里面有多少种"东西"——10 种还是 1000 种？</p></div>
+      </div>
+      <div class="ch-item"><div class="ch-icon" style="background:#fef2f2">🎭</div>
+        <div class="ch-text"><h4>坎二：LLM 会"幻觉"</h4><p>LLM 可能创造出原文没有的概念或关系，把幻想当成事实输出。</p></div>
+      </div>
+      <div class="ch-item"><div class="ch-icon" style="background:#fef2f2">🔍</div>
+        <div class="ch-text"><h4>坎三：粒度难控制</h4><p>"有关系"太笼统，"在左边/右边"又太细——什么粒度才合适？</p></div>
+      </div>
+      <div class="ch-item"><div class="ch-icon" style="background:#fef2f2">✅</div>
+        <div class="ch-text"><h4>坎四：怎么验证对错</h4><p>Ontology 没有"标准答案"，怎么知道 LLM 建得好不好？</p></div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:28px">过去两年（2025–2026），学术界和工业界围绕这四道坎，发展出了 <strong>五种不同的应对方法</strong>。</div>
+  </section>
+</div>
+
+<!-- ─── METHODS ─── -->
+<div class="container" id="methods">
+  <section>
+    <div class="slabel">方法流派</div>
+    <h2>五种流派：不同性格的人面对同一道题</h2>
+
+    <div class="mnav">
+      <a href="#ma" class="mpill a">A · 拆解派</a>
+      <a href="#mb" class="mpill b">B · 聚类派</a>
+      <a href="#mc" class="mpill c">C · 两步走派</a>
+      <a href="#md" class="mpill d">D · 框架派</a>
+      <a href="#me" class="mpill e">E · 直给派</a>
+    </div>
+
+    <!-- ── Method A ── -->
+    <div class="method-wrap ca" id="ma">
+      <div class="method-header">
+        <div class="mbadge a">A</div>
+        <div><h2 style="margin-bottom:3px">拆解派：流水线分解法</h2>
+          <div class="tag">大任务拆成小任务，每一步用最合适的工具</div></div>
+      </div>
+      <div class="meta-tags">
+        <span class="mt lo">幻觉风险 · 低</span>
+        <span class="mt" style="border-color:#93c5fd;color:var(--ma);background:#eff6ff">工程复杂度 · 高</span>
+        <span class="mt">Salovsky · IRT SystemX · Wikontic</span>
+      </div>
+
+      <p>好比做一道复杂的菜：<strong>先洗菜、再切菜、再炒菜、最后装盘</strong>。每一步清晰可控，出了问题知道在哪里修。</p>
+
+      <h3>标准五步流水线</h3>
+      <div class="flow ca">
+        <div class="flow-row">
+          <div class="fstep"><div class="fbox">文档输入</div><div class="flabel">起点</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">① 提取实体<br><small style="font-weight:400;font-size:11px">NER</small></div><div class="flabel">最关键</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">② 提取关系</div><div class="flabel">最难</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">③ 合并归一</div><div class="flabel">去重</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox hl">④ 双重验证</div><div class="flabel">核心亮点</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">⑤ 存入图谱</div><div class="flabel">终点</div></div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--text-light)">① 从文档中找出名词实体 &nbsp;② 判断名词间的关系 &nbsp;③ 将"供应商 A"和"Supplier A"合为同一实体 &nbsp;④ 检查结构合规性 + 逻辑一致性</p>
+
+      <h3>核心亮点：验证闭环</h3>
+      <p>每个新事实先通过双重检查，才能进入可信图谱：</p>
+      <div class="vbranch">
+        <div class="vpass"><div class="lb">✓ 通过验证</div>写入可信图谱，永久保存</div>
+        <div class="vfail"><div class="lb">✗ 未通过验证</div>留在日志，不进图谱</div>
+      </div>
+      <p style="font-size:14px">验证分两层：<span class="term" data-tip="SHACL：检查数据结构是否合规——如「一个订单必须有客户 ID，且 ID 必须是整数」。">SHACL</span>（结构验证） + <span class="term" data-tip="OWL Reasoner（推理引擎）：自动检查 Ontology 里是否有逻辑矛盾的软件，如 Pellet、HermiT。一个概念不能同时是另一个概念的父类和子类。">OWL Reasoner</span>（逻辑验证）。两层都通过才算可信。</p>
+
+      <div class="cs">
+        <div class="cs-lbl">工业实战案例</div>
+        <h4>IRT SystemX × 法国电力 EDF（2025）</h4>
+        <p>从法语技术文档半自动构建 Ontology。亮点是<strong>版本管理</strong>：每个 Ontology 版本有 5 种状态（已填充 → 已丰富 → 已评估 → 已使用 → 已归档），变更全程追踪。<span class="term" data-tip="FAIR：Findable（可发现）、Accessible（可访问）、Interoperable（可互操作）、Reusable（可复用）——衡量数据/本体质量的四项原则。">FAIR</span> 评分从 V1.1 的 22.5% 提升到 V1.3 的 36.11%。</p>
+      </div>
+
+      <div class="cs">
+        <div class="cs-lbl">轻量级案例</div>
+        <h4>Wikontic（2025）——不到 1000 个 Token 建完整知识图谱</h4>
+        <p>用 <span class="term" data-tip="Wikidata：维基百科背后的结构化知识库，包含数亿条实体和关系，由维基媒体基金会维护，免费开放使用。">Wikidata</span> 作为"骨架"约束 LLM 输出，<span class="term" data-tip="Token：LLM 处理文本的最小单位，大约是 0.75 个英文单词或 0.5 个汉字。Token 消耗量直接影响 API 调用成本。">Token</span> 消耗仅为 <span class="term" data-tip="GraphRAG（Graph-based Retrieval-Augmented Generation）：在传统 RAG 基础上加入图结构，不止搜片段，还能理解实体之间的关系网络。">GraphRAG</span> 的二十分之一。MuSiQue 基准上 96% 三元组包含正确答案实体。</p>
+      </div>
+
+      <div class="pc">
+        <div class="pros"><h4>优点</h4><ul>
+          <li>每步可控、可插拔、可验证</li>
+          <li>幻觉风险最低</li>
+          <li>可加版本管理，支持持续更新</li>
+        </ul></div>
+        <div class="cons"><h4>缺点</h4><ul>
+          <li>前一步误差会传到后一步</li>
+          <li>工程复杂度高，搭建成本大</li>
+          <li>多步调用 LLM，Token 消耗多</li>
+        </ul></div>
+      </div>
+      <p><strong>适合：</strong>对质量要求高的生产系统。</p>
+    </div>
+
+    <!-- ── Method B ── -->
+    <div class="method-wrap cb" id="mb">
+      <div class="method-header">
+        <div class="mbadge b">B</div>
+        <div><h2 style="margin-bottom:3px">聚类派：聚类驱动法</h2>
+          <div class="tag">先自动发现有哪些类型，再让 LLM 给每类命名</div></div>
+      </div>
+      <div class="meta-tags">
+        <span class="mt lo">幻觉风险 · 低</span>
+        <span class="mt">工程复杂度 · 中</span>
+        <span class="mt">LLM4Onto 2025</span>
+      </div>
+
+      <p>好比整理一堆混杂的乐高积木：<strong>先把颜色相近的放一起（聚类），再给每组贴标签</strong>（"这些是红色的轮子""这些是蓝色的窗户"）。不用事先知道有多少种积木，让数据自己说话。</p>
+
+      <h3>核心流程</h3>
+      <div class="flow cb">
+        <div class="flow-row">
+          <div class="fstep"><div class="fbox">文档</div><div class="flabel">输入</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">提取名词</div><div class="flabel">SpaCy</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">向量化</div><div class="flabel">BERT</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox hl">AP 聚类</div><div class="flabel">自动分组</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">LLM 命名</div><div class="flabel">多轮合并</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">Ontology</div><div class="flabel">输出</div></div>
+        </div>
+      </div>
+
+      <h3>为什么用 AP 聚类，不用 K-means？</h3>
+      <div class="cmp">
+        <div class="cmp-bad"><div class="lb">✗ K-means 的问题</div>需要事先告诉它"分几类"——但建 Ontology 时你恰恰不知道有多少类。</div>
+        <div class="cmp-ok"><div class="lb">✓ AP 聚类的优势</div><span class="term" data-tip="AP 聚类（Affinity Propagation）：一种不需要预设类别数量的聚类算法，自动根据数据点之间的相似度决定分多少组。">AP 聚类</span>不需要预设数量，自己看数据相似度决定分多少组。如果分得太细，LLM 会通过多轮对话把相近的簇合并。</div>
+      </div>
+
+      <h3>核心创新：HT-R-O 三步关系提取法</h3>
+      <p>关系提取是 Ontology 建设中最难的部分。LLM4Onto 把它拆成三步，每步基于原文，幻觉逐步降低：</p>
+
+      <div class="htr">
+        <div class="htr-step">
+          <div class="htr-left"><div class="htr-dot"></div><div class="htr-line"></div></div>
+          <div class="htr-body">
+            <div class="htr-step-lbl">第一步 · 实例级提取</div>
+            <div class="htr-step-title">从原文中提取实例级关系</div>
+            <div class="htr-ex">输入: "HoneyMyte 组织使用 ToneShell 后门"<br>输出: (HoneyMyte, <strong>use</strong>, ToneShell 后门)</div>
+          </div>
+        </div>
+        <div class="htr-step">
+          <div class="htr-left"><div class="htr-dot"></div><div class="htr-line"></div></div>
+          <div class="htr-body">
+            <div class="htr-step-lbl">第二步 · 本体级抽象</div>
+            <div class="htr-step-title">将实例关系上升为本体级关系</div>
+            <div class="htr-ex">输出: (APT 组织, <strong>use</strong>, 恶意软件)</div>
+          </div>
+        </div>
+        <div class="htr-step">
+          <div class="htr-left"><div class="htr-dot"></div></div>
+          <div class="htr-body">
+            <div class="htr-step-lbl">第三步 · 关系标准化</div>
+            <div class="htr-step-title">统一不同表达方式的关系名称</div>
+            <div class="htr-ex">"use" / "employ" / "leverage" → 统一为 <strong>"use"</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--text-light)">实验结果：网络安全领域自动发现 <strong>483 种实体类型 + 72 种关系类型</strong>（传统 NER 模型只能识别 13–40 种）。</p>
+
+      <div class="pc">
+        <div class="pros"><h4>优点</h4><ul>
+          <li>真正数据驱动，不需要人工标注</li>
+          <li>不需要提前知道有哪些类型</li>
+          <li>拆解为小任务，幻觉风险低</li>
+        </ul></div>
+        <div class="cons"><h4>缺点</h4><ul>
+          <li>聚类质量直接影响最终结果</li>
+          <li>没有内建的在线验证机制</li>
+          <li>开放域场景粒度可能过细</li>
+        </ul></div>
+      </div>
+      <p><strong>适合：</strong>探索新领域、不知道有什么类型的场景。</p>
+    </div>
+
+    <!-- ── Method C ── -->
+    <div class="method-wrap cc" id="mc">
+      <div class="method-header">
+        <div class="mbadge c">C</div>
+        <div><h2 style="margin-bottom:3px">两步走派：两阶段生成法</h2>
+          <div class="tag">先收集素材，再整理成有层次的结构</div></div>
+      </div>
+      <div class="meta-tags">
+        <span class="mt md">幻觉风险 · 中</span>
+        <span class="mt">工程复杂度 · 中</span>
+        <span class="mt">OntoEKG 2026 · NeOn-GPT</span>
+      </div>
+
+      <p>好比写论文：<strong>先列出一堆想写的点（素材收集），再把这些点组织成章节结构（层次整理）</strong>。两步分开，中间产物可以检查和修改。</p>
+
+      <h3>核心流程</h3>
+      <div class="flow cc">
+        <div class="flow-row">
+          <div class="fstep"><div class="fbox">非结构化<br>文档</div><div class="flabel">输入</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox hl">阶段一<br>提取模块</div><div class="flabel">识别类和属性</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox hl">阶段二<br>蕴含模块</div><div class="flabel">组织为层次</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox"><span class="term" data-tip="RDF（Resource Description Framework）：W3C 标准的数据模型，用「主语-谓语-宾语」三元组描述知识，是知识图谱的基础格式。">RDF</span> 序列化</div><div class="flabel">输出</div></div>
+        </div>
+      </div>
+
+      <p style="font-size:14px">阶段一负责"发现"——从企业文档中找出核心类和属性；阶段二负责"组织"——把扁平的概念列表整理成有上下级关系的层次树。中间产物可以人工审查。</p>
+
+      <div class="cs">
+        <div class="cs-lbl">代表论文</div>
+        <h4>OntoEKG（ICSC 2026）</h4>
+        <p>在"Data"领域评测中，Fuzzy-match F1 值达到 0.724。局限在于层次推理能力有限——当概念层级很复杂时，模型倾向于把东西铺平而非做好层次归类。</p>
+      </div>
+
+      <div class="pc">
+        <div class="pros"><h4>优点</h4><ul>
+          <li>结构清晰，中间产物可审查</li>
+          <li>快速构建初版 Ontology</li>
+          <li>工程复杂度中等，容易上手</li>
+        </ul></div>
+        <div class="cons"><h4>缺点</h4><ul>
+          <li>两阶段误差叠加</li>
+          <li>层次推理质量依赖 LLM 能力</li>
+          <li>没有内建的验证机制</li>
+        </ul></div>
+      </div>
+      <p><strong>适合：</strong>快速构建初版 Ontology 做验证、需要看清楚中间状态的场景。</p>
+    </div>
+
+    <!-- ── Method D ── -->
+    <div class="method-wrap cd" id="md">
+      <div class="method-header">
+        <div class="mbadge d">D</div>
+        <div><h2 style="margin-bottom:3px">框架派：Schema-Guided 提取法</h2>
+          <div class="tag">先画好框，让 LLM 在框框内提取</div></div>
+      </div>
+      <div class="meta-tags">
+        <span class="mt lo">幻觉风险 · 低</span>
+        <span class="mt">工程复杂度 · 中</span>
+        <span class="mt">OntoKG 2026 · Wikontic 2025</span>
+      </div>
+
+      <p>好比做选择题而不是问答题——<strong>不让 LLM 自由发挥"这是什么关系"，而是让它从给定列表中选</strong>："这个关系是'属于''位于''导致'中的哪一个？" 选择空间被压缩，幻觉空间自然变小。</p>
+
+      <h3>Schema 的两种范式</h3>
+      <div class="cmp">
+        <div class="cmp-bad" style="background:#fffbeb;border-left-color:var(--warn)">
+          <div class="lb" style="color:var(--warn)">Schema-Free 自由派</div>
+          LLM 自由发现新概念，灵活、开放，但输出不可控，可能超出预期范围。
+        </div>
+        <div class="cmp-ok">
+          <div class="lb">Schema-Based 框架派</div>
+          强调结构、标准化、一致性，输出天然合规，幻觉空间被大幅压缩。
+        </div>
+      </div>
+
+      <div class="callout">2025 年 Bian 综述的结论：两者<strong>互补而非互斥</strong>。理想系统 = 先 Schema-Free 发现新概念 → 再 Schema-Based 纳入标准结构。</div>
+
+      <h3>核心流程</h3>
+      <div class="flow cd">
+        <div class="flow-row">
+          <div class="fstep"><div class="fbox">已有框架<br><small style="font-weight:400;font-size:11px">Wikidata 等</small></div><div class="flabel">前置条件</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">定义类型<br>和关系清单</div><div class="flabel">约束设置</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox hl">LLM 在框<br>架内提取</div><div class="flabel">受约束生成</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">框架校验</div><div class="flabel">自动检查</div></div>
+          <span class="farr">→</span>
+          <div class="fstep"><div class="fbox">合规输出</div><div class="flabel">终点</div></div>
+        </div>
+      </div>
+
+      <div class="cs">
+        <div class="cs-lbl">大规模案例</div>
+        <h4>OntoKG（2026）——Wikidata 3460 万实体</h4>
+        <p>把 Wikidata 的 3.46 亿实体组织成 94 个模块（8 大类）。每条属性自动路由到「固有属性」（颜色、大小）或「关系属性」（位于、属于）两类中。结果：93.3% 类别覆盖率、98.0% 模块分配准确率。</p>
+      </div>
+
+      <div class="pc">
+        <div class="pros"><h4>优点</h4><ul>
+          <li>输出天然合规，幻觉空间小</li>
+          <li>有现成框架时工程量小</li>
+          <li>适合行业标准场景</li>
+        </ul></div>
+        <div class="cons"><h4>缺点</h4><ul>
+          <li>受限于现有框架的覆盖范围</li>
+          <li>发现全新概念能力弱</li>
+          <li>需要提前有合适的框架</li>
+        </ul></div>
+      </div>
+      <p><strong>适合：</strong>已有行业标准或数据规范的场景（医疗、法律、电力行业等）。</p>
+    </div>
+
+    <!-- ── Method E ── -->
+    <div class="method-wrap ce" id="me">
+      <div class="method-header">
+        <div class="mbadge e">E</div>
+        <div><h2 style="margin-bottom:3px">直给派：端到端 Prompt 法</h2>
+          <div class="tag">设计一个 Prompt，让 LLM 直接出 Ontology</div></div>
+      </div>
+      <div class="meta-tags">
+        <span class="mt hi">幻觉风险 · 高</span>
+        <span class="mt lo">工程复杂度 · 低</span>
+        <span class="mt">LLMs4OL 挑战赛 2025</span>
+      </div>
+
+      <p>好比让一个人同时做采购、厨师、服务员——<strong>一个 Prompt 包圆了所有工作</strong>。实现最简单，半小时出结果，但因为没有任何中间检查，幻觉风险最高。</p>
+
+      <h3>典型 Prompt 结构</h3>
+      <div class="code-block">
+        你是一个 <span style="color:var(--me);font-weight:700">{领域}</span> 本体专家。<br>
+        从以下文本中提取本体类和关系。<br>
+        <span style="color:var(--ok)">只提取文本中明确提到的内容，不要添加推断内容。</span><br>
+        输出格式为 JSON：<br>
+        {"classes": [{"name": "...", "definition": "..."}],<br>
+        &nbsp;"relationships": [{"source": "...", "target": "...", "type": "..."}]}<br>
+        规则：1. 只提取明确说明的内容 &nbsp;2. 使用标准化名称 &nbsp;3. 有歧义则输出 "None"<br>
+        文本：<span style="color:var(--me);font-weight:700">{input_text}</span>
+      </div>
+
+      <h3>LLMs4OL 挑战赛的三条关键发现（2025）</h3>
+      <div class="grid2">
+        <div class="ch-item"><div class="ch-icon" style="background:#fffbeb">📊</div>
+          <div class="ch-text"><h4>没有万能冠军</h4><p>没有单一模型在所有子任务上都表现最好。</p></div>
+        </div>
+        <div class="ch-item"><div class="ch-icon" style="background:#fffbeb">💡</div>
+          <div class="ch-text"><h4>小模型 + 好 Prompt ≈ 大模型</h4><p>精心设计的 Prompt 有时能让小模型接近大模型表现。</p></div>
+        </div>
+        <div class="ch-item"><div class="ch-icon" style="background:#fef2f2">⚠️</div>
+          <div class="ch-text"><h4>Prompt 极度敏感</h4><p>措辞稍微一变，生成出来的 Ontology 结构可能完全不同。</p></div>
+        </div>
+        <div class="ch-item"><div class="ch-icon" style="background:#fffbeb">🏃</div>
+          <div class="ch-text"><h4>出结果最快</h4><p>半小时能出第一版结果，适合快速验证想法。</p></div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pros"><h4>优点</h4><ul>
+          <li>实现最简单，无需任何工程搭建</li>
+          <li>半小时出结果，快速 POC</li>
+        </ul></div>
+        <div class="cons"><h4>缺点</h4><ul>
+          <li>幻觉风险最高</li>
+          <li>输出质量不稳定</li>
+          <li>Prompt 敏感性严重影响输出</li>
+        </ul></div>
+      </div>
+      <p><strong>适合：</strong>快速 POC 原型验证，<strong>不适合</strong>生产系统。</p>
+    </div>
+  </section>
+</div>
+
+<!-- ─── COMPARE ─── -->
+<div class="container" id="compare">
+  <section>
+    <div class="slabel">综合对比</div>
+    <h2>一张表看懂五种流派</h2>
+
+    <table class="ctable">
+      <thead>
+        <tr>
+          <th>流派</th>
+          <th>幻觉风险</th>
+          <th>工程复杂度</th>
+          <th>验证机制</th>
+          <th>版本管理</th>
+          <th>Token 消耗</th>
+          <th>工业实战</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--ma)">A 拆解派</strong><br><small style="color:var(--text-muted)">Salovsky, IRT SystemX</small></td>
+          <td><span class="rdot lo">低</span></td>
+          <td><div class="cbar hi"><span></span><span></span><span></span></div></td>
+          <td>SHACL + OWL</td><td>✅ 有</td><td>高</td><td>✅ EDF/RTE</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--mb)">B 聚类派</strong><br><small style="color:var(--text-muted)">LLM4Onto</small></td>
+          <td><span class="rdot lo">低</span></td>
+          <td><div class="cbar md"><span></span><span></span><span></span></div></td>
+          <td>无在线验证</td><td>❌ 无</td><td>中</td><td>❌ 学术</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--mc)">C 两步走派</strong><br><small style="color:var(--text-muted)">OntoEKG, NeOn-GPT</small></td>
+          <td><span class="rdot md">中</span></td>
+          <td><div class="cbar md"><span></span><span></span><span></span></div></td>
+          <td>无在线验证</td><td>❌ 无</td><td>中</td><td>部分验证</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--md)">D 框架派</strong><br><small style="color:var(--text-muted)">OntoKG, Wikontic</small></td>
+          <td><span class="rdot lo">低</span></td>
+          <td><div class="cbar md"><span></span><span></span><span></span></div></td>
+          <td>框架约束</td><td>❌ 无</td><td>极低*</td><td>✅ Wikidata</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--me)">E 直给派</strong><br><small style="color:var(--text-muted)">LLMs4OL</small></td>
+          <td><span class="rdot hi">高</span></td>
+          <td><div class="cbar lo"><span></span><span></span><span></span></div></td>
+          <td>无</td><td>❌ 无</td><td>中</td><td>❌ 学术</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:8px">* Wikontic 使用 &lt;1000 Token，为 GraphRAG 的 1/20。复杂度格数越多表示越高。</p>
+
+    <!-- Visual summary -->
+    <h3 style="margin-top:32px">哪种流派最适合你的需求？一眼看清</h3>
+    <div style="overflow-x:auto;margin-top:16px">
+      <svg width="800" height="280" viewBox="0 0 800 280" style="font-family:'Microsoft YaHei',sans-serif;max-width:100%">
+        <!-- axes -->
+        <line x1="80" y1="240" x2="760" y2="240" stroke="#cbd5e0" stroke-width="1.5"/>
+        <line x1="80" y1="30" x2="80" y2="240" stroke="#cbd5e0" stroke-width="1.5"/>
+        <!-- axis labels -->
+        <text x="420" y="272" text-anchor="middle" font-size="13" fill="#718096">工程复杂度 →</text>
+        <text x="20" y="140" text-anchor="middle" font-size="13" fill="#718096" transform="rotate(-90,20,140)">幻觉风险 →</text>
+        <!-- grid lines -->
+        <line x1="80" y1="140" x2="760" y2="140" stroke="#e2e8f0" stroke-dasharray="4"/>
+        <line x1="420" y1="30" x2="420" y2="240" stroke="#e2e8f0" stroke-dasharray="4"/>
+        <!-- axis ticks -->
+        <text x="80" y="255" text-anchor="middle" font-size="11" fill="#718096">低</text>
+        <text x="420" y="255" text-anchor="middle" font-size="11" fill="#718096">中</text>
+        <text x="760" y="255" text-anchor="middle" font-size="11" fill="#718096">高</text>
+        <text x="65" y="244" text-anchor="end" font-size="11" fill="#718096">低</text>
+        <text x="65" y="140" text-anchor="end" font-size="11" fill="#718096">中</text>
+        <text x="65" y="36" text-anchor="end" font-size="11" fill="#718096">高</text>
+        <!-- Bubbles: x=complexity, y=hallucination risk (inverted: high risk = high y) -->
+        <!-- A: complexity high(700), risk low(50) -->
+        <circle cx="680" cy="60" r="36" fill="#1d4ed8" opacity=".15" stroke="#1d4ed8" stroke-width="2"/>
+        <text x="680" y="55" text-anchor="middle" font-size="14" fill="#1d4ed8" font-weight="700">A</text>
+        <text x="680" y="72" text-anchor="middle" font-size="11" fill="#1d4ed8">拆解派</text>
+        <!-- B: complexity mid(420), risk low(50) -->
+        <circle cx="380" cy="60" r="36" fill="#7c3aed" opacity=".15" stroke="#7c3aed" stroke-width="2"/>
+        <text x="380" y="55" text-anchor="middle" font-size="14" fill="#7c3aed" font-weight="700">B</text>
+        <text x="380" y="72" text-anchor="middle" font-size="11" fill="#7c3aed">聚类派</text>
+        <!-- C: complexity mid(420), risk mid(140) -->
+        <circle cx="450" cy="155" r="36" fill="#0891b2" opacity=".15" stroke="#0891b2" stroke-width="2"/>
+        <text x="450" y="150" text-anchor="middle" font-size="14" fill="#0891b2" font-weight="700">C</text>
+        <text x="450" y="167" text-anchor="middle" font-size="11" fill="#0891b2">两步走派</text>
+        <!-- D: complexity mid(420), risk low(50) -->
+        <circle cx="310" cy="60" r="36" fill="#059669" opacity=".15" stroke="#059669" stroke-width="2"/>
+        <text x="310" y="55" text-anchor="middle" font-size="14" fill="#059669" font-weight="700">D</text>
+        <text x="310" y="72" text-anchor="middle" font-size="11" fill="#059669">框架派</text>
+        <!-- E: complexity low(140), risk high(220) -->
+        <circle cx="160" cy="205" r="36" fill="#d97706" opacity=".15" stroke="#d97706" stroke-width="2"/>
+        <text x="160" y="200" text-anchor="middle" font-size="14" fill="#d97706" font-weight="700">E</text>
+        <text x="160" y="217" text-anchor="middle" font-size="11" fill="#d97706">直给派</text>
+        <!-- ideal zone annotation -->
+        <rect x="290" y="35" width="280" height="60" rx="8" fill="none" stroke="#059669" stroke-dasharray="4" opacity=".4"/>
+        <text x="430" y="28" text-anchor="middle" font-size="11" fill="#059669" opacity=".7">低幻觉 · 中等复杂度 推荐区间</text>
+      </svg>
+    </div>
+  </section>
+</div>
+
+<!-- ─── CHOOSE ─── -->
+<div class="container" id="choose">
+  <section>
+    <div class="slabel">选型指南</div>
+    <h2>根据你的场景，该怎么选？</h2>
+
+    <div class="dec-list">
+      <div class="dec-item">
+        <div class="dec-q">🚀 就想快速试试，看看效果？</div>
+        <div class="dec-arr">→</div>
+        <div class="dec-ans">
+          <div class="dec-badge" style="background:var(--me)">E · 直给派</div>
+          <span style="font-size:13px;color:var(--text-light)">写个 Prompt 扔给 GPT-4 或 Claude，半小时出结果</span>
+        </div>
+      </div>
+      <div class="dec-item">
+        <div class="dec-q">🔍 探索没人建过的新领域？</div>
+        <div class="dec-arr">→</div>
+        <div class="dec-ans">
+          <div class="dec-badge" style="background:var(--mb)">B · 聚类派</div>
+          <span style="font-size:13px;color:var(--text-light)">不知道有什么类型，让数据自己说话</span>
+        </div>
+      </div>
+      <div class="dec-item">
+        <div class="dec-q">🏭 要上生产系统，不能出错？</div>
+        <div class="dec-arr">→</div>
+        <div class="dec-ans">
+          <div class="dec-badge" style="background:var(--ma)">A · 拆解派</div>
+          <span style="font-size:13px;color:var(--text-light)">流水线 + 验证机制 + 版本管理，工程量大但可靠</span>
+        </div>
+      </div>
+      <div class="dec-item">
+        <div class="dec-q">📋 已有行业标准或数据规范？</div>
+        <div class="dec-arr">→</div>
+        <div class="dec-ans">
+          <div class="dec-badge" style="background:var(--md)">D · 框架派</div>
+          <span style="font-size:13px;color:var(--text-light)">用 Wikidata 或行业标准约束 LLM，输出天然合规</span>
+        </div>
+      </div>
+      <div class="dec-item">
+        <div class="dec-q">🔄 建好了，还要持续更新？</div>
+        <div class="dec-arr">→</div>
+        <div class="dec-ans">
+          <div class="dec-badge" style="background:var(--ma)">A · 拆解派（+闭环）</div>
+          <span style="font-size:13px;color:var(--text-light)">IRT SystemX 的版本管理方案，业务变化时跟得上</span>
+        </div>
+      </div>
+      <div class="dec-item">
+        <div class="dec-q">⚡ 快速构建初版验证想法？</div>
+        <div class="dec-arr">→</div>
+        <div class="dec-ans">
+          <div class="dec-badge" style="background:var(--mc)">C · 两步走派</div>
+          <span style="font-size:13px;color:var(--text-light)">中间产物可审查，适合对外演示或快速迭代</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ─── LESSONS ─── -->
+<div class="container" id="lessons">
+  <section>
+    <div class="slabel">实战经验</div>
+    <h2>五个来自实战的工程教训</h2>
+
+    <div class="lesson-grid">
+      <div class="lesson-card">
+        <div class="lesson-num">01</div>
+        <h4>实体提取（NER）是误差的主要来源</h4>
+        <p>Salovsky 明确指出："大部分未来错误源于 <span class="term" data-tip="NER（Named Entity Recognition）：命名实体识别——从文本中自动找出人名、地名、公司名、产品名等专有名词的技术。">NER</span> 阶段"。类型标错、别名混淆、类型不完备是三大元凶。宁可在第一步多花功夫，也不要后期返工。</p>
+      </div>
+      <div class="lesson-card">
+        <div class="lesson-num">02</div>
+        <h4>关系提取比实体发现难得多</h4>
+        <p>发现"有哪些东西"相对容易，搞清楚"这些东西之间是什么关系"才是真正挑战。建议先提取粗粒度关系，再用 LLM 细化和标准化。</p>
+      </div>
+      <div class="lesson-card">
+        <div class="lesson-num">03</div>
+        <h4>验证机制是"玩具"和"生产系统"的分界线</h4>
+        <p>没有验证措施就是"让 LLM 随便写写"。生产系统至少需要 <span class="term" data-tip="SHACL：W3C 标准的数据验证语言，检查图数据是否符合预设规则。">SHACL</span> 结构验证，有条件再加 OWL Reasoner 逻辑验证。</p>
+      </div>
+      <div class="lesson-card">
+        <div class="lesson-num">04</div>
+        <h4>Prompt 措辞影响输出结构</h4>
+        <p>同个 LLM，Prompt 稍微换几个词，生成出来的 Ontology 结构可能完全不同。使用结构化模板 + 规则 + 示例，而非纯自然语言描述，能大幅减少波动。</p>
+      </div>
+      <div class="lesson-card" style="grid-column:1/-1;border-left:3px solid var(--accent)">
+        <div class="lesson-num">05</div>
+        <h4>不是数据越多越好</h4>
+        <p>Wikontic 用不到 1000 个 <span class="term" data-tip="Token：LLM 处理文本的最小单位，大约是 0.75 个英文单词或 0.5 个汉字。Token 消耗量直接影响 API 调用成本。">Token</span> 建出了有效知识图谱，是 GraphRAG 的二十分之一。关键不是数据量，而是数据质量和约束的合理性。</p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:28px">
+      <strong>一句话总结：</strong>LLM 建 Ontology 不再是"能不能"的问题，而是"怎么建更好"的问题。五种流派各有擅长，<strong>根据你的场景选对方法，比选最新的技术更重要</strong>。
+    </div>
+  </section>
+</div>
+
+<!-- ─── TRENDS ─── -->
+<div class="container">
+  <section>
+    <div class="slabel">未来方向</div>
+    <h2>这个领域正在往哪里走</h2>
+
+    <div class="trend-list">
+      <div class="trend-item">
+        <div class="trend-icon">🔀</div>
+        <div>
+          <h4>趋势 1：自由派 + 框架派正在融合</h4>
+          <p>先让 LLM 自由探索发现新概念，再自动将新概念纳入标准框架——"从无序到有序"的闭环正在成为主流设计模式。</p>
+        </div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-icon">🤖</div>
+        <div>
+          <h4>趋势 2：Ontology 从数据库走向 Agent 的记忆</h4>
+          <p>Ontology 不只是用来查的静态知识库，还可以作为 AI Agent 的"世界模型"——Agent 用它理解当前状态、规划下一步行动、记录执行结果。</p>
+        </div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-icon">🖼️</div>
+        <div>
+          <h4>趋势 3：从文本扩展到多模态</h4>
+          <p>不只是从文字中提取，还要从图表、图片、传感器数据中提取 Ontology。这个方向刚刚起步，是下一个值得关注的增长点。</p>
+        </div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-icon">📏</div>
+        <div>
+          <h4>趋势 4：标准化评估正在建立</h4>
+          <p>LLMs4OL 挑战赛、UPM 综述等正在推动建立统一评估标准——让不同方法可以在同一个标尺上比较，这对整个领域的进步至关重要。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ─── GLOSSARY ─── -->
+<div class="container">
+  <section>
+    <div class="slabel">术语速查</div>
+    <h2>文中专业术语一览</h2>
+    <p style="font-size:14px;color:var(--text-light)">所有带蓝色下划线的词均可悬停查看解释。以下是完整的术语对照表：</p>
+
+    <div class="glos">
+      <div class="g-item"><span class="g-term">Ontology</span><span class="g-def">本体——领域概念、关系、规则的形式化描述，相当于「知识地图」</span></div>
+      <div class="g-item"><span class="g-term">LLM</span><span class="g-def">大语言模型，如 GPT-4、Claude、LLaMA</span></div>
+      <div class="g-item"><span class="g-term">OWL</span><span class="g-def">Web Ontology Language，W3C 标准的本体描述语言</span></div>
+      <div class="g-item"><span class="g-term">SHACL</span><span class="g-def">Shapes Constraint Language，W3C 标准的数据验证语言</span></div>
+      <div class="g-item"><span class="g-term">RDF</span><span class="g-def">Resource Description Framework，用「主语-谓语-宾语」三元组描述知识</span></div>
+      <div class="g-item"><span class="g-term">NER</span><span class="g-def">Named Entity Recognition，命名实体识别，从文本中找出专有名词</span></div>
+      <div class="g-item"><span class="g-term">BERT</span><span class="g-def">Google 的预训练语言模型，能把文字转换成数值向量</span></div>
+      <div class="g-item"><span class="g-term">AP 聚类</span><span class="g-def">Affinity Propagation，不需要预设类别数的聚类算法</span></div>
+      <div class="g-item"><span class="g-term">GraphRAG</span><span class="g-def">Graph-based RAG，在传统 RAG 基础上加入图结构，理解实体关系</span></div>
+      <div class="g-item"><span class="g-term">Wikidata</span><span class="g-def">维基百科背后的结构化知识库，包含数亿条实体和关系</span></div>
+      <div class="g-item"><span class="g-term">SPARQL</span><span class="g-def">RDF 数据的查询语言，类似 SQL 但查的是图不是表</span></div>
+      <div class="g-item"><span class="g-term">Token</span><span class="g-def">LLM 处理文本的最小单位，约 0.75 个英文单词或 0.5 个汉字</span></div>
+      <div class="g-item"><span class="g-term">FAIR</span><span class="g-def">Findable, Accessible, Interoperable, Reusable——数据质量四项原则</span></div>
+      <div class="g-item"><span class="g-term">Reasoner</span><span class="g-def">推理引擎，自动检查 Ontology 是否有逻辑矛盾，如 Pellet、HermiT</span></div>
+    </div>
+  </section>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <p>零点未来 · 技术科普系列</p>
+    <p style="margin-top:4px">基于 2025–2026 年学术文献整理 · 涵盖 9 篇论文和综述</p>
+  </div>
+</footer>
+
+<script src="/ontology-readings-20260930-v1/llm-ontology-methods-1.js"></script>
+<footer class="isaac-reading-end">本文收录自本地 HTML 阅读资料，原有署名与参考资料保留在文中。<br><a href="/strategy/">返回 AI 战略认知 · 全部文章</a></footer><a class="isaac-reading-return" href="/strategy/">← AI 战略认知 · 全部文章</a></body>
+</html>

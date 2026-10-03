@@ -1,0 +1,123 @@
+/* Use the same monochrome reading system as AI strategy. */
+.oc-page{--oc-ink:#fff;--oc-muted:#ccc;--oc-quiet:#aaa;--oc-line:#343434;color:var(--oc-ink);font-family:var(--editorial-body);width:min(100% - 96px,1100px);margin:0 auto;padding:112px 0 64px}
+.oc-page *{min-width:0}
+.oc-page p,.oc-page li,.oc-page a{overflow-wrap:anywhere}
+.oc-page h1,.oc-page h2,.oc-page h3{font-family:var(--editorial-display);font-weight:400;letter-spacing:-.025em;text-wrap:pretty;color:#fff}
+.oc-page .eyebrow{font-family:var(--editorial-body);font-size:10px;font-weight:400;line-height:1.7;letter-spacing:.07em;color:var(--oc-quiet);margin:0}
+.oc-page a:focus-visible,.oc-page summary:focus-visible{outline:1px solid #fff;outline-offset:5px}
+.oc-page a:hover{text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1px}
+.oc-hero{margin-left:280px;margin-bottom:34px}
+.oc-back{display:inline-flex;align-items:center;min-height:32px;font-size:12px;color:#aaa;margin-bottom:14px}
+.oc-hero h1{font-size:48px;line-height:1.4;margin:14px 0 16px}
+.oc-hero>p{font-size:16px;line-height:1.9;color:#ccc;margin:0;max-width:47em}
+.oc-hero-links{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:17px;font-size:12px;color:#ccc}
+.oc-hero-links>a{min-height:30px;display:inline-flex;align-items:center}
+.oc-reading{display:grid;grid-template-columns:216px minmax(0,1fr);gap:64px;align-items:start}
+.oc-index{position:sticky;top:96px;padding-top:20px;border-top:1px solid var(--oc-line)}
+.oc-index>nav{display:grid;margin-top:12px}
+.oc-index>nav>a{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:40px;padding:8px 0;font-size:14px;line-height:1.7;color:#ddd}
+.oc-index>nav>a>span{font-size:11px;color:#aaa;font-variant-numeric:tabular-nums}
+.oc-product-index{border-left:1px solid #343434;padding-left:13px;margin:6px 0 13px;display:grid;gap:7px}
+.oc-product-index>a{font-size:12px;line-height:1.8;color:#aaa;padding:3px 0}
+.oc-content{min-width:0}
+.oc-section{border-top:1px solid var(--oc-line);padding:26px 0 28px;scroll-margin-top:10px}
+.oc-section-head{margin-bottom:20px}
+.oc-section h2{font-size:29px;line-height:1.5;margin:0 0 10px}
+.oc-section-head>p{font-size:14px;line-height:1.9;color:#ccc;margin:0}
+.oc-evidence{border-left:1px solid #555;padding:0 0 0 17px;margin:20px 0 24px}
+.oc-evidence>strong{font-size:12px;font-weight:500;line-height:1.8;color:#ddd}
+.oc-evidence>p{font-size:12px;line-height:1.9;color:#aaa;margin:6px 0 0}
+.oc-offer{padding:23px 0 25px;border-top:1px solid var(--oc-line);scroll-margin-top:10px}
+.oc-offer:last-child{padding-bottom:0}
+.oc-offer-heading{display:grid;grid-template-columns:25px minmax(0,1fr) auto;gap:12px;align-items:start}
+.oc-number{font-size:11px;line-height:1.7;color:#aaa;padding-top:2px;font-variant-numeric:tabular-nums}
+.oc-offer-heading h3{font-size:27px;line-height:1.55;margin:9px 0 7px}
+.oc-offer-intro{font-size:14px;line-height:1.85;color:#ddd;margin:0}
+.oc-stage{font-size:11px;line-height:1.7;color:#ccc;border:1px solid #444;padding:3px 8px;white-space:nowrap;font-weight:400}
+.oc-offer-detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:28px;margin:20px 0 0 37px}
+.oc-offer-detail h4{font-family:var(--editorial-body);font-size:13px;font-weight:500;line-height:1.8;color:#eee;margin:0 0 7px}
+.oc-offer-detail h4:not(:first-child){margin-top:16px}
+.oc-offer-detail p,.oc-offer-detail ul{font-size:14px;line-height:1.95;color:#ccc;margin:0}
+.oc-offer-detail ul{padding-left:17px}
+.oc-offer-detail li+li{margin-top:5px}
+.oc-offer-detail .oc-output{padding-top:12px;margin-top:13px;border-top:1px solid var(--oc-line);color:#ddd}
+.oc-review{font-size:11px;line-height:1.9;color:#aaa;margin:17px 0 0}
+.oc-offer>.oc-review{margin-left:37px}
+.oc-scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.oc-scenario-grid>a{padding:19px 0;border-top:1px solid var(--oc-line)}
+.oc-scenario-grid span{font-size:10px;line-height:1.8;color:#aaa}
+.oc-scenario-grid h3{font-size:21px;line-height:1.6;margin:10px 0}
+.oc-scenario-grid h3 br{display:none}
+.oc-scenario-grid p{font-size:13px;line-height:1.9;color:#bbb;margin:0 0 12px}
+.oc-scenario-grid b{font-size:11px;line-height:1.9;font-weight:400;color:#ddd}
+.oc-flow{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;margin:0;padding:0;list-style:none}
+.oc-flow li{display:flex;gap:13px;border-top:1px solid var(--oc-line);padding:18px 0}
+.oc-flow li>span{font-size:10px;line-height:1.8;color:#aaa;padding-top:3px}
+.oc-flow h3{font-family:var(--editorial-body);font-size:16px;font-weight:500;line-height:1.8;margin:0}
+.oc-flow p{font-size:13px;line-height:1.95;color:#bbb;margin:7px 0 0}
+.oc-input-output{display:grid;grid-template-columns:1fr 1fr;gap:28px;border-top:1px solid var(--oc-line);padding-top:22px;margin-top:8px}
+.oc-input-output .eyebrow{margin-bottom:9px}
+.oc-input-output h3{font-size:21px;line-height:1.6;margin:0 0 10px}
+.oc-input-output ul{padding-left:17px;margin:0;font-size:13px;line-height:1.95;color:#bbb}
+.oc-input-output li+li{margin-top:5px}
+.oc-acceptance{border-top:1px solid var(--oc-line);padding-top:24px;margin-top:25px}
+.oc-acceptance h3{font-size:24px;line-height:1.5;margin:0 0 18px}
+.oc-check-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.oc-check-grid p{font-size:12px;line-height:1.95;color:#bbb;margin:0}
+.oc-check-grid strong{display:block;font-size:12px;line-height:1.8;font-weight:500;color:#eee;margin-bottom:8px}
+.oc-faq .faq-item{border-color:var(--oc-line)}
+.oc-faq .faq-item summary{font-size:14px;font-weight:400;line-height:1.9;min-height:52px;padding:15px 0;color:#eee;display:flex;justify-content:space-between;gap:16px}
+.oc-faq .faq-item summary span{font-size:16px;font-weight:300;color:#aaa;flex-shrink:0}
+.oc-faq .faq-item[open] summary span{transform:rotate(45deg)}
+.oc-faq .faq-item p{font-size:14px;line-height:1.95;color:#ccc;margin:0 0 19px}
+.oc-reference,.oc-update{font-size:11px;line-height:1.95;color:#aaa;margin:20px 0 0}
+.oc-reference a{text-decoration:underline;text-underline-offset:4px;margin:0 3px;color:#ddd}
+.oc-update{font-size:10px;margin-top:12px}
+.oc-contact>p{font-size:14px;line-height:1.9;color:#ccc;margin:10px 0 18px}
+.oc-contact>a{font-size:14px;line-height:1.8;display:inline-flex;gap:24px;align-items:center;flex-wrap:wrap;min-height:44px;color:#fff}
+.oc-contact>a>span{font-size:12px;letter-spacing:.03em;color:#aaa}
+@media(max-width:1000px){
+ .oc-page{width:min(100% - 48px,820px)}
+ .oc-hero{margin-left:0;margin-bottom:26px}
+ .oc-reading{display:block}
+ .oc-index{position:static;margin-bottom:26px;padding-top:16px}
+ .oc-index>nav{display:flex;flex-wrap:wrap;gap:4px 25px;margin-top:9px}
+ .oc-index>nav>a{gap:12px;font-size:13px;min-height:36px}
+ .oc-product-index{display:none}
+}
+@media(max-width:760px){
+ .oc-page{width:calc(100% - 40px);padding:100px 0 40px}
+ .oc-back{font-size:11px;margin-bottom:12px}
+ .oc-hero h1{font-size:33px;line-height:1.5;margin:12px 0 14px}
+ .oc-hero>p{font-size:14px;line-height:1.9}
+ .oc-hero-links{font-size:11px;gap:8px 24px;margin-top:14px}
+ .oc-index{margin-bottom:20px;padding-top:14px}
+ .oc-index>nav{gap:2px 20px}
+ .oc-index>nav>a{font-size:12px;gap:9px}
+ .oc-section{padding:22px 0 24px}
+ .oc-section h2{font-size:25px}
+ .oc-section-head{margin-bottom:16px}
+ .oc-section-head>p{font-size:13px}
+ .oc-evidence{padding-left:14px;margin:18px 0 22px}
+ .oc-evidence>p{font-size:11px}
+ .oc-offer{padding:20px 0 23px}
+ .oc-offer-heading{grid-template-columns:20px minmax(0,1fr);gap:10px}
+ .oc-offer-heading .eyebrow{font-size:9px}
+ .oc-offer-heading h3{font-size:23px;line-height:1.55;margin:8px 0}
+ .oc-offer-intro{font-size:13px}
+ .oc-stage{grid-column:2;justify-self:start;font-size:10px;margin:1px 0 0}
+ .oc-offer-detail{grid-template-columns:1fr;margin-left:0;gap:17px;margin-top:17px}
+ .oc-offer-detail p,.oc-offer-detail ul{font-size:14px}
+ .oc-offer>.oc-review{margin-left:0;font-size:11px}
+ .oc-scenario-grid,.oc-flow,.oc-input-output{grid-template-columns:1fr}
+ .oc-scenario-grid h3{font-size:20px}
+ .oc-scenario-grid>a{padding:17px 0}
+ .oc-flow li{padding:15px 0}
+ .oc-input-output{gap:24px;padding-top:20px}
+ .oc-check-grid{grid-template-columns:1fr;gap:18px}
+ .oc-acceptance h3{font-size:22px}
+ .oc-check-grid strong{margin-bottom:5px}
+ .oc-faq .faq-item summary{font-size:13px;padding:14px 0}
+ .oc-faq .faq-item p{font-size:14px}
+ .oc-contact>a{gap:14px}
+}

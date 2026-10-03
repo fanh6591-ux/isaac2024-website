@@ -1,0 +1,35 @@
+/* The strategy and enterprise FAQ share a monochrome reading theme. */
+html.editorial-dark-root{background:#000;color-scheme:dark;scrollbar-color:#555 #000}
+body.editorial-page.editorial-dark{--ink:#fff;--paper:#000;--muted:#bdbdbd;--accent:#fff;--line:#ffffff30;--editorial-accent:#fff;--editorial-quiet:#c4c4c4;--editorial-rule:#ffffff30;background:#000;color:#fff}
+.editorial-dark ::selection{background:#fff;color:#000}
+.editorial-dark .editorial-hero h1 em{color:#fff}
+.editorial-dark .editorial-hero p,.editorial-dark .question-card p,.editorial-dark .chapter-lead,.editorial-dark .editorial-chapter section p{color:#e5e5e5}
+.editorial-dark .question-card,.editorial-dark .question-card:nth-child(2),.editorial-dark .question-card:nth-child(3){background:#111;color:#fff}
+.editorial-dark .question-card:hover{background:#1d1d1d}
+.editorial-dark .question-card-top{color:#c4c4c4}
+.editorial-dark .editorial-diagram{stroke:#d9d9d9}
+.editorial-dark .editorial-diagram .diagram-fill{fill:#ffffff0d;stroke:#fff}
+.editorial-dark .reader-question,.editorial-dark .method-flow li{background:#111;color:#fff;border-color:#ffffff60}
+.editorial-dark .editorial-link:hover{text-decoration:underline;text-underline-offset:5px}
+.editorial-dark .site-header.site-header-expanded,.editorial-dark .site-header.site-header-expanded.mobile-open{background:#101010e8;color:#fff;border-color:#ffffff30;box-shadow:0 6px 30px #0004}
+.editorial-dark .site-header.site-header-expanded .header-contact{border-color:#ffffff30}
+.editorial-dark .site-header.site-header-expanded .nav-panel{background:#111111f5;color:#fff;border-color:#ffffff30;box-shadow:0 20px 70px #0006}
+.editorial-dark .nav-panel small,.editorial-dark .nav-panel a span{color:#c4c4c4}
+.editorial-dark .nav-services a:hover strong{color:#fff;text-decoration:underline;text-underline-offset:4px}
+.editorial-dark .panel-footer{border-color:#ffffff30}
+.editorial-dark .site-footer{background:#080808;color:#fff;border-top:1px solid #ffffff30}
+.editorial-dark .site-footer small{color:#bdbdbd}
+.editorial-dark .skip-link{background:#111;color:#fff}
+.editorial-dark .assistant-launch,.editorial-dark .assistant-panel{background:#111;color:#fff;border-color:#ffffff40}
+.editorial-dark .assistant-panel h2,.editorial-dark .assistant-panel textarea,.editorial-dark .assistant-sources a{color:#fff}
+.editorial-dark .assistant-panel header p,.editorial-dark .assistant-footnote{color:#bdbdbd}
+.editorial-dark .assistant-message.answer,.editorial-dark .assistant-suggestions button{color:#e5e5e5}
+.editorial-dark .assistant-message.question{background:#ffffff15}
+.editorial-dark .assistant-panel header,.editorial-dark .assistant-panel form,.editorial-dark .assistant-suggestions button,.editorial-dark .assistant-sources a{border-color:#ffffff30}
+.editorial-dark .assistant-panel form button{background:#fff;color:#000}
+.editorial-dark .assistant-panel textarea::placeholder{color:#bdbdbd}
+@media(max-width:1100px){
+ .editorial-dark .site-header.site-header-expanded.mobile-open nav{background:#111111fa;color:#fff;border-color:#ffffff30;box-shadow:0 18px 40px #0006}
+ .editorial-dark .site-header.site-header-expanded nav>a,.editorial-dark .site-header.site-header-expanded .nav-menu>summary{border-color:#ffffff30}
+ .editorial-dark .site-header.site-header-expanded .nav-panel{background:transparent;box-shadow:none}
+}

@@ -1,0 +1,92 @@
+.services-directory-page .faq-index {
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scrollbar-color: #777 transparent;
+}
+
+.services-directory-page .faq-index .catalog-index-group {
+  gap: 0;
+}
+
+.services-directory-page .faq-index [data-catalog-target] {
+  position: relative;
+  border-left: 0;
+  padding-left: 10px;
+}
+
+.services-directory-page .faq-index .catalog-index-member {
+  padding-left: 24px;
+}
+
+.services-directory-page .faq-index [data-catalog-target][aria-current="true"] {
+  border-left: 0;
+}
+
+.services-directory-page .faq-index [data-catalog-target]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: min(23px, 65%);
+  border-radius: 2px;
+  background: #f4f4f4;
+  opacity: 0;
+  transform: translateY(-50%) scaleY(.35);
+  transform-origin: center;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .22s ease;
+}
+
+.services-directory-page .faq-index [data-catalog-target][aria-current="true"]::before {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
+
+.services-directory-page .faq-index .catalog-index-parent {
+  transform-origin: left center;
+  transition: color .2s ease, transform .24s cubic-bezier(.2,.7,.2,1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .services-directory-page .faq-index .catalog-index-parent:hover {
+    transform: scale(1.035);
+    text-decoration: none;
+  }
+}
+
+.services-directory-page .faq-index .catalog-index-group[data-expanded="true"] > .catalog-index-parent {
+  color: #fff;
+}
+
+.services-directory-page .faq-index .catalog-index-children {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows .28s cubic-bezier(.2,.7,.2,1), opacity .2s ease;
+}
+
+.services-directory-page .faq-index .catalog-index-children-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.services-directory-page .faq-index .catalog-index-group[data-expanded="true"] > .catalog-index-children {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.services-directory-page .faq-index .catalog-index-group[data-expanded="false"] > .catalog-index-children {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-directory-page .faq-index .catalog-index-parent,
+  .services-directory-page .faq-index [data-catalog-target]::before,
+  .services-directory-page .faq-index .catalog-index-children {
+    transition: none;
+  }
+}

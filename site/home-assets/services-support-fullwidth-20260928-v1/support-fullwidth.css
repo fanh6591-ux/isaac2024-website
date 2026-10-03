@@ -1,0 +1,14 @@
+/* Use the available screen width instead of stopping the customer-service page at 1720px. */
+@media (min-width: 1721px) {
+  .ai-support-page .ai-support-layout {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* The single website-support scene carried a second, 1320px cap. */
+  .ai-support-page #website-support .section-2 .wp1320 {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+  }
+}

@@ -1,0 +1,36 @@
+.services-directory-page .customer-service-disclosure {
+  border-top: 1px solid #383838;
+  margin-top: 20px;
+}
+
+.services-directory-page .customer-service-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 19px 0;
+  color: #f4f4f4;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: color .2s ease;
+}
+
+.services-directory-page .customer-service-disclosure > summary::-webkit-details-marker { display: none; }
+.services-directory-page .customer-service-disclosure > summary::marker { content: ""; }
+.services-directory-page .customer-service-disclosure > summary:hover { color: #fff; }
+.services-directory-page .customer-service-disclosure > summary:focus-visible { outline: 1px solid #fff; outline-offset: 5px; }
+.services-directory-page .customer-service-disclosure .disclosure-count { color: #aaa; letter-spacing: .04em; }
+.services-directory-page .customer-service-disclosure .disclosure-action { display: inline-flex; align-items: center; gap: 16px; white-space: nowrap; }
+.services-directory-page .customer-service-disclosure .disclosure-mark { display: inline-block; font-size: 22px; font-weight: 300; line-height: 1; transform-origin: center; transition: transform .22s ease; }
+.services-directory-page .customer-service-disclosure .when-open { display: none; }
+.services-directory-page .customer-service-disclosure[open] .when-open { display: inline; }
+.services-directory-page .customer-service-disclosure[open] .when-closed { display: none; }
+.services-directory-page .customer-service-disclosure[open] .disclosure-mark { transform: rotate(45deg); }
+.services-directory-page .customer-service-disclosure[open] .catalog-members { padding-bottom: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .services-directory-page .customer-service-disclosure > summary,
+  .services-directory-page .customer-service-disclosure .disclosure-mark { transition: none; }
+}

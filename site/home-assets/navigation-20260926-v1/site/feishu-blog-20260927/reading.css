@@ -1,0 +1,8 @@
+@font-face{font-family:'Isaac Blog Complete Han';src:url('./fonts/noto-sans-sc.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Isaac Blog Complete Song';src:url('./fonts/noto-serif-sc.woff2') format('woff2');font-weight:200 900;font-display:swap}
+.strategy-blog,.strategy-article{font-family:'Isaac Editorial Sans','Isaac Blog Complete Han','PingFang SC',sans-serif}
+.strategy-blog h1,.strategy-article h1,.strategy-blog h2,.strategy-article h2{font-family:'Isaac Editorial Serif','Isaac Blog Complete Song',serif}
+.blog-imported-prose h2{margin:54px 0 24px}
+.blog-imported-prose p{margin-bottom:16px}
+.blog-imported-prose{overflow-wrap:anywhere}
+.blog-imported-prose em{font-style:italic}

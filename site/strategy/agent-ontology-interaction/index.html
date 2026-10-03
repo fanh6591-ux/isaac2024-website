@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palantir AIP Agent 与 Ontology 交互机制 · 深度解析</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #FFFFFF;
+  --text: #1A1A1A;
+  --text-secondary: #555555;
+  --accent: #3B82F6;
+  --accent-dark: #2563EB;
+  --accent-light: #EFF6FF;
+  --grey-50: #FAFAFA;
+  --grey-100: #F5F5F5;
+  --grey-200: #EEEEEE;
+  --grey-300: #E0E0E0;
+  --grey-400: #BDBDBD;
+  --grey-500: #9E9E9E;
+  --grey-700: #616161;
+  --code-bg: #F8F8F8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --max-width: 920px;
+  --font-body: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+  --font-mono: "SF Mono", "Cascadia Code", "Fira Code", "Consolas", "Menlo", monospace;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; font-size: 17px; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.78;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4 { font-weight: 700; line-height: 1.3; color: var(--text); }
+h1 { font-size: 2.6rem; letter-spacing: -0.02em; margin-bottom: 0.4em; }
+h2 { font-size: 1.75rem; margin: 2.8em 0 0.8em; padding-top: 0.4em; }
+h2::before { content: ''; display: block; width: 48px; height: 3px; background: var(--accent); margin-bottom: 0.5em; border-radius: 2px; }
+h3 { font-size: 1.25rem; margin: 2em 0 0.6em; }
+h4 { font-size: 1.05rem; margin: 1.5em 0 0.4em; }
+p { margin: 1em 0; }
+
+strong, b { color: var(--text); font-weight: 700; }
+.hl { color: var(--accent); font-weight: 700; }
+.hl-bg { background: var(--accent-light); padding: 0.1em 0.3em; border-radius: 3px; color: var(--accent); font-weight: 600; }
+.hl-yellow { background: #FFF3B0; padding: 0.05em 0.25em; border-radius: 2px; }
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  color: #333;
+  border: 1px solid var(--grey-200);
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  padding: 1.2em 1.4em;
+  overflow-x: auto;
+  line-height: 1.6;
+  margin: 1.2em 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+pre code { background: none; padding: 0; border: none; font-size: inherit; }
+
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  background: var(--grey-50);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+blockquote p { margin: 0.3em 0; }
+
+/* ===== LAYOUT ===== */
+.article-wrapper {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ===== TOP NAV ===== */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--grey-200);
+  padding: 0.6rem 0;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+.top-nav.visible { transform: translateY(0); }
+.top-nav-inner {
+  max-width: var(--max-width); margin: 0 auto; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-nav-title { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.top-nav-badge { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 6rem 0 3rem;
+  text-align: center;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-bottom: 1.2rem;
+  padding: 0.3em 0.9em;
+  border: 1.5px solid var(--accent);
+  border-radius: 20px;
+}
+
+.hero h1 { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin: 0.8em auto 2em;
+  line-height: 1.6;
+}
+
+/* Hero formula */
+.hero-formula {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 0.4em; margin: 2.5em auto; max-width: 780px;
+  font-size: 0.9rem; font-family: var(--font-mono);
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 1.4em 1.6em;
+}
+
+.hero-formula-chip {
+  display: inline-flex; align-items: center; padding: 0.35em 0.8em;
+  border-radius: 20px; font-weight: 700; font-size: 0.82rem;
+  font-family: var(--font-body); white-space: nowrap;
+}
+.hero-formula-chip.llm { background: #1A1A1A; color: #FFF; }
+.hero-formula-chip.ctx { background: var(--grey-200); color: var(--text); }
+.hero-formula-chip.tool { background: var(--grey-300); color: var(--text); }
+.hero-formula-chip.onto { background: var(--accent); color: #FFF; }
+.hero-formula-chip.gov { border: 2px solid var(--accent); color: var(--accent); background: #FFF; }
+.hero-formula-plus { color: var(--grey-400); font-size: 1.2rem; font-weight: 300; }
+
+/* ===== TABLE OF CONTENTS ===== */
+.toc {
+  background: var(--grey-50); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 1.8em 2em;
+  margin: 2em 0 3em;
+}
+
+.toc-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-500); margin-bottom: 1em; }
+.toc ol { list-style: none; counter-reset: toc-counter; }
+.toc li { counter-increment: toc-counter; margin: 0.4em 0; }
+.toc li::before {
+  content: counter(toc-counter, decimal-leading-zero);
+  font-size: 0.72rem; font-weight: 700; color: var(--grey-400);
+  margin-right: 0.8em; font-family: var(--font-mono);
+}
+.toc a {
+  color: var(--text); text-decoration: none; font-weight: 500;
+  transition: color var(--transition);
+  border-bottom: 1px solid transparent;
+}
+.toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.toc .toc-sub { margin-left: 2em; font-size: 0.93em; }
+
+/* ===== SECTIONS ===== */
+.section { margin: 2em 0; }
+
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg);
+  padding: 1.6em 1.8em;
+  margin: 1.5em 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  font-weight: 700; font-size: 1.05rem; margin-bottom: 0.6em;
+  display: flex; align-items: center; gap: 0.5em;
+}
+
+/* ===== ANALOGY BOX ===== */
+.analogy {
+  background: #FFF;
+  border-left: 3px solid var(--accent);
+  padding: 1em 1.3em;
+  margin: 1.2em 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.95em;
+  color: var(--text-secondary);
+}
+
+.analogy::before { content: '💡 类比：'; font-size: 0.85em; font-weight: 600; color: var(--accent); }
+.analogy strong { color: var(--accent); }
+
+/* ===== TABLE ===== */
+.comp-table {
+  width: 100%; border-collapse: collapse; margin: 1.5em 0;
+  font-size: 0.92rem; border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.comp-table thead { background: var(--text); color: #FFF; }
+.comp-table th { padding: 0.8em 1em; text-align: left; font-weight: 600; font-size: 0.85rem; }
+.comp-table td { padding: 0.75em 1em; border-bottom: 1px solid var(--grey-200); }
+.comp-table tbody tr { background: #FFF; }
+.comp-table tbody tr:nth-child(even) { background: var(--grey-50); }
+.comp-table tbody tr:hover { background: var(--accent-light); }
+
+/* ===== SVG DIAGRAM CONTAINER ===== */
+.diagram-container {
+  position: relative;
+  margin: 2.5em 0;
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5em;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.diagram-container.full-width {
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  border-radius: 0;
+  padding: 2.5em 2em;
+}
+
+.diagram-label {
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--grey-500); margin-bottom: 1em;
+  text-align: center;
+}
+
+.diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+/* ===== ARCH DIAGRAM SPECIFIC ===== */
+.arch-layer { transition: filter 0.3s ease; cursor: default; }
+.arch-layer:hover { filter: brightness(0.97); }
+
+@keyframes flowDash { to { stroke-dashoffset: -40; } }
+
+.flow-line {
+  stroke-dasharray: 8 6;
+  animation: flowDash 1.5s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.pulse-dot { animation: pulse 2s ease-in-out infinite; }
+
+/* ===== STEP ANIMATION ===== */
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.step-animate { opacity: 0; }
+.step-animate.active { animation: stepIn 0.5s ease forwards; }
+
+/* ===== COMPARISON BADGES ===== */
+.tag {
+  display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 0.2em 0.7em; border-radius: 12px;
+  font-family: var(--font-body);
+}
+.tag-context { background: var(--grey-200); color: var(--text); }
+.tag-query { background: var(--accent); color: #FFF; }
+.tag-auto { background: var(--grey-200); color: var(--text); }
+.tag-llm { background: var(--text); color: #FFF; }
+
+/* ===== TRUST TABLE ===== */
+.trust-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 1.2em 0; }
+.trust-table th { background: var(--text); color: #FFF; padding: 0.6em 0.8em; text-align: left; font-size: 0.82rem; }
+.trust-table td { padding: 0.5em 0.8em; border-bottom: 1px solid var(--grey-200); }
+.trust-table .tag-official { background: #E8F5E9; color: #2E7D32; padding: 0.15em 0.5em; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+.trust-table .tag-infer { background: #FFF3E0; color: #E65100; padding: 0.15em 0.5em; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+.trust-table .tag-suggest { background: #E3F2FD; color: #1565C0; padding: 0.15em 0.5em; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+.trust-table .tag-example { background: #F3E5F5; color: #7B1FA2; padding: 0.15em 0.5em; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+
+/* ===== FOOTER ===== */
+.article-footer {
+  margin-top: 4em; padding: 2em 0; border-top: 1px solid var(--grey-200);
+  color: var(--text-secondary); font-size: 0.88rem; text-align: center;
+}
+
+/* ===== SCROLL PROGRESS ===== */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--accent); z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  .article-wrapper { padding: 0 1.2rem; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.4rem; }
+  .hero { padding: 4rem 0 2rem; }
+  .hero-formula { font-size: 0.75rem; padding: 1em; gap: 0.3em; }
+  .hero-formula-chip { font-size: 0.7rem; padding: 0.25em 0.55em; }
+  .diagram-container { padding: 1em; }
+  pre { font-size: 0.75rem; padding: 1em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .flow-line { animation: none; }
+  .pulse-dot { animation: none; }
+  .step-animate { opacity: 1; animation: none; }
+}
+
+/* ===== PRINT ===== */
+@media print {
+  .top-nav, .scroll-progress { display: none; }
+  .reveal { opacity: 1; transform: none; }
+  body { font-size: 12pt; }
+}
+
+/* ===== INTERACTIVE TERMINAL ===== */
+.interactive-terminal {
+  background: #1A1A1A; color: #E0E0E0; border-radius: var(--radius-md);
+  padding: 1.2em 1.4em; margin: 1.5em 0; font-family: var(--font-mono);
+  font-size: 0.82rem; line-height: 1.7; overflow-x: auto;
+  box-shadow: var(--shadow-md);
+}
+.interactive-terminal .prompt { color: #4CAF50; }
+.interactive-terminal .output { color: #BDBDBD; }
+.interactive-terminal .highlight { color: var(--accent); }
+.interactive-terminal .dim { color: #757575; }
+
+/* layer nav dots */
+.layer-dots { display: flex; gap: 0.5em; justify-content: center; margin: 1em 0; }
+.layer-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--grey-300);
+  transition: background var(--transition), transform var(--transition);
+  cursor: pointer;
+}
+.layer-dot.active { background: var(--accent); transform: scale(1.3); }
+
+/* concept grid */
+.concept-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; margin: 1.5em 0;
+}
+@media (max-width: 600px) { .concept-grid { grid-template-columns: 1fr; } }
+.concept-item {
+  background: #FFF; border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+  padding: 1.2em 1.4em; transition: box-shadow var(--transition), border-color var(--transition);
+}
+.concept-item:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
+.concept-item h4 { margin-top: 0; font-size: 1rem; }
+.concept-item .icon { font-size: 1.6rem; margin-bottom: 0.3em; display: block; }
+
+/* Footnote style */
+.fn { font-size: 0.82rem; color: var(--grey-500); }
+</style>
+<meta name="description" content="从检索上下文到工具调用与行动，解释 Agent 如何使用 Ontology。"><link rel="canonical" href="https://isaac2024.online/strategy/agent-ontology-interaction/"><link rel="stylesheet" href="/ontology-readings-20260930-v1/reading.css"></head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav class="top-nav" id="topNav">
+  <div class="top-nav-inner">
+    <span class="top-nav-title">Palantir Agent × Ontology 交互机制</span>
+    <span class="top-nav-badge">深度解析</span>
+  </div>
+</nav>
+
+<div class="article-wrapper">
+
+<!-- ===== HERO ===== -->
+<header class="hero reveal">
+  <div class="hero-badge">零点未来 · 技术科普</div>
+  <h1>Palantir AIP Agent 与 Ontology<br>的<span class="hl">交互机制</span></h1>
+  <p class="hero-subtitle">
+    Agent 不直接访问底层数据库，也不自由扫描完整 Ontology schema。<br>
+    它在一个<span class="hl">被配置和授权的边界内</span>，通过 Ontology 暴露的对象、关系、上下文、函数和动作完成业务交互。
+  </p>
+
+  <div class="hero-formula" aria-label="交互公式">
+    <span class="hero-formula-chip llm">LLM</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip ctx">Retrieval Context</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip tool">Tools</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip onto">Ontology</span>
+    <span class="hero-formula-plus">+</span>
+    <span class="hero-formula-chip gov">Governance</span>
+  </div>
+</header>
+
+<!-- ===== GLOBAL SVG MARKERS ===== -->
+<svg width="0" height="0" aria-hidden="true">
+  <defs>
+    <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.10"/></filter>
+    <marker id="arrowDown" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#666666"/>
+    </marker>
+    <marker id="arrowDownRed" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#3B82F6"/>
+    </marker>
+  </defs>
+</svg>
+
+<!-- ===== TOC ===== -->
+<nav class="toc reveal" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <ol>
+    <li><a href="#s0">核心结论：Agent 与 Ontology 的关系</a></li>
+    <li><a href="#s1">Ontology 在 Agent 眼里是什么？</a></li>
+    <li><a href="#s2">交互分层：五层架构</a></li>
+    <li><a href="#s3">Layer 1 · Context Layer（检索上下文）</a></li>
+    <li><a href="#s4">Layer 2 · Query Layer（对象查询）</a></li>
+    <li><a href="#s5">Context 与 Query 的关键区别</a></li>
+    <li><a href="#s6">Layer 3 · Logic Layer（函数与逻辑）</a></li>
+    <li><a href="#s7">Layer 4 · Action Layer（业务动作）</a></li>
+    <li><a href="#s8">Layer 5 · Governance Layer（治理层）</a></li>
+    <li><a href="#s9">Tool Calling 模式</a></li>
+    <li><a href="#s10">端到端交互链路（全流程推演）</a></li>
+    <li><a href="#s11">内部 Agent 与外部 Agent</a></li>
+    <li><a href="#s12">最小可工作版本设计</a></li>
+    <li><a href="#s13">总结</a></li>
+    <li><a href="#refs">参考文档</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 0. 核心结论 ===== -->
+<section class="section reveal" id="s0">
+  <h2>0. 核心结论</h2>
+
+  <p>在 Palantir 体系里，<span class="hl">Agent 不直接访问底层数据库表</span>，也不自由扫描完整 Ontology schema。它是在<span class="hl">被配置和授权的边界内</span>，通过 Ontology 暴露的对象、关系、上下文、函数和动作完成业务交互。</p>
+
+  <blockquote>
+    <p><strong>Ontology</strong> 是企业业务世界的受治理语义接口；<strong>Agent</strong> 是通过自然语言使用这些接口的操作员。</p>
+    <p>你可以把 Ontology 理解为 Agent 的<span class="hl">"操作系统"（AgentOS）</span>——Agent 的一切能力都在 Ontology 这个受控边界内运行。</p>
+  </blockquote>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">交互公式 · 数据流转</div>
+    <svg viewBox="0 0 860 110" width="860" height="110" role="img" aria-label="交互公式流程图">
+      <defs>
+        <marker id="arr" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto">
+          <path d="M0,0 L12,6 L0,12 Z" fill="#666666"/>
+        </marker>
+      </defs>
+      <rect x="15" y="30" width="130" height="50" rx="25" fill="#1A1A1A"/>
+      <text x="80" y="60" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">👤 用户消息</text>
+
+      <line x1="145" y1="55" x2="185" y2="55" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <rect x="188" y="22" width="115" height="32" rx="16" fill="#EEEEEE"/>
+      <text x="245" y="43" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">Context 注入</text>
+
+      <line x1="303" y1="38" x2="340" y2="38" stroke="#999" stroke-width="1"/>
+
+      <rect x="188" y="58" width="115" height="32" rx="16" fill="#EEEEEE"/>
+      <text x="245" y="79" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">Tools 调用</text>
+
+      <line x1="303" y1="74" x2="340" y2="74" stroke="#999" stroke-width="1"/>
+
+      <!-- Merge to LLM -->
+      <path d="M340,38 L355,38 L355,55 L370,55" stroke="#999" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+      <path d="M340,74 L355,74 L355,55" stroke="#999" stroke-width="1.5" fill="none"/>
+
+      <rect x="373" y="30" width="80" height="50" rx="8" fill="#333"/>
+      <text x="413" y="60" text-anchor="middle" fill="#FFF" font-size="13" font-weight="700" font-family="Microsoft YaHei, sans-serif">LLM</text>
+
+      <line x1="453" y1="55" x2="493" y2="55" stroke="#3B82F6" stroke-width="2" marker-end="url(#arr)"/>
+
+      <rect x="496" y="22" width="140" height="32" rx="16" fill="#3B82F6"/>
+      <text x="566" y="43" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">Ontology 查询/计算</text>
+
+      <rect x="496" y="58" width="140" height="32" rx="16" fill="#2563EB"/>
+      <text x="566" y="79" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">Governance 约束</text>
+
+      <line x1="636" y1="38" x2="673" y2="38" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="636" y1="74" x2="673" y2="74" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <rect x="676" y="30" width="130" height="50" rx="25" fill="#1A1A1A"/>
+      <text x="741" y="55" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">✅ 审计与结果</text>
+    </svg>
+  </div>
+
+  <p>各部分的分工：</p>
+  <ul style="margin-left:1.5em; line-height:2;">
+    <li><strong>LLM</strong> — 理解用户意图，决策下一步</li>
+    <li><strong>Retrieval Context</strong> — 确定性为 LLM 提供业务上下文，避免 Agent "两眼一黑"</li>
+    <li><strong>Ontology</strong> — 企业业务对象、关系、函数、动作的语义模型</li>
+    <li><strong>Tools</strong> — 把 LLM 意图转换成可执行的查询、函数调用或业务动作</li>
+    <li><strong>Governance</strong> — 约束 Agent 能看什么、能调什么、能改什么，并记录审计与 lineage</li>
+  </ul>
+</section>
+
+<!-- ===== 1. Ontology 在 Agent 眼里是什么 ===== -->
+<section class="section reveal" id="s1">
+  <h2>1. Ontology 在 Agent 眼里是什么？</h2>
+
+    <div class="diagram-container reveal">
+    <div class="diagram-label">Ontology 语义层结构</div>
+    <svg viewBox="0 0 780 280" width="780" height="280" role="img" aria-label="Ontology结构图">
+      <!-- Bottom layer: Raw data -->
+      <rect x="30" y="220" width="720" height="50" rx="6" fill="#F5F5F5" stroke="#E0E0E0"/>
+      <text x="390" y="250" text-anchor="middle" fill="#9E9E9E" font-size="11" font-family="Microsoft YaHei, sans-serif">Datasets · Virtual Tables · Models · Pipelines（底层数据资产）</text>
+
+      <!-- Middle: Ontology -->
+      <rect x="30" y="90" width="720" height="120" rx="8" fill="#FFF" stroke="#3B82F6" stroke-width="2"/>
+      <text x="60" y="120" fill="#3B82F6" font-size="14" font-weight="700" font-family="Microsoft YaHei, sans-serif">ONTOLOGY — 受治理的语义层</text>
+
+      <!-- Left: Semantic -->
+      <rect x="55" y="135" width="320" height="60" rx="6" fill="#FAFAFA" stroke="#E0E0E0"/>
+      <text x="75" y="158" fill="#333" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Semantic（描述世界）</text>
+      <text x="75" y="176" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">Object Types · Properties · Links · Interfaces</text>
+
+      <!-- Right: Kinetic -->
+      <rect x="395" y="135" width="330" height="60" rx="6" fill="#FAFAFA" stroke="#E0E0E0"/>
+      <text x="415" y="158" fill="#333" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Kinetic（改变世界）</text>
+      <text x="415" y="176" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">Actions · Functions · Automate · AIP Logic</text>
+
+      <!-- Top: Agent -->
+      <rect x="260" y="15" width="260" height="50" rx="25" fill="#1A1A1A"/>
+      <text x="390" y="46" text-anchor="middle" fill="#FFF" font-size="13" font-weight="600" font-family="Microsoft YaHei, sans-serif">🤖 AIP Agent / Chatbot</text>
+
+      <!-- Arrows from agent to ontology -->
+      <line x1="340" y1="65" x2="200" y2="130" stroke="#999" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+      <line x1="440" y1="65" x2="560" y2="130" stroke="#999" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+      <!-- Arrows from ontology to data -->
+      <line x1="200" y1="210" x2="180" y2="220" stroke="#CCC" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="560" y1="210" x2="580" y2="220" stroke="#CCC" stroke-width="1" stroke-dasharray="4 3"/>
+    </svg>
+  </div>
+
+  <p>Palantir Ontology 是企业的 <span class="hl">operational layer</span>，坐在 datasets、virtual tables、models 之上，把底层数字资产映射成现实世界对象。它<strong>不是</strong>传统数据目录，也<strong>不</strong>只是知识图谱。</p>
+
+  <div class="concept-grid">
+    <div class="concept-item">
+      <span class="icon">📋</span>
+      <h4>Semantic Elements <span style="font-weight:400;font-size:0.85em;color:#757575;">描述业务世界</span></h4>
+      <p style="margin:0.4em 0;font-size:0.9em;">
+        <span class="hl-yellow">Object Types</span> — Shipment, Order, Warehouse, Customer<br>
+        <span class="hl-yellow">Properties</span> — status, ETA, priority, performanceScore<br>
+        <span class="hl-yellow">Links</span> — Shipment → Order → Customer
+      </p>
+      <p style="margin:0;font-size:0.85em;color:var(--text-secondary);">解决：Agent 如何理解"企业里有什么，它们之间是什么关系"</p>
+    </div>
+    <div class="concept-item">
+      <span class="icon">⚡</span>
+      <h4>Kinetic Elements <span style="font-weight:400;font-size:0.85em;color:#757575;">改变业务世界</span></h4>
+      <p style="margin:0.4em 0;font-size:0.9em;">
+        <span class="hl-yellow">Actions</span> — updateShipmentETA, assignCarrier<br>
+        <span class="hl-yellow">Functions</span> — calculateDelayRisk, optimizeSchedule
+      </p>
+      <p style="margin:0;font-size:0.85em;color:var(--text-secondary);">解决：Agent 如何从"回答问题"走向"执行业务"</p>
+    </div>
+  </div>
+
+  <p>关键理解：Palantir Ontology 的核心不是"把表换个名字"，而是<span class="hl">把企业的名词、关系、规则、动作和权限放到同一个受治理的语义层里</span>。</p>
+</section>
+
+<!-- ===== 2. 交互分层 ===== -->
+<section class="section reveal" id="s2">
+  <h2>2. Agent 与 Ontology 的交互分层</h2>
+
+  <p>建议把交互分成<span class="hl">五层</span>来看：</p>
+
+  <div style="margin:2em 0;">
+    <div style="display:flex;align-items:center;gap:0.8em;margin:0.6em 0;padding:0.5em 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F5F5F5;border:1px solid #E0E0E0;font-weight:700;font-size:0.8rem;color:#333;flex-shrink:0;">1</span>
+      <span><strong>Context Layer</strong> — 让 Agent 先看见相关上下文（系统确定性触发）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.8em;margin:0.6em 0;padding:0.5em 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#E0E0E0;border:1px solid #CCC;font-weight:700;font-size:0.8rem;color:#333;flex-shrink:0;">2</span>
+      <span><strong>Query Layer</strong> — 让 Agent 主动查询对象和关系（LLM 自主决策）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.8em;margin:0.6em 0;padding:0.5em 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#9E9E9E;border:1px solid #888;font-weight:700;font-size:0.8rem;color:#FFF;flex-shrink:0;">3</span>
+      <span><strong>Logic Layer</strong> — 让 Agent 调用函数、模型和业务逻辑（LLM 自主决策）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.8em;margin:0.6em 0;padding:0.5em 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#616161;border:1px solid #555;font-weight:700;font-size:0.8rem;color:#FFF;flex-shrink:0;">4</span>
+      <span><strong>Action Layer</strong> — 让 Agent 执行受控业务动作（LLM 决策 + 可选用户确认）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.8em;margin:0.6em 0;padding:0.5em 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#3B82F6;font-weight:700;font-size:0.8rem;color:#FFF;flex-shrink:0;">5</span>
+      <span><strong>Governance Layer</strong> — 约束 Agent 的权限、审计和安全边界（全链路贯穿）</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3. Layer 1: Context Layer ===== -->
+<section class="section reveal" id="s3">
+  <h2>3. Layer 1 · Context Layer（Retrieval Context）</h2>
+
+  <p>Context Layer 的作用是：在用户每次提问时，<span class="hl">系统自动</span>给 Agent 提供相关背景。关键特征：<span class="hl-bg">确定性触发</span> — 每条用户消息到达时自动执行，不依赖 LLM 自己判断要不要检索。</p>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">Retrieval Context 的三种类型</div>
+    <svg viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="Context Layer三种类型">
+      <!-- Top: User Message -->
+      <rect x="300" y="10" width="200" height="36" rx="18" fill="#1A1A1A"/>
+      <text x="400" y="33" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">👤 用户消息到达</text>
+
+      <line x1="400" y1="46" x2="400" y2="70" stroke="#999" stroke-width="2"/>
+
+      <!-- Diverging paths -->
+      <rect x="290" y="72" width="220" height="30" rx="6" fill="#333"/>
+      <text x="400" y="92" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">系统自动触发（不经过 LLM）</text>
+
+      <!-- Three branches, all starting from bottom of "系统自动触发" box -->
+      <!-- Box bottom is at y=102 (72+30), spanning x=290 to x=510 -->
+      <!-- 1. Ontology Context -->
+      <line x1="330" y1="102" x2="110" y2="135" stroke="#666" stroke-width="1.8" marker-end="url(#arrowDown)"/>
+      <rect x="25" y="138" width="220" height="80" rx="8" fill="#FFF" stroke="#E0E0E0" filter="url(#shadow)"/>
+      <text x="135" y="162" text-anchor="middle" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">📋 Ontology Context</text>
+      <text x="135" y="182" text-anchor="middle" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">固定对象 / 语义搜索</text>
+      <text x="135" y="200" text-anchor="middle" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">从 Object Type 检索</text>
+
+      <!-- 2. Document Context -->
+      <line x1="400" y1="102" x2="400" y2="135" stroke="#666" stroke-width="1.8" marker-end="url(#arrowDown)"/>
+      <rect x="285" y="138" width="230" height="80" rx="8" fill="#FFF" stroke="#E0E0E0" filter="url(#shadow)"/>
+      <text x="400" y="162" text-anchor="middle" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">📄 Document Context</text>
+      <text x="400" y="182" text-anchor="middle" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">全文 / 语义 Chunk</text>
+      <text x="400" y="200" text-anchor="middle" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">从文档检索相关内容</text>
+
+      <!-- 3. Function Context -->
+      <line x1="470" y1="102" x2="690" y2="135" stroke="#666" stroke-width="1.8" marker-end="url(#arrowDown)"/>
+      <rect x="550" y="138" width="225" height="80" rx="8" fill="#FFF" stroke="#E0E0E0" filter="url(#shadow)"/>
+      <text x="662" y="162" text-anchor="middle" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">⚙️ Function-backed Context</text>
+      <text x="662" y="182" text-anchor="middle" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">自定义 TypeScript 检索</text>
+      <text x="662" y="200" text-anchor="middle" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">多数据源拼装</text>
+
+      <!-- Merge to LLM -->
+      <path d="M135,218 L135,260 L400,260 L400,243" stroke="#666" stroke-width="1.8" fill="none" marker-end="url(#arrowDown)"/>
+      <path d="M400,218 L400,243" stroke="#666" stroke-width="1.8" fill="none" marker-end="url(#arrowDown)"/>
+      <path d="M662,218 L662,260 L400,260" stroke="#666" stroke-width="1.8" fill="none"/>
+
+      <rect x="310" y="270" width="180" height="40" rx="20" fill="#3B82F6"/>
+      <text x="400" y="295" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">注入 LLM Context</text>
+    </svg>
+  </div>
+
+  <h3>3.1 Ontology Context</h3>
+  <p>从 Object Type 检索对象，支持<strong>固定对象集</strong>（Variable Input）和<strong>语义搜索</strong>（Vector Embedding）两种方式。</p>
+
+  <div class="card">
+    <div class="card-title">📌 固定对象集 — 仓库调度助手</div>
+    <p style="font-size:0.92em;margin:0.3em 0;">
+      配置：Object Type = <span class="hl-yellow">Warehouse</span>，绑定 Workshop 页面当前选中 Warehouse<br>
+      效果：用户在 Workshop 选中"华南仓"后打开 Agent → Agent 自动拿到容量、积压量、负责人等信息 → 用户直接问"现在积压情况怎么样？"
+    </p>
+  </div>
+
+  <div class="analogy">
+    <strong>秘书在老板走进会议室前，已经把这个客户的档案放到桌上了。</strong>老板不需要说"帮我找一下档案"，坐下就能直接谈事。
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 语义搜索 — 客户投诉处理助手</div>
+    <p style="font-size:0.92em;margin:0.3em 0;">
+      配置：Object Type = <span class="hl-yellow">CustomerComplaint</span>，语义搜索 K=5<br>
+      用户问"有没有客户反映过冷链断链导致货损的情况？"→ 系统自动向量化问题 → 搜索 embedding → 返回 5 条最相关历史投诉 → LLM 直接总结
+    </p>
+  </div>
+
+  <div class="analogy">
+    <strong>图书管理员听到你的问题后，自动从书架上抽出最相关的 5 本书放到你面前。</strong>你不需要自己去找书，直接翻阅就行。
+  </div>
+
+  <h3>3.2 Document Context</h3>
+  <p>从文档中检索相关内容，支持<strong>全文模式</strong>和<strong>语义 Chunk 模式</strong>两种方式。</p>
+
+  <div class="card">
+    <div class="card-title">📄 全文模式 — 合同条款审查</div>
+    <p style="font-size:0.92em;margin:0.3em 0;">
+      配置：关联 Foundry 文档集，全文检索<br>
+      效果：用户问"这份承运合同中关于延误赔偿的条款是什么？"→ Agent 直接拿到完整合同文本 → LLM 定位并解释相关条款
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 语义 Chunk 模式 — 多文档精准定位</div>
+    <p style="font-size:0.92em;margin:0.3em 0;">
+      配置：关联多个合同/文档，语义搜索 K=3<br>
+      用户问"承运商 A 的延误赔偿条款和免责条件"→ 系统自动从三份合同中搜出最相关的 chunk → LLM 直接对比分析
+    </p>
+  </div>
+
+  <div class="analogy">
+    <strong>图书管理员听到你的问题后，自动从书架上抽出最相关的 5 本书放到你面前。</strong>你不需要自己去找书，直接翻阅就行。
+  </div>
+
+  <h3>3.3 Function-backed Context</h3>
+  <p>当内置检索不够用时，用 TypeScript 写自定义检索函数。函数输出 <code>retrievedPrompt</code> 字符串注入 LLM context。<span class="hl-yellow">适合多数据源、多检索策略、多业务规则组合的复杂企业场景</span>。</p>
+
+  <div class="card">
+    <div class="card-title">🎯 客户 360° 视图助手</div>
+    <p style="font-size:0.92em;margin:0.3em 0;">
+      场景：用户问"这个客户最近情况怎么样？"<br>
+      自定义函数同时拉取：CRM 沟通记录 + Ontology 活跃订单 + 语义搜索投诉工单 → 拼装成综合情报注入 LLM
+    </p>
+  </div>
+
+  <div class="analogy">
+    <strong>秘书在老板开会前，同时打电话给销售部、客服部和法务部</strong>，把各方信息汇总成一页纸摆到桌上。
+  </div>
+</section>
+
+<!-- ===== 4. Layer 2: Query Layer ===== -->
+<section class="section reveal" id="s4">
+  <h2>4. Layer 2 · Query Layer（Object Query Tool）</h2>
+
+  <p>Context Layer 是<span class="hl">系统自动注入</span>；Query Layer 是<span class="hl">Agent 主动查询</span>。Object Query Tool 允许 LLM 在配置边界内访问指定 Object Types 和 Properties，支持 <strong>filtering、aggregation、inspection、traversal of links</strong>。</p>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">Object Query 工作流程</div>
+    <svg viewBox="0 0 780 230" width="780" height="230" role="img" aria-label="Object Query流程">
+      <rect x="20" y="20" width="180" height="50" rx="25" fill="#1A1A1A"/>
+      <text x="110" y="42" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">LLM 决策查询</text>
+      <text x="110" y="58" text-anchor="middle" fill="#CCC" font-size="9" font-family="Microsoft YaHei, sans-serif">"我需要查..."</text>
+
+      <line x1="200" y1="45" x2="260" y2="45" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="263" y="10" width="250" height="110" rx="8" fill="#FFF" stroke="#999" stroke-width="1.5"/>
+      <text x="388" y="35" text-anchor="middle" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">Object Query Tool</text>
+      <line x1="278" y1="45" x2="498" y2="45" stroke="#EEE"/>
+      <text x="283" y="65" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">• Filter: status="delayed"</text>
+      <text x="283" y="82" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">• Aggregation: COUNT, GROUP BY</text>
+      <text x="283" y="99" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">• Link Traversal: Ship→Order→Cust</text>
+
+      <line x1="513" y1="65" x2="560" y2="65" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="563" y="10" width="195" height="110" rx="8" fill="#FAFAFA" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="660" y="35" text-anchor="middle" fill="#3B82F6" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">Ontology</text>
+      <line x1="578" y1="45" x2="743" y2="45" stroke="#EEE"/>
+      <text x="583" y="65" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">• Object Types & Links</text>
+      <text x="583" y="82" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">• Properties & Values</text>
+      <text x="583" y="99" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">• 基于语义对象，非 SQL</text>
+
+      <line x1="660" y1="120" x2="660" y2="155" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="490" y="158" width="340" height="55" rx="8" fill="#3B82F6" filter="url(#shadow)"/>
+      <text x="660" y="180" text-anchor="middle" fill="#FFF" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">📊 结构化查询结果 + Citations</text>
+      <text x="660" y="200" text-anchor="middle" fill="#DBEAFE" font-size="10" font-family="Microsoft YaHei, sans-serif">点击可跳转到具体 Ontology Object 来源</text>
+    </svg>
+  </div>
+
+  <h3>三种典型查询模式</h3>
+
+  <div class="card">
+    <div class="card-title">🔢 多条件过滤 + 聚合</div>
+    <p style="font-size:0.92em;">"今天华南仓有多少个延误的高优先级订单？" → Filter: region="华南" + delayed + high priority → <span class="hl-yellow">COUNT → 7</span><br>
+    追问"哪几个是 VIP 客户？" → 沿 link Shipment→Order→Customer → Filter: serviceLevel="VIP" → <span class="hl-yellow">3 个</span></p>
+  </div>
+
+  <div class="analogy">
+    <strong>老板在开会时自己翻资料</strong>，先按地区筛订单，再追问"哪些是大客户"。资料一直在桌上，但翻哪页、怎么筛，是老板自己决定的。
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 Link 遍历 — 追溯问题根因</div>
+    <p style="font-size:0.92em;">"订单 ORD-8832 的延误是哪个环节出的问题？" → 沿 link 逐层：Shipment → Carrier（履约率 72%）→ TransitHub（拥堵等级 high）→ <span class="hl-yellow">综合判断：车辆故障 + 中转枢纽拥堵</span></p>
+  </div>
+
+  <div class="analogy">
+    <strong>侦探沿线索链逐步追查</strong> — 从案件到嫌疑人，从嫌疑人到同伙，从同伙到据点。每一步都是"顺着关系往下查"。
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 聚合 — 运营概览</div>
+    <p style="font-size:0.92em;">"各区域仓库积压情况对比？" → Group By: warehouse.region, Aggregation: COUNT(status="pending_dispatch") → <span class="hl-yellow">华南 42 / 华东 28 / 华北 15 / 西南 8</span></p>
+  </div>
+
+  <div class="analogy">
+    <strong>管理层要一张各区域的"红绿灯"看板</strong> — 不看具体每一单，只看汇总数字，一眼判断哪里需要关注。
+  </div>
+</section>
+
+<!-- ===== 5. Context vs Query 区别 ===== -->
+<section class="section reveal" id="s5">
+  <h2>5. Retrieval Context 与 Object Query 的关键区别</h2>
+
+  <p>这是设计 Agent 时<span class="hl">最容易混淆的一点</span>。</p>
+
+  <table class="comp-table">
+    <thead>
+      <tr><th>维度</th><th>Retrieval Context</th><th>Object Query Tool</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>触发方式</td><td><span class="tag tag-context">每条用户消息自动触发</span></td><td><span class="tag tag-query">LLM 自己决定是否调用</span></td></tr>
+      <tr><td>可靠性</td><td>确定性更强</td><td>依赖 LLM 判断，存在漏查风险</td></tr>
+      <tr><td>适合内容</td><td>当前业务对象、关键背景、必须看到的信息</td><td>探索性分析、临时查询、多轮追问</td></tr>
+      <tr><td>风险</td><td>配置不当带来 token 浪费或上下文噪声</td><td>LLM 可能忘查、查错、查不全</td></tr>
+    </tbody>
+  </table>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">设计原则：什么放哪里？</div>
+    <svg viewBox="0 0 780 180" width="780" height="180" role="img" aria-label="Context vs Query分工">
+      <!-- Left: Context -->
+      <rect x="15" y="10" width="365" height="160" rx="10" fill="#FAFAFA" stroke="#E0E0E0"/>
+      <text x="197" y="40" text-anchor="middle" fill="#333" font-size="13" font-weight="700" font-family="Microsoft YaHei, sans-serif">🔒 Retrieval Context</text>
+      <text x="197" y="60" text-anchor="middle" fill="#9E9E9E" font-size="10" font-family="Microsoft YaHei, sans-serif">系统每轮自动注入</text>
+      <text x="45" y="90" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">• 当前用户正在操作的 Warehouse</text>
+      <text x="45" y="110" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">• 今日 KPI 快照（出库量/积压/异常）</text>
+      <text x="45" y="130" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">• 用户角色和权限等级</text>
+      <text x="45" y="155" fill="#9E9E9E" font-size="10" font-family="Microsoft YaHei, sans-serif">→ 确保 Agent 始终知道"在跟谁说话"</text>
+
+      <!-- Right: Query -->
+      <rect x="400" y="10" width="365" height="160" rx="10" fill="#FFF" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="582" y="40" text-anchor="middle" fill="#3B82F6" font-size="13" font-weight="700" font-family="Microsoft YaHei, sans-serif">🔎 Object Query Tool</text>
+      <text x="582" y="60" text-anchor="middle" fill="#9E9E9E" font-size="10" font-family="Microsoft YaHei, sans-serif">LLM 按需调用</text>
+      <text x="430" y="90" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">• "对比华南和华东仓的积压情况"</text>
+      <text x="430" y="110" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">• "这个承运商过去 30 天表现？"</text>
+      <text x="430" y="130" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">• "SH-0042 现在到哪了？"</text>
+      <text x="430" y="155" fill="#9E9E9E" font-size="10" font-family="Microsoft YaHei, sans-serif">→ 临时提出的、无法提前预测的探索性查询</text>
+    </svg>
+  </div>
+
+  <div class="analogy">
+    <strong>Retrieval Context 是固定在工位上的监控大屏</strong> — 永远开着，永远显示关键指标。<strong>Object Query 是你手里的对讲机</strong> — 需要的时候才拿起来问一句"3 号仓现在什么情况"。
+  </div>
+</section>
+
+<!-- ===== 6. Layer 3: Logic Layer ===== -->
+<section class="section reveal" id="s6">
+  <h2>6. Layer 3 · Logic Layer（Function Tool + AIP Logic）</h2>
+
+  <p>Agent 查询到对象后，需要调用<span class="hl">封装好的业务逻辑</span>，而不是让 LLM 自己"脑补规则"。分工原则：<strong>LLM 负责理解意图、选择函数、解释结果；Function 负责执行业务规则、调用模型、做优化计算</strong>。</p>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">Function Tool 调用流程</div>
+    <svg viewBox="0 0 780 200" width="780" height="200" role="img" aria-label="Function Tool流程">
+      <rect x="15" y="25" width="160" height="50" rx="8" fill="#1A1A1A"/>
+      <text x="95" y="47" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">LLM 选择函数</text>
+      <text x="95" y="64" text-anchor="middle" fill="#CCC" font-size="9" font-family="Microsoft YaHei, sans-serif">"调用风险评分"</text>
+
+      <line x1="175" y1="50" x2="225" y2="50" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="228" y="10" width="320" height="150" rx="8" fill="#FFF" stroke="#999" stroke-width="1.5"/>
+      <text x="388" y="35" text-anchor="middle" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">AIP Logic Function</text>
+      <line x1="243" y1="45" x2="533" y2="45" stroke="#EEE"/>
+      <text x="253" y="68" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">1. 查询历史延误数据（过去 90 天）</text>
+      <text x="253" y="86" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">2. 读取承运商当前履约评分</text>
+      <text x="253" y="104" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">3. 调用天气 API（目的地未来 24h）</text>
+      <text x="253" y="122" fill="#555" font-size="10" font-family="Microsoft YaHei, sans-serif">4. 运行延误概率预测模型</text>
+      <text x="253" y="140" fill="#3B82F6" font-size="10" font-weight="700" font-family="Microsoft YaHei, sans-serif">5. 综合打分 → high / medium / low</text>
+
+      <line x1="548" y1="85" x2="595" y2="85" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="598" y="60" width="170" height="50" rx="8" fill="#3B82F6"/>
+      <text x="683" y="82" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">结构化结果返回 LLM</text>
+      <text x="683" y="99" text-anchor="middle" fill="#DBEAFE" font-size="9" font-family="Microsoft YaHei, sans-serif">LLM 用自然语言解释</text>
+    </svg>
+  </div>
+
+  <p>三个典型例子说明<strong>为什么不能让 LLM 自己算</strong>：</p>
+
+  <div class="card">
+    <div class="card-title">🎯 风险评分 — calculateDelayRisk</div>
+    <p style="font-size:0.92em;">没有 Function：LLM 只能模糊判断"看起来有风险"。<br>
+    有了 Function：函数内部整合历史数据 + 履约率 + 天气 + 预测模型 → <span class="hl-yellow">精确输出 high/medium/low + 原因</span></p>
+  </div>
+
+  <div class="analogy">
+    <strong>老板让专业分析师出一份风险报告</strong>，而不是自己拍脑袋猜"大概有风险吧"。分析师用数据、模型和历史经验算出来的结论，比直觉靠谱得多。
+  </div>
+
+  <div class="card">
+    <div class="card-title">📧 跨对象业务逻辑 — recommendResolution</div>
+    <p style="font-size:0.92em;">输入 Shipment object + 客户投诉邮件原文 → AIP Logic 提取情绪和诉求 → 查询历史处理方案 → <span class="hl-yellow">输出建议方案 + 历史成功率</span></p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📐 优化类计算 — optimizeCarrierAllocation</div>
+    <p style="font-size:0.92em;">50 个订单 + 3 个承运商 + 成本/时效约束 → 线性规划模型 → <span class="hl-yellow">最优分配方案 + 预估成本 ¥84,200</span></p>
+  </div>
+
+  <div class="analogy">
+    <strong>调度经理把需求表交给运筹学专家</strong>，让专家跑优化模型。经理不需要自己会线性规划，只需要看懂结果、决定是否执行。
+  </div>
+</section>
+
+<!-- ===== 7. Layer 4: Action Layer ===== -->
+<section class="section reveal" id="s7">
+  <h2>7. Layer 4 · Action Layer</h2>
+
+  <p>Action Layer 是 Agent 从<span class="hl">"问答助手"变成"业务操作员"</span>的关键。Action Tool 让 Chatbot 执行 ontology edit，可配置为自动执行或用户确认后执行。</p>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">Action 执行流程 — 高风险需确认 vs 低风险自动执行</div>
+    <svg viewBox="0 0 780 260" width="780" height="260" role="img" aria-label="Action执行流程">
+      <!-- High risk path -->
+      <rect x="15" y="10" width="365" height="240" rx="10" fill="#FFF3E0" stroke="#E65100" stroke-width="1"/>
+      <text x="197" y="38" text-anchor="middle" fill="#E65100" font-size="13" font-weight="700" font-family="Microsoft YaHei, sans-serif">⚠️ 高风险操作</text>
+
+      <rect x="45" y="55" width="130" height="36" rx="6" fill="#1A1A1A"/>
+      <text x="110" y="78" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">LLM 生成 Action</text>
+
+      <line x1="175" y1="73" x2="205" y2="73" stroke="#999" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+      <rect x="208" y="55" width="140" height="36" rx="18" fill="#FFF" stroke="#E65100" stroke-width="1.5"/>
+      <text x="278" y="78" text-anchor="middle" fill="#E65100" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">用户确认？</text>
+
+      <line x1="278" y1="91" x2="278" y2="115" stroke="#E65100" stroke-width="1.5"/>
+
+      <!-- Yes -->
+      <rect x="228" y="118" width="100" height="30" rx="6" fill="#4CAF50"/>
+      <text x="278" y="138" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">✓ 确认执行</text>
+
+      <line x1="278" y1="148" x2="278" y2="172" stroke="#999" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+      <rect x="198" y="175" width="160" height="36" rx="6" fill="#3B82F6"/>
+      <text x="278" y="198" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">Ontology 写入 + 审计</text>
+
+      <!-- Example -->
+      <text x="50" y="235" fill="#757575" font-size="9" font-family="Microsoft YaHei, sans-serif">例：换承运商（涉及合同和成本）</text>
+
+      <!-- Low risk path -->
+      <rect x="400" y="10" width="365" height="240" rx="10" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1"/>
+      <text x="582" y="38" text-anchor="middle" fill="#2E7D32" font-size="13" font-weight="700" font-family="Microsoft YaHei, sans-serif">🟢 低风险操作</text>
+
+      <rect x="430" y="55" width="130" height="36" rx="6" fill="#1A1A1A"/>
+      <text x="495" y="78" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">系统/函数检测触发</text>
+
+      <line x1="560" y1="73" x2="590" y2="73" stroke="#999" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+      <rect x="593" y="55" width="140" height="36" rx="18" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.5"/>
+      <text x="663" y="78" text-anchor="middle" fill="#2E7D32" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">自动执行</text>
+
+      <line x1="663" y1="91" x2="663" y2="172" stroke="#2E7D32" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+
+      <rect x="583" y="175" width="160" height="36" rx="6" fill="#2E7D32"/>
+      <text x="663" y="198" text-anchor="middle" fill="#FFF" font-size="10" font-weight="600" font-family="Microsoft YaHei, sans-serif">直接完成</text>
+
+      <text x="440" y="235" fill="#757575" font-size="9" font-family="Microsoft YaHei, sans-serif">例：天气延误 <4h 自动更新 ETA</text>
+    </svg>
+  </div>
+
+  <div class="analogy">
+    <strong>自动驾驶在简单直道上自主调整车速</strong>，不需要驾驶员每次点确认。但遇到复杂路口（高风险操作），系统会把控制权交回给人。
+  </div>
+
+  <h3>辅助工具</h3>
+  <ul style="margin-left:1.5em;line-height:2;">
+    <li><span class="hl-yellow">Update Application Variable</span> — Agent 改变 Workshop 等应用状态（如"只看华东数据"→ 页面联动刷新）</li>
+    <li><span class="hl-yellow">Command Tool</span> — 触发其他 Palantir 应用操作（如"在地图上标出这 5 个订单"）</li>
+    <li><span class="hl-yellow">Request Clarification</span> — 执行前向用户确认模糊指令（如"您指的是哪个订单？"）</li>
+  </ul>
+
+  <div class="analogy">
+    <strong>护士在给药前再确认一遍："您说的是左手还是右手？"</strong>宁可多问一句，也不在不可逆操作上犯错。
+  </div>
+</section>
+
+<!-- ===== 8. Layer 5: Governance ===== -->
+<section class="section reveal" id="s8">
+  <h2>8. Layer 5 · Governance Layer</h2>
+
+  <p>Governance 是 Palantir AIP 和普通 Agent 框架的<span class="hl">核心差异之一</span>。它不是单独的一步，而是<span class="hl-bg">贯穿全链路的约束机制</span>。</p>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">Governance 全链路约束</div>
+    <svg viewBox="0 0 780 280" width="780" height="280" role="img" aria-label="Governance全链路">
+      <!-- Five layer bars with governance overlay -->
+      <rect x="30" y="15" width="720" height="35" rx="6" fill="#F5F5F5" stroke="#E0E0E0"/>
+      <text x="390" y="38" text-anchor="middle" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">Retrieval Context 配置 → 控制 Agent 每轮默认能看到什么</text>
+
+      <rect x="30" y="58" width="720" height="35" rx="6" fill="#EEEEEE" stroke="#E0E0E0"/>
+      <text x="390" y="81" text-anchor="middle" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">Object Query 配置 → 控制 Agent 可以主动查询哪些 object types 和 properties</text>
+
+      <rect x="30" y="101" width="720" height="35" rx="6" fill="#E0E0E0" stroke="#D6D6D6"/>
+      <text x="390" y="124" text-anchor="middle" fill="#555" font-size="11" font-family="Microsoft YaHei, sans-serif">Function 配置 → 控制 Agent 可以调用哪些业务逻辑和模型</text>
+
+      <rect x="30" y="144" width="720" height="35" rx="6" fill="#BDBDBD" stroke="#AEAEAE"/>
+      <text x="390" y="167" text-anchor="middle" fill="#FFF" font-size="11" font-family="Microsoft YaHei, sans-serif">Action 配置 → 控制 Agent 可以执行哪些业务变更，是否需要人工确认</text>
+
+      <rect x="30" y="187" width="720" height="35" rx="6" fill="#9E9E9E" stroke="#888"/>
+      <text x="390" y="210" text-anchor="middle" fill="#FFF" font-size="11" font-family="Microsoft YaHei, sans-serif">Security / Permission / Dynamic Security / Audit / Lineage</text>
+
+      <!-- Red governance boundary -->
+      <rect x="15" y="5" width="8" height="225" rx="4" fill="#3B82F6"/>
+      <text x="15" y="245" text-anchor="middle" fill="#3B82F6" font-size="9" font-family="Microsoft YaHei, sans-serif">全链路</text>
+
+      <!-- Bottom result -->
+      <rect x="250" y="242" width="280" height="30" rx="15" fill="#3B82F6"/>
+      <text x="390" y="262" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">审计日志：谁 · 何时 · 哪个 Agent · 做了什么</text>
+    </svg>
+  </div>
+
+  <h3>同一 Agent，不同角色 — 权限分层示例</h3>
+
+  <div class="concept-grid">
+    <div class="concept-item" style="border-left:3px solid #FF9800;">
+      <h4>👷 一线调度员</h4>
+      <p style="font-size:0.88em;margin:0.3em 0;">
+        L1: 只注入 3 条线路 Shipment<br>
+        L2: 只能查这 3 条线路<br>
+        L3: 可用 calculateDelayRisk，<span class="hl-yellow">不能</span> viewProfitMargin<br>
+        L4: updateETA 可自动，assignCarrier <span class="hl-yellow">需确认</span><br>
+        L5: 所有操作记录到审计日志
+      </p>
+    </div>
+    <div class="concept-item" style="border-left:3px solid #3B82F6;">
+      <h4>👔 区域经理</h4>
+      <p style="font-size:0.88em;margin:0.3em 0;">
+        L1: 注入整个华南区域 Shipment 概览<br>
+        L2: 可查所有线路 + 承运商绩效<br>
+        L3: 可用 viewProfitMargin + optimizeAllocation<br>
+        L4: assignCarrier <span class="hl-yellow">无需确认</span>，但 cancelOrder 仍需确认<br>
+        L5: 同样审计，但权限范围更大
+      </p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>同一栋大楼，实习生只有自己楼层的门禁卡，总经理有全楼门禁卡。</strong>但地下金库两个人都需要双人认证才能进 — 权限分层，高风险区域额外保护。
+  </div>
+
+  <h3>防幻觉的 Governance 约束</h3>
+  <p>用户问"公司今年总营收多少？" → 没有 Governance 的 Agent 可能"脑补"一个数字 → <span class="hl">幻觉</span>。但有了 Governance：</p>
+  <p style="text-align:center;font-size:1.05em;">L1 没配置财务 Context → L2 没 FinancialReport Object Type → L3 没授权财务 Function → Agent 只能诚实回答：<span class="hl-yellow">"我没有权限访问公司财务数据"</span></p>
+
+  <div class="analogy">
+    <strong>不是在考场上贴"禁止作弊"的标语，而是直接不把答案带进考场。</strong>Agent 不是"被告知不能说"，而是"根本接触不到那些信息"。
+  </div>
+</section>
+
+<!-- ===== 9. Tool Calling ===== -->
+<section class="section reveal" id="s9">
+  <h2>9. Tool Calling Mode：工具如何暴露给 LLM？</h2>
+
+  <table class="comp-table">
+    <thead>
+      <tr><th></th><th>Prompted Tool Calling</th><th>Native Tool Calling</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>适用范围</td><td>所有模型 + 所有工具类型</td><td>部分 Palantir 模型 + Action/Object Query/Function/Update App Var</td></tr>
+      <tr><td>调用方式</td><td>一次一个 tool</td><td><span class="hl-yellow">可并行调用多个 tool</span></td></tr>
+      <tr><td>适合场景</td><td>模型兼容性优先</td><td>性能优先、token 效率优先</td></tr>
+    </tbody>
+  </table>
+
+  <p>关键澄清：<span class="hl">Palantir 不是把整个 Ontology schema 全量塞进 system prompt</span>。更准确的理解是 — 在具体 Chatbot / Application / Workflow 中，被配置、被授权、和当前任务相关的 Ontology 能力，以工具说明、上下文片段、函数签名、动作定义等形式暴露给 LLM。</p>
+</section>
+
+<!-- ===== 10. 端到端交互链路 ===== -->
+<section class="section reveal" id="s10">
+  <h2>10. 一次端到端交互链路</h2>
+
+  <p>下面用一个<span class="hl">物流延误风险</span>场景串联全部五层。以下流程是基于官方文档所做的推演，数字均为业务示例值。</p>
+
+  <!-- Animated Step-by-Step Flow -->
+  <div class="diagram-container reveal" id="e2eDiagram">
+    <div class="diagram-label">端到端交互流程 · 6 步串联</div>
+    <div class="layer-dots" id="layerDots">
+      <span class="layer-dot active" data-step="0"></span>
+      <span class="layer-dot" data-step="1"></span>
+      <span class="layer-dot" data-step="2"></span>
+      <span class="layer-dot" data-step="3"></span>
+      <span class="layer-dot" data-step="4"></span>
+      <span class="layer-dot" data-step="5"></span>
+    </div>
+    <svg viewBox="0 0 860 480" width="860" height="480" role="img" aria-label="端到端交互链路" id="e2eSvg">
+      <defs>
+        <marker id="e2eArr" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#666666"/></marker>
+        <marker id="e2eArrRed" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="7" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#3B82F6"/></marker>
+      </defs>
+
+      <!-- Background -->
+      <rect x="0" y="0" width="860" height="480" fill="#FAFAFA" rx="12"/>
+
+      <!-- Step 0: User Message -->
+      <g id="e2eStep0">
+        <rect x="230" y="12" width="400" height="42" rx="21" fill="#1A1A1A" filter="url(#shadow)"/>
+        <text x="430" y="32" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">👤 "帮我看看今天华南仓哪些订单有延误风险？"</text>
+        <text x="430" y="52" text-anchor="middle" fill="#3B82F6" font-size="10" font-weight="700" font-family="Microsoft YaHei, sans-serif">→ 用户消息到达</text>
+      </g>
+
+      <!-- Step 0→1 arrow -->
+      <line x1="430" y1="60" x2="430" y2="82" stroke="#999" stroke-width="1.5" marker-end="url(#e2eArr)"/>
+
+      <!-- Step 1: Context Layer -->
+      <g id="e2eStep1">
+        <rect x="30" y="85" width="800" height="52" rx="8" fill="#F5F5F5" stroke="#DDD" stroke-width="1"/>
+        <text x="60" y="108" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">Step 1 · Context Layer [系统级 · 确定性触发]</text>
+        <text x="60" y="126" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">Ontology Context: 语义搜索 → Top-10 Shipment 注入 LLM → LLM 未参与决策</text>
+      </g>
+
+      <line x1="430" y1="137" x2="430" y2="158" stroke="#999" stroke-width="1.5" marker-end="url(#e2eArr)"/>
+
+      <!-- Step 2: Query Layer -->
+      <g id="e2eStep2">
+        <rect x="30" y="161" width="800" height="52" rx="8" fill="#EEEEEE" stroke="#CCC" stroke-width="1"/>
+        <text x="60" y="184" fill="#333" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">Step 2 · Query Layer [LLM 决策 · 可能多轮]</text>
+        <text x="60" y="202" fill="#757575" font-size="10" font-family="Microsoft YaHei, sans-serif">Object Query 1: Filter warehouse="华南仓" + in_transit/delayed + ETA&lt;today → 23 Shipment | Query 2: Link遍历 → Order → Customer</text>
+      </g>
+
+      <line x1="430" y1="213" x2="430" y2="234" stroke="#999" stroke-width="1.5" marker-end="url(#e2eArr)"/>
+
+      <!-- Step 3: Logic Layer -->
+      <g id="e2eStep3">
+        <rect x="30" y="237" width="800" height="52" rx="8" fill="#9E9E9E" stroke="#888" stroke-width="1"/>
+        <text x="60" y="260" fill="#FFF" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">Step 3 · Logic Layer [LLM 决策]</text>
+        <text x="60" y="278" fill="#E0E0E0" font-size="10" font-family="Microsoft YaHei, sans-serif">calculateDelayRisk(23 shipments) → 5 high-risk | recommendResolution(5 high-risk) → 建议换承运商/拆单/通知客户</text>
+      </g>
+
+      <line x1="430" y1="289" x2="430" y2="310" stroke="#999" stroke-width="1.5" marker-end="url(#e2eArr)"/>
+
+      <!-- Step 4: LLM Response -->
+      <g id="e2eStep4">
+        <rect x="230" y="313" width="400" height="52" rx="8" fill="#333" stroke="#222" stroke-width="1"/>
+        <text x="250" y="336" fill="#FFF" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">LLM 生成回答 [推理 + Citations]</text>
+        <text x="250" y="354" fill="#CCC" font-size="10" font-family="Microsoft YaHei, sans-serif">"23 个 Shipment，5 个高风险：SH-0042 建议转派… 是否执行？"</text>
+      </g>
+
+      <line x1="430" y1="365" x2="430" y2="386" stroke="#999" stroke-width="1.5" marker-end="url(#e2eArr)"/>
+
+      <!-- Step 5: Action + Governance -->
+      <g id="e2eStep5">
+        <rect x="30" y="389" width="800" height="52" rx="8" fill="#3B82F6" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="60" y="412" fill="#FFF" font-size="12" font-weight="700" font-family="Microsoft YaHei, sans-serif">Step 5+6 · Action + Governance [LLM 决策 + 用户确认 + 系统级]</text>
+        <text x="60" y="430" fill="#DBEAFE" font-size="10" font-family="Microsoft YaHei, sans-serif">assignCarrier(SH-0042, CarrierB) ✓ | createExceptionCase(SH-0119) ✓ | Audit: jing.wang 14:32 CST → Ontology 更新</text>
+      </g>
+
+    </svg>
+  </div>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">交互链路总结</div>
+    <svg viewBox="0 0 560 560" width="560" height="560" role="img" aria-label="交互链路总结">
+      <rect x="180" y="8" width="200" height="36" rx="18" fill="#1A1A1A"/>
+      <text x="280" y="31" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">👤 用户消息</text>
+
+      <line x1="280" y1="44" x2="280" y2="68" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="100" y="72" width="360" height="42" rx="8" fill="#F5F5F5" stroke="#DDD"/>
+      <text x="280" y="89" text-anchor="middle" fill="#333" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Layer 1: Context [系统级 · 确定触发]</text>
+      <text x="280" y="105" text-anchor="middle" fill="#757575" font-size="9" font-family="Microsoft YaHei, sans-serif">Ontology / Document / Function Context → 注入 LLM</text>
+
+      <line x1="280" y1="114" x2="280" y2="138" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="100" y="142" width="360" height="42" rx="8" fill="#EEEEEE" stroke="#CCC"/>
+      <text x="280" y="159" text-anchor="middle" fill="#333" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Layer 2: Query [LLM 决策]</text>
+      <text x="280" y="175" text-anchor="middle" fill="#757575" font-size="9" font-family="Microsoft YaHei, sans-serif">Object Query → 过滤 / 聚合 / 遍历 Links</text>
+
+      <line x1="280" y1="184" x2="280" y2="208" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="100" y="212" width="360" height="42" rx="8" fill="#9E9E9E" stroke="#888"/>
+      <text x="280" y="229" text-anchor="middle" fill="#FFF" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Layer 3: Logic [LLM 决策]</text>
+      <text x="280" y="245" text-anchor="middle" fill="#E0E0E0" font-size="9" font-family="Microsoft YaHei, sans-serif">Function Tool → 业务逻辑 / 模型推理 / AIP Logic</text>
+
+      <line x1="280" y1="254" x2="280" y2="278" stroke="#999" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+      <rect x="100" y="282" width="360" height="42" rx="8" fill="#616161" stroke="#555"/>
+      <text x="280" y="299" text-anchor="middle" fill="#FFF" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Layer 4: Action [LLM 决策 + 用户确认]</text>
+      <text x="280" y="315" text-anchor="middle" fill="#CCC" font-size="9" font-family="Microsoft YaHei, sans-serif">Action / Command / Update App Var → Ontology Edit</text>
+
+      <line x1="280" y1="324" x2="280" y2="348" stroke="#3B82F6" stroke-width="2.5" marker-end="url(#arrowDownRed)"/>
+
+      <rect x="60" y="352" width="440" height="48" rx="8" fill="#3B82F6" stroke="#2563EB" stroke-width="1.5"/>
+      <text x="280" y="371" text-anchor="middle" fill="#FFF" font-size="11" font-weight="700" font-family="Microsoft YaHei, sans-serif">Layer 5: Governance [全链路贯穿]</text>
+      <text x="280" y="389" text-anchor="middle" fill="#DBEAFE" font-size="9" font-family="Microsoft YaHei, sans-serif">权限校验 / 审计日志 / Lineage / 应用状态同步</text>
+
+
+      <line x1="280" y1="400" x2="280" y2="430" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowDownRed)"/>
+
+      <rect x="150" y="434" width="260" height="42" rx="21" fill="#1A1A1A"/>
+      <text x="280" y="460" text-anchor="middle" fill="#FFF" font-size="12" font-weight="600" font-family="Microsoft YaHei, sans-serif">✅ 业务操作完成 + 审计记录</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ===== 11. 内部 vs 外部 Agent（简化） ===== -->
+<section class="section reveal" id="s11">
+  <h2>11. 内部 Agent 与外部 Agent</h2>
+
+  <p>上述五层架构主要描述<span class="hl">内部 Agent</span>（AIP Chatbot Studio / Workshop / AIP Logic）。外部 Agent 接入时需区分两个机制：</p>
+
+  <div class="concept-grid">
+    <div class="concept-item" style="border-left:3px solid #1565C0;">
+      <h4>🔧 Palantir MCP</h4>
+      <p style="font-size:0.88em;margin:0.3em 0;">
+        <strong>面向：</strong>开发者 / Ontology Builder<br>
+        <strong>能做：</strong>修改 Ontology <span class="hl-yellow">类型定义</span>（结构）<br>
+        <strong>不能做：</strong>写入 ontology <span class="hl-yellow">数据</span>（硬约束）<br>
+        <strong>约束：</strong>所有修改需 proposal review + 人工审批
+      </p>
+    </div>
+    <div class="concept-item" style="border-left:3px solid #3B82F6;">
+      <h4>🌐 Ontology MCP (OMCP)</h4>
+      <p style="font-size:0.88em;margin:0.3em 0;">
+        <strong>面向：</strong>外部业务 Agent / Headless Agent<br>
+        <strong>能做：</strong>读取对象、执行 action、<span class="hl-yellow">写入数据</span><br>
+        <strong>不能做：</strong>修改 Ontology 类型定义<br>
+        <strong>约束：</strong>application restrictions + OAuth 2.0
+      </p>
+    </div>
+  </div>
+
+  <p>核心原则不变：<span class="hl">Agent 通过受治理的 Ontology 接口访问对象、关系、函数和动作，而非绕过 Ontology 直接访问底层数据</span>。</p>
+</section>
+
+<!-- ===== 12. 最小可工作版本 ===== -->
+<section class="section reveal" id="s12">
+  <h2>12. 最小可工作版本设计</h2>
+
+  <p>如果要设计一个类似 Palantir Ontology-aware Agent 的最小版本：</p>
+
+  <div class="diagram-container reveal">
+    <div class="diagram-label">最小架构 · 9 个核心组件</div>
+    <svg viewBox="0 0 780 320" width="780" height="320" role="img" aria-label="最小架构组件">
+      <rect x="20" y="10" width="230" height="42" rx="6" fill="#F5F5F5" stroke="#DDD"/>
+      <text x="135" y="36" text-anchor="middle" fill="#333" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">1. Ontology Schema Registry</text>
+
+      <rect x="270" y="10" width="230" height="42" rx="6" fill="#F5F5F5" stroke="#DDD"/>
+      <text x="385" y="36" text-anchor="middle" fill="#333" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">2. Tool Registry</text>
+
+      <rect x="520" y="10" width="240" height="42" rx="6" fill="#EEEEEE" stroke="#CCC"/>
+      <text x="640" y="36" text-anchor="middle" fill="#333" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">3. Context Builder</text>
+
+      <rect x="20" y="68" width="230" height="42" rx="6" fill="#EEEEEE" stroke="#CCC"/>
+      <text x="135" y="94" text-anchor="middle" fill="#333" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">4. Object Query Tool</text>
+
+      <rect x="270" y="68" width="230" height="42" rx="6" fill="#E0E0E0" stroke="#BBB"/>
+      <text x="385" y="94" text-anchor="middle" fill="#333" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">5. Function Tool</text>
+
+      <rect x="520" y="68" width="240" height="42" rx="6" fill="#BDBDBD" stroke="#AAA"/>
+      <text x="640" y="94" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">6. Action Tool</text>
+
+      <rect x="20" y="126" width="355" height="42" rx="6" fill="#3B82F6"/>
+      <text x="197" y="152" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">7. Permission Evaluator</text>
+
+      <rect x="395" y="126" width="365" height="42" rx="6" fill="#2563EB"/>
+      <text x="577" y="152" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">8. Audit Logger / Lineage Tracker</text>
+
+      <rect x="250" y="184" width="280" height="36" rx="18" fill="#1A1A1A"/>
+      <text x="390" y="207" text-anchor="middle" fill="#FFF" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">9. Application State</text>
+
+      <!-- Minimum flow -->
+      <rect x="80" y="250" width="620" height="50" rx="8" fill="#FAFAFA" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="390" y="270" text-anchor="middle" fill="#3B82F6" font-size="11" font-weight="600" font-family="Microsoft YaHei, sans-serif">最小链路：User Message → Context Builder → LLM → Object Query → Function → Response → Confirmation → Action → Edit → Audit</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ===== 13. 总结 ===== -->
+<section class="section reveal" id="s13">
+  <h2>13. 总结</h2>
+
+  <p>Palantir AIP Agent 与 Ontology 的交互，<span class="hl">不是简单的 RAG 架构，也不是 LLM 直接查数据库</span>。它是一个五层协同的 enterprise agent runtime：</p>
+
+  <div style="margin:2em 0;">
+    <div style="display:flex;align-items:flex-start;gap:1em;margin:1em 0;padding:1em;background:var(--grey-50);border-radius:var(--radius-md);border-left:3px solid #DDD;">
+      <span style="font-size:1.4em;flex-shrink:0;">🔍</span>
+      <div><strong>Context Layer</strong> — 系统确定性提供上下文，确保 Agent 不会"两眼一黑"</div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:1em;margin:1em 0;padding:1em;background:var(--grey-50);border-radius:var(--radius-md);border-left:3px solid #CCC;">
+      <span style="font-size:1.4em;flex-shrink:0;">🔎</span>
+      <div><strong>Query Layer</strong> — Agent 主动查询对象和关系，支持探索式分析</div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:1em;margin:1em 0;padding:1em;background:var(--grey-50);border-radius:var(--radius-md);border-left:3px solid #999;">
+      <span style="font-size:1.4em;flex-shrink:0;">⚙️</span>
+      <div><strong>Logic Layer</strong> — Agent 调用封装好的业务逻辑和模型，避免 LLM 脑补规则</div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:1em;margin:1em 0;padding:1em;background:var(--grey-50);border-radius:var(--radius-md);border-left:3px solid #666;">
+      <span style="font-size:1.4em;flex-shrink:0;">⚡</span>
+      <div><strong>Action Layer</strong> — Agent 执行受控业务变更，从问答走向执行</div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:1em;margin:1em 0;padding:1em;background:var(--accent-light);border-radius:var(--radius-md);border-left:3px solid var(--accent);">
+      <span style="font-size:1.4em;flex-shrink:0;">🛡️</span>
+      <div><strong>Governance Layer</strong> — 全链路权限、审计和安全约束，确保企业级可控</div>
+    </div>
+  </div>
+
+  <blockquote>
+    <p>真正值得借鉴的不是某一个 tool，而是这套设计思想：</p>
+    <p><strong>把企业业务世界先建模成可查询、可计算、可执行、可治理的 Ontology，再让 Agent 在这个受控语义层上工作。</strong></p>
+  </blockquote>
+</section>
+
+<!-- ===== 参考文档 ===== -->
+<section class="section reveal" id="refs">
+  <h2>参考文档</h2>
+  <table class="comp-table">
+    <thead><tr><th>页面</th><th>URL</th></tr></thead>
+    <tbody>
+      <tr><td>AIP Overview</td><td><a href="https://www.palantir.com/docs/foundry/aip/overview/" target="_blank" rel="noopener">palantir.com/docs/foundry/aip/overview</a></td></tr>
+      <tr><td>AIP Architecture</td><td><a href="https://www.palantir.com/docs/foundry/architecture-center/aip-architecture/" target="_blank" rel="noopener">palantir.com/docs/foundry/architecture-center/aip-architecture</a></td></tr>
+      <tr><td>AIP Features</td><td><a href="https://www.palantir.com/docs/foundry/aip/aip-features/" target="_blank" rel="noopener">palantir.com/docs/foundry/aip/aip-features</a></td></tr>
+      <tr><td>Chatbot Studio Tools</td><td><a href="https://www.palantir.com/docs/foundry/chatbot-studio/tools/" target="_blank" rel="noopener">palantir.com/docs/foundry/chatbot-studio/tools</a></td></tr>
+      <tr><td>Chatbot Studio Core Concepts</td><td><a href="https://www.palantir.com/docs/foundry/chatbot-studio/core-concepts/" target="_blank" rel="noopener">palantir.com/docs/foundry/chatbot-studio/core-concepts</a></td></tr>
+      <tr><td>Retrieval Context</td><td><a href="https://www.palantir.com/docs/foundry/chatbot-studio/retrieval-context/" target="_blank" rel="noopener">palantir.com/docs/foundry/chatbot-studio/retrieval-context</a></td></tr>
+      <tr><td>AIP Logic Overview</td><td><a href="https://www.palantir.com/docs/foundry/logic/overview/" target="_blank" rel="noopener">palantir.com/docs/foundry/logic/overview</a></td></tr>
+      <tr><td>Ontology System</td><td><a href="https://www.palantir.com/docs/foundry/architecture-center/ontology-system/" target="_blank" rel="noopener">palantir.com/docs/foundry/architecture-center/ontology-system</a></td></tr>
+      <tr><td>Ontology Overview</td><td><a href="https://www.palantir.com/docs/foundry/ontology/overview/" target="_blank" rel="noopener">palantir.com/docs/foundry/ontology/overview</a></td></tr>
+      <tr><td>Palantir MCP</td><td><a href="https://www.palantir.com/docs/foundry/palantir-mcp/overview/" target="_blank" rel="noopener">palantir.com/docs/foundry/palantir-mcp/overview</a></td></tr>
+      <tr><td>Ontology MCP (OMCP)</td><td><a href="https://www.palantir.com/docs/foundry/ontology-mcp/overview/" target="_blank" rel="noopener">palantir.com/docs/foundry/ontology-mcp/overview</a></td></tr>
+      <tr><td>Model Integration</td><td><a href="https://www.palantir.com/docs/foundry/model-integration/overview/" target="_blank" rel="noopener">palantir.com/docs/foundry/model-integration/overview</a></td></tr>
+    </tbody>
+  </table>
+  <p class="fn" style="margin-top:1em;">数据来源：Palantir 官方文档（截至 2026 年 6 月）。推断性内容已在文中标注，数字均为业务场景示例值。</p>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="article-footer reveal">
+  <p><strong>零点未来 · 技术科普</strong> — Palantir AIP Agent 与 Ontology 交互机制 · 深度解析</p>
+</footer>
+
+</div><!-- .article-wrapper -->
+
+<script src="/ontology-readings-20260930-v1/agent-ontology-interaction-1.js"></script>
+
+<footer class="isaac-reading-end">本文收录自本地 HTML 阅读资料，原有署名与参考资料保留在文中。<br><a href="/strategy/">返回 AI 战略认知 · 全部文章</a></footer><a class="isaac-reading-return" href="/strategy/">← AI 战略认知 · 全部文章</a></body>
+</html>

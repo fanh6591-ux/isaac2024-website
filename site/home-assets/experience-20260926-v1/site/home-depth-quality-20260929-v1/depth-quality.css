@@ -1,0 +1,30 @@
+/* Keep the world full screen and the return affordance compact. */
+.game-return-dock{width:170px!important;bottom:max(20px,env(safe-area-inset-bottom))!important}
+.game-return-dock #game-contact,.game-return-dock [data-home-return]{height:44px!important;min-height:44px;font-size:14px!important;border-radius:24px!important;box-shadow:0 5px 22px #0004!important}
+.game-return-dock .return-label{gap:12px!important}.game-return-dock .return-label b{font-size:20px!important}
+.game-return-dock .return-label{font-size:14px!important}
+.game-return-dock .return-charge{stroke-width:2}
+.game-return-dock>p{display:none!important}
+
+/* One transparent scene canvas in front of the directory; no second WebGL pass. */
+body[data-journey-foreground="true"] #stage{z-index:8!important;pointer-events:none!important;background:none!important}
+body[data-journey-foreground="true"] #stage::before,body[data-journey-foreground="true"] #stage::after{display:none!important}
+body[data-journey-foreground="true"] .product-journey-layer{background:var(--journey-bg,#211810)}
+body[data-journey-foreground="true"] .journey-atmosphere{background:radial-gradient(ellipse at 49% 0,#a45b3038 0,transparent 62%)}
+body[data-journey-foreground="true"] .scene-shade{opacity:0!important}
+body[data-journey-foreground="true"] .journey-row{border-bottom-color:#e6ceb758}
+
+/* Compact and touch layouts leave a clear upper area for the falling model. */
+@media(max-width:700px){
+ .game-return-dock{width:160px!important;bottom:max(16px,env(safe-area-inset-bottom))!important}
+}
+@media(prefers-reduced-motion:reduce){.game-return-dock .return-charge{filter:none}}
+@media(min-width:701px) and (max-width:1024px) and (orientation:portrait){
+ .home-page.has-scene .layout-gallery .story-copy{left:5.4vw!important;width:38vw!important;max-width:38vw!important}
+ .home-page.has-scene .layout-gallery h2{font-size:24px!important;line-height:1.4!important;letter-spacing:-.03em!important}
+ .home-page.has-scene .layout-gallery .story-copy>p{font-size:14px!important;line-height:1.8!important;width:100%!important}
+}
+@media(min-width:701px) and (max-width:1024px) and (orientation:portrait){
+ .journey-row>a{font-size:19px;gap:12px}.journey-number{min-width:14px}
+ .journey-row>p{font-size:12px}
+}
